@@ -35,9 +35,11 @@
 
   <div class="grid"></div>
 
-  <div class="glow glow-a"></div>
+  <div class="radial radial-a"></div>
 
-  <div class="glow glow-b"></div>
+  <div class="radial radial-b"></div>
+
+  <div class="diamond-overlay"></div>
 
 </div>
 
@@ -51,13 +53,31 @@
 
     <div class="sidebar-scroll">
 
-      <div class="subtitle">
-        PROJECT
+      <div class="logo-wrap">
+
+        <div class="logo-ring"></div>
+
+        <div>
+
+          <div class="subtitle">
+            ARCHIVE SYSTEM
+          </div>
+
+          <div class="logo-title">
+            Pair Archive
+          </div>
+
+        </div>
+
       </div>
 
       <!-- PROJECT -->
 
       <div class="panel">
+
+        <div class="panel-title">
+          PROJECT
+        </div>
 
         <input
           id="projectName"
@@ -74,8 +94,7 @@
         <select
           id="projectSelect"
           onchange="loadProject(this.value)"
-        >
-        </select>
+        ></select>
 
       </div>
 
@@ -83,8 +102,8 @@
 
       <div class="panel">
 
-        <div class="subtitle">
-          PAIR
+        <div class="panel-title">
+          PAIR INFO
         </div>
 
         <input
@@ -99,7 +118,7 @@
 
       </div>
 
-      <!-- CHARACTER A -->
+      <!-- CHAR A -->
 
       <div class="panel character-card">
 
@@ -138,7 +157,7 @@
 
       </div>
 
-      <!-- CHARACTER B -->
+      <!-- CHAR B -->
 
       <div class="panel character-card">
 
@@ -181,6 +200,10 @@
 
       <div class="panel">
 
+        <div class="panel-title">
+          EXPORT
+        </div>
+
         <button
           class="main-btn full"
           onclick="exportTXT()"
@@ -214,16 +237,18 @@
     id="captureTarget"
   >
 
+    <!-- HERO -->
+
     <div class="hero">
 
       <div>
 
         <div class="subtitle">
-          ARCHIVE
+          STORY TIMELINE
         </div>
 
         <h1 class="title">
-          Timeline
+          Narrative Flow
         </h1>
 
       </div>
@@ -250,16 +275,16 @@
 
     <!-- REL GRAPH -->
 
-    <div class="panel relation-panel">
+    <div class="relation-wrap panel">
 
-      <div class="subtitle">
-        RELATION GRAPH
+      <div class="panel-title">
+        RELATION FLOW
       </div>
 
       <canvas
         id="relationCanvas"
-        width="900"
-        height="220"
+        width="1000"
+        height="240"
       ></canvas>
 
     </div>
@@ -267,7 +292,7 @@
     <!-- TIMELINE -->
 
     <div
-      class="timeline"
+      class="timeline-wrap"
       id="timeline"
     ></div>
 
@@ -277,16 +302,14 @@
 
   <aside class="settings">
 
-    <div class="subtitle">
-      SETTINGS
-    </div>
-
-    <!-- COLOR -->
-
     <div class="panel">
 
+      <div class="panel-title">
+        THEME
+      </div>
+
       <div class="setting-label">
-        메인 컬러
+        Accent
       </div>
 
       <input
@@ -295,14 +318,34 @@
         onchange="setAccent(this.value)"
       />
 
+      <div class="setting-label">
+        Accent 2
+      </div>
+
+      <input
+        type="color"
+        value="#63ffe9"
+        onchange="setAccent2(this.value)"
+      />
+
+      <div class="setting-label">
+        Panel
+      </div>
+
+      <input
+        type="color"
+        value="#141a2d"
+        onchange="setPanel(this.value)"
+      />
+
     </div>
 
     <!-- BG -->
 
     <div class="panel">
 
-      <div class="setting-label">
-        배경 이미지
+      <div class="panel-title">
+        BACKGROUND
       </div>
 
       <input
@@ -312,7 +355,7 @@
       />
 
       <div class="setting-label">
-        블러
+        Blur
       </div>
 
       <input
@@ -324,7 +367,7 @@
       />
 
       <div class="setting-label">
-        확대
+        Scale
       </div>
 
       <input
@@ -337,7 +380,7 @@
       />
 
       <div class="setting-label">
-        회전
+        Rotate
       </div>
 
       <input
@@ -349,7 +392,7 @@
       />
 
       <div class="setting-label">
-        X 이동
+        X
       </div>
 
       <input
@@ -361,7 +404,7 @@
       />
 
       <div class="setting-label">
-        Y 이동
+        Y
       </div>
 
       <input
@@ -553,20 +596,21 @@ function render() {
 
   state.timelines.forEach((item, index) => {
 
-    const div =
+    const card =
       document.createElement('div')
-
-    div.className =
-      item.type === 'chapter'
-      ? 'chapter-card'
-      : 'panel timeline-item'
 
     if (item.type === 'chapter') {
 
-      div.innerHTML = `
+      card.className =
+        'chapter-block'
+
+      card.innerHTML = `
+
+        <div class="chapter-diamond"></div>
+
         <input
           class="chapter-input"
-          placeholder="챕터 이름"
+          placeholder="CHAPTER"
           value="${item.title || ''}"
           onchange="updateTimeline(${index}, 'title', this.value)"
         >
@@ -574,57 +618,94 @@ function render() {
 
     } else {
 
-      div.innerHTML = `
+      card.className =
+        'timeline-node'
 
-        <div class="episode-number">
-          EPISODE ${index + 1}
-        </div>
+      card.innerHTML = `
 
-        <input
-          placeholder="날짜"
-          value="${item.date || ''}"
-          onchange="updateTimeline(${index}, 'date', this.value)"
-        >
+        <div class="timeline-line"></div>
 
-        <input
-          placeholder="에피소드 제목"
-          value="${item.title || ''}"
-          onchange="updateTimeline(${index}, 'title', this.value)"
-        >
+        <div class="timeline-dot"></div>
 
-        <textarea
-          placeholder="서사를 입력하세요"
-          onchange="updateTimeline(${index}, 'content', this.value)"
-        >${item.content || ''}</textarea>
+        <div class="timeline-card">
 
-        <input
-          type="range"
-          min="0"
-          max="100"
-          value="${item.relation || 50}"
-          onchange="updateTimeline(${index}, 'relation', this.value)"
-        >
+          <div class="timeline-top">
 
-        <input
-          type="file"
-          accept="image/*"
-          onchange="timelineImage(event, ${index})"
-        >
+            <div class="episode-id">
+              EP ${index + 1}
+            </div>
 
-        ${
-          item.image
-          ? `
-            <img
-              src="${item.image}"
-              class="image-preview"
+            <div class="timeline-date-wrap">
+
+              <input
+                class="mini-input"
+                placeholder="DATE"
+                value="${item.date || ''}"
+                onchange="updateTimeline(${index}, 'date', this.value)"
+              >
+
+            </div>
+
+          </div>
+
+          <input
+            class="timeline-title"
+            placeholder="에피소드 제목"
+            value="${item.title || ''}"
+            onchange="updateTimeline(${index}, 'title', this.value)"
+          >
+
+          <details>
+
+            <summary>
+              상세 서사 펼치기
+            </summary>
+
+            <textarea
+              placeholder="서사를 입력하세요"
+              onchange="updateTimeline(${index}, 'content', this.value)"
+            >${item.content || ''}</textarea>
+
+            <div class="relation-box">
+
+              <div class="relation-label">
+                관계 변화
+              </div>
+
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value="${item.relation || 50}"
+                onchange="updateTimeline(${index}, 'relation', this.value)"
+              />
+
+            </div>
+
+            <input
+              type="file"
+              accept="image/*"
+              onchange="timelineImage(event, ${index})"
             >
-          `
-          : ''
-        }
+
+            ${
+              item.image
+              ? `
+                <img
+                  src="${item.image}"
+                  class="image-preview"
+                >
+              `
+              : ''
+            }
+
+          </details>
+
+        </div>
       `
     }
 
-    timelineEl.appendChild(div)
+    timelineEl.appendChild(card)
   })
 
   applyBG()
@@ -731,6 +812,20 @@ function setAccent(color) {
   document.documentElement
     .style
     .setProperty('--accent', color)
+}
+
+function setAccent2(color) {
+
+  document.documentElement
+    .style
+    .setProperty('--accent2', color)
+}
+
+function setPanel(color) {
+
+  document.documentElement
+    .style
+    .setProperty('--panelSolid', color)
 }
 
 function changeBG(event) {
@@ -847,11 +942,25 @@ function importTXT(event) {
 
 async function exportPNG() {
 
-  const target =
-    document.getElementById('captureTarget')
+  document.body.classList.add(
+    'export-mode'
+  )
 
   const canvas =
-    await html2canvas(target)
+    await html2canvas(
+      document.getElementById(
+        'captureTarget'
+      ),
+      {
+        backgroundColor: null,
+        useCORS: true,
+        scale: 2
+      }
+    )
+
+  document.body.classList.remove(
+    'export-mode'
+  )
 
   const link =
     document.createElement('a')
@@ -868,7 +977,9 @@ async function exportPNG() {
 function renderGraph() {
 
   const canvas =
-    document.getElementById('relationCanvas')
+    document.getElementById(
+      'relationCanvas'
+    )
 
   const ctx =
     canvas.getContext('2d')
@@ -880,25 +991,25 @@ function renderGraph() {
     canvas.height
   )
 
-  ctx.beginPath()
+  const episodes =
+    state.timelines.filter(
+      t => t.type === 'episode'
+    )
 
   ctx.strokeStyle =
     '#91a2ff'
 
   ctx.lineWidth = 4
 
-  const episodes =
-    state.timelines.filter(
-      t => t.type === 'episode'
-    )
+  ctx.beginPath()
 
   episodes.forEach((item, index) => {
 
     const x =
-      60 + index * 120
+      80 + index * 120
 
     const y =
-      180 - item.relation
+      200 - item.relation
 
     if (index === 0) {
 
@@ -908,18 +1019,33 @@ function renderGraph() {
 
       ctx.lineTo(x, y)
     }
+  })
+
+  ctx.stroke()
+
+  episodes.forEach((item, index) => {
+
+    const x =
+      80 + index * 120
+
+    const y =
+      200 - item.relation
+
+    ctx.beginPath()
 
     ctx.fillStyle =
       '#ffffff'
 
-    ctx.beginPath()
-
-    ctx.arc(x, y, 6, 0, Math.PI * 2)
+    ctx.arc(
+      x,
+      y,
+      7,
+      0,
+      Math.PI * 2
+    )
 
     ctx.fill()
   })
-
-  ctx.stroke()
 }
 
 projectName.oninput = e => {
@@ -976,8 +1102,9 @@ new Sortable(
         moved
       )
 
-      save()
       renderGraph()
+
+      save()
     }
   }
 )
