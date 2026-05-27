@@ -3,425 +3,384 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OC CHRONICLE SYSTEM // v1.0</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <title>OC ARTBOARD SYSTEM</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
         :root {
-            --bg: #030509;
-            --panel: rgba(13, 17, 26, 0.75);
+            /* 컬러 팔레트 최적화: 심해와 우주의 경계 */
+            --bg: #07090f;
+            --panel: rgba(11, 14, 23, 0.65);
+            --panel2: rgba(22, 27, 38, 0.85);
             --accent: #8ea1ff;
-            --accent-rgb: 142, 161, 255;
-            --sub-accent: #63ffe9;
+            --accent2: #63ffe9;
             --text: #edf2ff;
-            --muted: rgba(237, 242, 255, 0.45);
+            --muted: rgba(237, 242, 255, 0.5);
             --line: rgba(142, 161, 255, 0.15);
-            --card-bg: rgba(20, 25, 38, 0.85);
-            font-family: 'Pretendard', -apple-system, sans-serif;
+            --glow: 0 0 20px rgba(142, 161, 255, 0.2);
         }
 
         * { box-sizing: border-box; outline: none; }
-        body, html { 
-            margin: 0; padding: 0; width: 100%; height: 100%; 
-            background: var(--bg); color: var(--text); overflow: hidden;
+        
+        body, html {
+            width: 100%; height: 100%; margin: 0;
+            font-family: 'Pretendard', sans-serif;
+            background: var(--bg); color: var(--text);
+            overflow: hidden; /* 전체 스크롤 막고 보드 안에서만 스크롤 */
         }
 
-        /* --- Interactive Background Layer --- */
-        #viewport {
-            position: fixed; inset: 0; z-index: -1;
-            overflow: hidden; perspective: 1000px;
+        /* 1. 배경 시스템 (SF 감성 극대화) */
+        .bg { position: fixed; inset: 0; z-index: -20; background: var(--bg); }
+        .bg-image {
+            position: absolute; inset: -10%; background-size: cover; background-position: center;
+            opacity: 0.3; filter: blur(15px); transition: 0.5s ease;
         }
-        #bg-canvas {
-            position: absolute; inset: -50%;
-            width: 200%; height: 200%;
-            background-size: cover; background-position: center;
-            transform-origin: center;
-            transition: filter 0.3s ease;
-        }
-        .bg-overlay {
-            position: fixed; inset: 0;
-            background: radial-gradient(circle at center, transparent, var(--bg) 90%);
-            z-index: -1; pointer-events: none;
+        .bg-noise {
+            position: absolute; inset: 0; opacity: 0.04; mix-blend-mode: overlay;
+            background-image: url('data:image/svg+xml;utf8,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)"/%3E%3C/svg%3E');
         }
         .bg-grid {
-            position: fixed; inset: 0;
+            position: absolute; inset: 0; opacity: 0.3;
             background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
-            background-size: 50px 50px;
-            z-index: -1; opacity: 0.2; pointer-events: none;
+            background-size: 60px 60px;
+            mask-image: radial-gradient(circle at center, white, transparent 80%);
+            -webkit-mask-image: radial-gradient(circle at center, white, transparent 80%);
         }
 
-        /* --- Layout --- */
-        #app-container {
-            display: grid;
-            grid-template-columns: 320px 1fr 350px;
-            height: 100vh; position: relative; z-index: 10;
+        /* 2. 헤더 (시스템 HUD 느낌) */
+        .header {
+            height: 70px; border-bottom: 1px solid var(--line);
+            background: rgba(7, 9, 15, 0.8); backdrop-filter: blur(12px);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 30px; position: relative; z-index: 20; box-shadow: 0 4px 20px rgba(0,0,0,0.5);
         }
-
-        /* --- Profile Column --- */
-        .side-panel {
-            background: rgba(3, 5, 9, 0.8);
-            backdrop-filter: blur(20px);
-            border-right: 1px solid var(--line);
-            padding: 30px; display: flex; flex-direction: column; gap: 20px;
-            overflow-y: auto;
-        }
-        .side-panel::-webkit-scrollbar { width: 4px; }
-        .side-panel::-webkit-scrollbar-thumb { background: var(--accent); }
-
-        .system-label {
-            font-size: 10px; letter-spacing: 0.2em; color: var(--accent);
-            text-transform: uppercase; margin-bottom: 5px; opacity: 0.8;
-        }
-
-        .char-card {
-            background: var(--card-bg); border: 1px solid var(--line);
-            border-radius: 12px; padding: 15px; position: relative;
-        }
-        .char-card::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
-            background: linear-gradient(90deg, var(--accent), transparent);
-        }
-
-        .image-upload-zone {
-            width: 100%; aspect-ratio: 4/5; background: rgba(0,0,0,0.3);
-            border: 1px dashed var(--line); border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; overflow: hidden; margin-bottom: 10px;
-        }
-        .image-upload-zone img { width: 100%; height: 100%; object-fit: cover; }
-
-        input, textarea {
-            width: 100%; background: transparent; border: 1px solid transparent;
-            color: var(--text); font-family: inherit; transition: 0.2s;
-        }
-        input:focus, textarea:focus { border-bottom: 1px solid var(--accent); }
-        .name-input { font-size: 18px; font-weight: 800; margin-bottom: 5px; }
-        .bio-input { font-size: 13px; line-height: 1.6; color: var(--muted); height: 100px; resize: none; }
-
-        /* --- Center Timeline Board --- */
-        #artboard {
-            overflow-y: auto; overflow-x: hidden; scroll-behavior: smooth;
-            padding: 100px 0; position: relative;
-        }
-        .timeline-axis {
-            position: absolute; left: 50%; top: 0; bottom: 0;
-            width: 1px; background: linear-gradient(to bottom, transparent, var(--accent), transparent);
-            transform: translateX(-50%); opacity: 0.5;
-        }
-        .timeline-content {
-            max-width: 900px; margin: 0 auto; position: relative;
-            display: flex; flex-direction: column; gap: 60px;
-        }
-
-        .timeline-card {
-            width: 420px; background: var(--card-bg);
-            border: 1px solid var(--line); border-radius: 16px;
-            padding: 25px; position: relative;
-            backdrop-filter: blur(10px);
-            transition: transform 0.3s ease;
-        }
-        .timeline-card:nth-child(odd) { align-self: flex-start; }
-        .timeline-card:nth-child(even) { align-self: flex-end; }
+        .header-left, .header-right { display: flex; align-items: center; gap: 15px; }
         
-        .timeline-card::after {
-            content: ''; position: absolute; top: 30px;
-            width: 20px; height: 1px; background: var(--accent);
+        input, textarea, button { font-family: inherit; }
+        input, textarea {
+            border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2);
+            color: white; border-radius: 6px; transition: 0.3s ease; padding: 0 15px;
         }
-        .timeline-card:nth-child(odd)::after { right: -20px; }
-        .timeline-card:nth-child(even)::after { left: -20px; }
+        input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 10px rgba(142,161,255,0.2); }
+        
+        .pair-name-input { width: 250px; height: 40px; font-size: 16px; font-weight: 800; letter-spacing: 0.05em; color: var(--accent2); }
+        .pair-keyword-input { width: 200px; height: 40px; font-size: 13px; letter-spacing: 0.1em; }
+        
+        .header-btn {
+            height: 40px; border: 1px solid var(--accent); background: rgba(142,161,255,0.05);
+            color: var(--accent); border-radius: 6px; padding: 0 20px; cursor: pointer;
+            font-size: 12px; font-weight: 700; letter-spacing: 0.1em; transition: 0.3s ease;
+        }
+        .header-btn:hover { background: var(--accent); color: var(--bg); box-shadow: var(--glow); }
 
-        .card-date { font-size: 12px; font-weight: 700; color: var(--accent); margin-bottom: 8px; font-variant-numeric: tabular-nums; }
-        .card-title { font-size: 22px; font-weight: 900; margin-bottom: 15px; letter-spacing: -0.02em; }
-        .card-image { width: 100%; border-radius: 8px; margin-bottom: 15px; border: 1px solid var(--line); }
-        .card-desc { font-size: 14px; line-height: 1.8; color: var(--muted); white-space: pre-wrap; }
+        /* 3. 메인 보드 레이아웃 */
+        .board {
+            height: calc(100vh - 70px); display: grid;
+            grid-template-columns: 320px minmax(0, 1fr); gap: 0; /* 분리된 느낌을 없애고 하나로 융합 */
+            padding: 0; position: relative;
+        }
 
-        /* --- Floating Editor & Tools --- */
-        .tool-panel {
-            background: rgba(3, 5, 9, 0.8); backdrop-filter: blur(20px);
-            border-left: 1px solid var(--line); padding: 30px;
+        /* 4. 프로필 패널 (좌측 고정, 유리 질감) */
+        .profile-column {
+            background: var(--panel); border-right: 1px solid var(--line);
+            backdrop-filter: blur(20px); padding: 30px; overflow-y: auto; z-index: 10;
             display: flex; flex-direction: column; gap: 25px;
         }
+        .profile-column::-webkit-scrollbar { width: 4px; }
+        .profile-column::-webkit-scrollbar-thumb { background: var(--accent); }
 
-        button {
-            background: transparent; border: 1px solid var(--accent); color: var(--accent);
-            padding: 12px; border-radius: 8px; cursor: pointer; font-weight: 700;
-            font-size: 12px; letter-spacing: 0.1em; transition: 0.3s;
+        .profile-panel { display: flex; flex-direction: column; gap: 10px; }
+        .panel-label { font-size: 10px; font-weight: 800; color: var(--accent); letter-spacing: 0.2em; text-transform: uppercase; }
+        
+        .profile-image {
+            width: 100%; aspect-ratio: 1/1; border-radius: 12px;
+            border: 1px solid var(--line); background: rgba(0,0,0,0.5);
+            background-size: cover; background-position: center;
+            cursor: pointer; position: relative; overflow: hidden;
         }
-        button:hover { background: var(--accent); color: var(--bg); box-shadow: 0 0 20px rgba(var(--accent-rgb), 0.4); }
-        button.danger { border-color: #ff5e5e; color: #ff5e5e; }
-        button.danger:hover { background: #ff5e5e; color: #fff; }
+        .profile-image::after {
+            content: 'CLICK TO UPLOAD'; position: absolute; inset: 0; display: flex;
+            align-items: center; justify-content: center; font-size: 11px;
+            letter-spacing: 0.1em; color: var(--muted); opacity: 1; transition: 0.3s;
+        }
+        .profile-image.has-img::after { opacity: 0; }
+        
+        .profile-name { height: 45px; font-size: 18px; font-weight: 800; text-align: center; }
+        .profile-bio { min-height: 120px; padding: 15px; font-size: 13px; line-height: 1.8; resize: none; }
 
-        .editor-box {
-            background: rgba(255,255,255,0.03); border-radius: 12px; padding: 20px;
-            display: flex; flex-direction: column; gap: 15px; border: 1px solid rgba(255,255,255,0.05);
+        /* 5. 스토리 타임라인 (수직 스크롤 아트보드) */
+        .story-board-wrap {
+            position: relative; overflow-y: auto; overflow-x: hidden;
+            padding: 60px; scroll-behavior: smooth;
+        }
+        .story-board-wrap::-webkit-scrollbar { width: 0; } /* 캡처를 위해 숨김 */
+
+        .story-board {
+            max-width: 1000px; margin: 0 auto; position: relative;
+            display: flex; flex-direction: column; gap: 40px; padding: 40px 0;
+        }
+        /* 중앙 관통 라인 */
+        .story-board::before {
+            content: ''; position: absolute; left: 50%; top: 0; bottom: 0;
+            width: 2px; background: linear-gradient(to bottom, transparent, var(--accent), transparent);
+            transform: translateX(-50%); opacity: 0.5;
         }
 
-        /* --- Scrollbar --- */
-        #artboard::-webkit-scrollbar { width: 0px; } /* 아트보드는 스크롤바 숨김 */
+        /* 6. 서사 카드 (교차 정렬 방식) */
+        .story-card {
+            width: calc(50% - 40px); background: var(--panel2);
+            border: 1px solid var(--line); border-radius: 16px;
+            padding: 30px; position: relative; backdrop-filter: blur(10px);
+            transition: 0.3s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        /* 좌우 정렬 및 연결선 */
+        .story-card:nth-child(odd) { align-self: flex-start; }
+        .story-card:nth-child(even) { align-self: flex-end; }
+        
+        .story-card::after {
+            content: ''; position: absolute; top: 40px; width: 40px; height: 2px; background: var(--accent); opacity: 0.5;
+        }
+        .story-card:nth-child(odd)::after { right: -40px; }
+        .story-card:nth-child(even)::after { left: -40px; }
+        
+        /* 타임라인 노드(점) */
+        .story-card::before {
+            content: ''; position: absolute; top: 35px; width: 12px; height: 12px;
+            background: var(--bg); border: 2px solid var(--accent2); border-radius: 50%; z-index: 2;
+            box-shadow: 0 0 10px var(--accent2);
+        }
+        .story-card:nth-child(odd)::before { right: -47px; }
+        .story-card:nth-child(even)::before { left: -47px; }
 
-        /* --- Animation --- */
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .timeline-card { animation: fadeIn 0.6s ease forwards; }
+        .story-card:hover { border-color: var(--accent); transform: translateY(-5px); box-shadow: var(--glow); }
+
+        .story-date { font-size: 12px; font-weight: 700; color: var(--accent2); letter-spacing: 0.1em; margin-bottom: 10px; }
+        .story-title { font-size: 24px; font-weight: 900; line-height: 1.3; margin-bottom: 20px; letter-spacing: -0.03em; }
+        .story-image { width: 100%; border-radius: 8px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); display: none; }
+        .story-text { font-size: 14px; line-height: 1.9; color: var(--muted); white-space: pre-wrap; word-break: keep-all; }
+
+        .delete-btn {
+            position: absolute; top: 20px; right: 20px; background: transparent; border: none;
+            color: #ff4d4d; font-size: 11px; cursor: pointer; opacity: 0.3; transition: 0.2s;
+        }
+        .story-card:hover .delete-btn { opacity: 1; }
+
+        /* 7. 에디터 (우측 하단 플로팅) */
+        .editor {
+            position: fixed; right: 30px; bottom: 30px; width: 400px;
+            background: rgba(7, 9, 15, 0.95); border: 1px solid var(--accent);
+            border-radius: 16px; padding: 25px; backdrop-filter: blur(20px);
+            display: flex; flex-direction: column; gap: 15px; z-index: 100;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8), var(--glow);
+            transform: translateY(120%); transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .editor.open { transform: translateY(0); }
+
+        .editor-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); padding-bottom: 10px; margin-bottom: 10px; }
+        .editor-label { font-size: 13px; font-weight: 800; color: var(--accent); letter-spacing: 0.1em; }
+        .close-btn { background: transparent; border: none; color: white; font-size: 20px; cursor: pointer; }
+
+        .editor input { height: 45px; }
+        .editor textarea { height: 120px; padding-top: 15px; }
+        .file-upload-btn {
+            border: 1px dashed var(--line); background: rgba(0,0,0,0.2); color: var(--muted);
+            height: 40px; display: flex; align-items: center; justify-content: center;
+            border-radius: 6px; font-size: 12px; cursor: pointer; transition: 0.3s;
+        }
+        .file-upload-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+        .complete-btn {
+            height: 50px; border: none; background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #000; font-weight: 900; font-size: 15px; letter-spacing: 0.1em;
+            border-radius: 8px; cursor: pointer; transition: 0.3s;
+        }
+        .complete-btn:hover { box-shadow: 0 0 20px rgba(99, 255, 233, 0.4); transform: scale(1.02); }
 
     </style>
 </head>
 <body>
 
-    <div id="viewport">
-        <div id="bg-canvas"></div>
-        <div class="bg-overlay"></div>
+    <div class="bg">
+        <div class="bg-image" id="main-bg-img"></div>
         <div class="bg-grid"></div>
+        <div class="bg-noise"></div>
     </div>
 
-    <div id="app-container">
-        <aside class="side-panel">
-            <div class="system-label">Synchronization Status</div>
-            <input type="text" id="pair-name" class="name-input" placeholder="페어 코드네임" style="font-size: 24px; color: var(--accent);">
+    <header class="header">
+        <div class="header-left">
+            <input type="text" class="pair-name-input" id="pair-name" placeholder="PAIR CODENAME // 페어명">
+            <input type="text" class="pair-keyword-input" id="pair-keyword" placeholder="RELATION KEYWORD // 관계 키워드">
+        </div>
+        <div class="header-right">
+            <label class="header-btn" style="display:flex; align-items:center; cursor:pointer;">
+                배경 이미지 변경
+                <input type="file" hidden accept="image/*" onchange="changeBackground(event)">
+            </label>
+            <button class="header-btn" onclick="toggleEditor()">+ 새 서사 기록</button>
+            <button class="header-btn" onclick="exportArtboard()" style="border-color: var(--accent2); color: var(--accent2);">아트보드 내보내기 (PNG)</button>
+        </div>
+    </header>
+
+    <main class="board" id="capture-area">
+        
+        <aside class="profile-column">
+            <div class="profile-panel">
+                <div class="panel-label">CHARACTER 01</div>
+                <label class="profile-image" id="p1-img-box">
+                    <input type="file" hidden accept="image/*" onchange="loadProfileImg(event, 'p1-img-box')">
+                </label>
+                <input type="text" class="profile-name" placeholder="NAME">
+                <textarea class="profile-bio" placeholder="프로필 요약 및 서사 데이터 입력..."></textarea>
+            </div>
             
-            <div class="system-label" style="margin-top:20px;">Character 01</div>
-            <div class="char-card">
-                <div class="image-upload-zone" onclick="triggerImgUpload('c1-img')">
-                    <img id="c1-preview" src="" style="display:none;">
-                    <span id="c1-placeholder">IMAGE UPLOAD</span>
-                </div>
-                <input type="file" id="c1-img" hidden onchange="handleProfileImg(this, 'c1-preview', 'c1-placeholder')">
-                <input type="text" class="name-input" placeholder="NAME">
-                <textarea class="bio-input" placeholder="DATA FRAGMENT..."></textarea>
-            </div>
+            <div style="height: 1px; background: var(--line); margin: 10px 0;"></div>
 
-            <div class="system-label" style="margin-top:10px;">Character 02</div>
-            <div class="char-card">
-                <div class="image-upload-zone" onclick="triggerImgUpload('c2-img')">
-                    <img id="c2-preview" src="" style="display:none;">
-                    <span id="c2-placeholder">IMAGE UPLOAD</span>
-                </div>
-                <input type="file" id="c2-img" hidden onchange="handleProfileImg(this, 'c2-preview', 'c2-placeholder')">
-                <input type="text" class="name-input" placeholder="NAME">
-                <textarea class="bio-input" placeholder="DATA FRAGMENT..."></textarea>
+            <div class="profile-panel">
+                <div class="panel-label">CHARACTER 02</div>
+                <label class="profile-image" id="p2-img-box">
+                    <input type="file" hidden accept="image/*" onchange="loadProfileImg(event, 'p2-img-box')">
+                </label>
+                <input type="text" class="profile-name" placeholder="NAME">
+                <textarea class="profile-bio" placeholder="프로필 요약 및 서사 데이터 입력..."></textarea>
             </div>
-
-            <div class="system-label" style="margin-top:20px;">System Controls</div>
-            <button onclick="exportImage()">IMAGE EXPORT (PNG)</button>
-            <button onclick="exportTxt()">DATA BACKUP (TXT)</button>
-            <button onclick="triggerTxtImport()">IMPORT DATA</button>
-            <input type="file" id="import-file" hidden onchange="importTxt(event)" accept=".txt">
         </aside>
 
-        <main id="artboard">
-            <div class="timeline-axis"></div>
-            <div class="timeline-content" id="timeline-list">
+        <section class="story-board-wrap" id="board-wrap">
+            <div class="story-board" id="timeline-container">
                 </div>
-        </main>
+        </section>
+    </main>
 
-        <aside class="tool-panel">
-            <div class="system-label">Event Recorder</div>
-            <div class="editor-box">
-                <input type="text" id="ev-date" placeholder="DATE (e.g. 2024.05.27)" class="name-input" style="font-size: 14px;">
-                <input type="text" id="ev-title" placeholder="EVENT TITLE" class="name-input">
-                <div class="image-upload-zone" style="aspect-ratio: 16/9;" onclick="triggerImgUpload('ev-img')">
-                    <img id="ev-preview" src="" style="display:none;">
-                    <span id="ev-placeholder">EVENT VISUAL</span>
-                </div>
-                <input type="file" id="ev-img" hidden onchange="handleProfileImg(this, 'ev-preview', 'ev-placeholder')">
-                <textarea id="ev-content" class="bio-input" placeholder="DESCRIBE THE MOMENT..." style="height: 150px;"></textarea>
-                <button onclick="addTimelineItem()">+ ADD TO CHRONICLE</button>
-            </div>
-
-            <div class="system-label">Visual Adjustments</div>
-            <div class="editor-box">
-                <div style="font-size:11px; margin-bottom:5px;">BG UPLOAD</div>
-                <input type="file" onchange="setBgImage(event)" style="font-size:10px;">
-                <div style="font-size:11px; margin-top:15px; margin-bottom:5px;">BLUR LEVEL</div>
-                <input type="range" min="0" max="20" value="0" oninput="updateBgEffects(this.value)">
-                <div style="font-size:10px; color:var(--muted); margin-top:10px; line-height:1.4;">
-                    * Wheel: Zoom<br>
-                    * Drag: Move<br>
-                    * Shift + Wheel: Rotate
-                </div>
-            </div>
-            <button class="danger" onclick="clearData()">SYSTEM RESET</button>
-        </aside>
+    <div class="editor" id="editor-panel">
+        <div class="editor-header">
+            <span class="editor-label">ADD NEW CHRONICLE</span>
+            <button class="close-btn" onclick="toggleEditor()">×</button>
+        </div>
+        <input type="text" id="evDate" placeholder="DATE (ex: 2026.05.27)">
+        <input type="text" id="evTitle" placeholder="EPISODE TITLE">
+        <label class="file-upload-btn">
+            + 썸네일 이미지 첨부 (선택)
+            <input type="file" id="evImg" hidden accept="image/*" onchange="setTempImage(event)">
+        </label>
+        <img id="temp-img-preview" src="" style="display:none; width:100%; border-radius:6px; border:1px solid var(--line);">
+        <textarea id="evContent" placeholder="서사 내용을 작성하십시오..."></textarea>
+        <button class="complete-btn" onclick="addStoryCard()">RECORD >></button>
     </div>
 
     <script>
-        // --- Background Interaction Logic ---
-        let bgCanvas = document.getElementById('bg-canvas');
-        let scale = 1, posX = 0, posY = 0, rotate = 0, blurVal = 0;
-        let isDragging = false, startX, startY;
+        let tempImgSrc = '';
 
-        function updateTransform() {
-            bgCanvas.style.transform = `translate(${posX}px, ${posY}px) scale(${scale}) rotate(${rotate}deg)`;
+        // 에디터 열기/닫기
+        function toggleEditor() {
+            document.getElementById('editor-panel').classList.toggle('open');
         }
 
-        window.addEventListener('mousedown', (e) => {
-            if(e.target.closest('.side-panel') || e.target.closest('.tool-panel') || e.target.closest('.timeline-card')) return;
-            isDragging = true; startX = e.clientX - posX; startY = e.clientY - posY;
-        });
-        window.addEventListener('mousemove', (e) => {
-            if(!isDragging) return;
-            posX = e.clientX - startX; posY = e.clientY - startY;
-            updateTransform();
-        });
-        window.addEventListener('mouseup', () => isDragging = false);
-        window.addEventListener('wheel', (e) => {
-            if(e.target.closest('.side-panel') || e.target.closest('.tool-panel') || e.target.closest('#artboard')) return;
-            e.preventDefault();
-            if(e.shiftKey) rotate += e.deltaY * 0.1;
-            else scale -= e.deltaY * 0.001;
-            updateTransform();
-        }, {passive: false});
-
-        function setBgImage(e) {
-            const file = e.target.files[0];
+        // 전체 배경 변경
+        function changeBackground(event) {
+            const file = event.target.files[0];
             if(file) {
                 const reader = new FileReader();
-                reader.onload = (ev) => bgCanvas.style.backgroundImage = `url(${ev.target.result})`;
-                reader.readAsDataURL(file);
-            }
-        }
-        function updateBgEffects(val) {
-            bgCanvas.style.filter = `blur(${val}px) brightness(0.7)`;
-        }
-
-        // --- Logic: Timeline & Data ---
-        function triggerImgUpload(id) { document.getElementById(id).click(); }
-
-        function handleProfileImg(input, previewId, placeholderId) {
-            const file = input.files[0];
-            if(file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    document.getElementById(previewId).src = e.target.result;
-                    document.getElementById(previewId).style.display = 'block';
-                    document.getElementById(placeholderId).style.display = 'none';
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        function addTimelineItem() {
-            const date = document.getElementById('ev-date').value;
-            const title = document.getElementById('ev-title').value;
-            const content = document.getElementById('ev-content').value;
-            const imgSrc = document.getElementById('ev-preview').src;
-            const hasImg = document.getElementById('ev-preview').style.display !== 'none';
-
-            if(!title) { alert("서사 제목은 필수입니다."); return; }
-
-            const list = document.getElementById('timeline-list');
-            const card = document.createElement('div');
-            card.className = 'timeline-card';
-            card.innerHTML = `
-                <div class="card-date">${date || 'UNDATED'}</div>
-                <div class="card-title">${title}</div>
-                ${hasImg ? `<img src="${imgSrc}" class="card-image">` : ''}
-                <div class="card-desc">${content}</div>
-                <button onclick="this.parentElement.remove(); autoSave();" style="margin-top:15px; border-color:#ff5e5e; color:#ff5e5e; padding:5px 10px; font-size:10px;">DELETE</button>
-            `;
-            list.appendChild(card);
-            autoSave();
-            
-            // 리셋 에디터
-            document.getElementById('ev-title').value = '';
-            document.getElementById('ev-content').value = '';
-            document.getElementById('ev-preview').style.display = 'none';
-            document.getElementById('ev-placeholder').style.display = 'block';
-        }
-
-        // --- Persistence & Export ---
-        function autoSave() {
-            const data = {
-                pairName: document.getElementById('pair-name').value,
-                profiles: Array.from(document.querySelectorAll('.side-panel .char-card')).map(c => ({
-                    name: c.querySelector('.name-input').value,
-                    bio: c.querySelector('.bio-input').value,
-                    img: c.querySelector('img').src,
-                    imgVisible: c.querySelector('img').style.display
-                })),
-                timeline: Array.from(document.querySelectorAll('.timeline-card')).map(c => ({
-                    date: c.querySelector('.card-date').innerText,
-                    title: c.querySelector('.card-title').innerText,
-                    desc: c.querySelector('.card-desc').innerText,
-                    img: c.querySelector('.card-image') ? c.querySelector('.card-image').src : null
-                }))
-            };
-            localStorage.setItem('oc_chronicle_v1', JSON.stringify(data));
-        }
-
-        function loadData() {
-            const raw = localStorage.getItem('oc_chronicle_v1');
-            if(!raw) return;
-            const data = JSON.parse(raw);
-            document.getElementById('pair-name').value = data.pairName;
-            
-            const profCards = document.querySelectorAll('.side-panel .char-card');
-            data.profiles.forEach((p, i) => {
-                profCards[i].querySelector('.name-input').value = p.name;
-                profCards[i].querySelector('.bio-input').value = p.bio;
-                if(p.imgVisible === 'block') {
-                    profCards[i].querySelector('img').src = p.img;
-                    profCards[i].querySelector('img').style.display = 'block';
-                    profCards[i].querySelector('span').style.display = 'none';
+                reader.onload = e => {
+                    document.getElementById('main-bg-img').style.backgroundImage = `url(${e.target.result})`;
                 }
-            });
-
-            const list = document.getElementById('timeline-list');
-            list.innerHTML = '';
-            data.timeline.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'timeline-card';
-                card.innerHTML = `
-                    <div class="card-date">${item.date}</div>
-                    <div class="card-title">${item.title}</div>
-                    ${item.img ? `<img src="${item.img}" class="card-image">` : ''}
-                    <div class="card-desc">${item.desc}</div>
-                    <button onclick="this.parentElement.remove(); autoSave();" style="margin-top:15px; border-color:#ff5e5e; color:#ff5e5e; padding:5px 10px; font-size:10px;">DELETE</button>
-                `;
-                list.appendChild(card);
-            });
-        }
-
-        function exportTxt() {
-            const raw = localStorage.getItem('oc_chronicle_v1');
-            const blob = new Blob([raw], {type: 'text/plain'});
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = `CHRONICLE_${document.getElementById('pair-name').value || 'DATA'}.txt`;
-            a.click();
-        }
-
-        function triggerTxtImport() { document.getElementById('import-file').click(); }
-        function importTxt(e) {
-            const file = e.target.files[0];
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-                localStorage.setItem('oc_chronicle_v1', ev.target.result);
-                loadData();
-                alert("SYSTEM: DATA RECOVERY COMPLETE.");
-            };
-            reader.readAsText(file);
-        }
-
-        function exportImage() {
-            const art = document.body;
-            html2canvas(art, { backgroundColor: '#030509', useCORS: true, scale: 2 }).then(canvas => {
-                const a = document.createElement('a');
-                a.href = canvas.toDataURL("image/png");
-                a.download = `ARTBOARD_${document.getElementById('pair-name').value}.png`;
-                a.click();
-            });
-        }
-
-        function clearData() {
-            if(confirm("시스템의 모든 데이터를 소거하시겠습니까? 백업되지 않은 데이터는 복구할 수 없습니다.")) {
-                localStorage.removeItem('oc_chronicle_v1');
-                location.reload();
+                reader.readAsDataURL(file);
             }
         }
 
-        document.addEventListener('input', autoSave);
-        window.onload = loadData;
+        // 프로필 이미지 업로드
+        function loadProfileImg(event, boxId) {
+            const file = event.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const box = document.getElementById(boxId);
+                    box.style.backgroundImage = `url(${e.target.result})`;
+                    box.classList.add('has-img');
+                }
+                reader.readAsDataURL(file);
+            }
+        }
 
+        // 에디터 임시 이미지
+        function setTempImage(event) {
+            const file = event.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    tempImgSrc = e.target.result;
+                    const preview = document.getElementById('temp-img-preview');
+                    preview.src = tempImgSrc;
+                    preview.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // 타임라인 카드 추가
+        function addStoryCard() {
+            const date = document.getElementById('evDate').value;
+            const title = document.getElementById('evTitle').value;
+            const content = document.getElementById('evContent').value;
+
+            if(!title) { alert("서사의 제목은 톱니바퀴의 축입니다. 반드시 입력하십시오."); return; }
+
+            const container = document.getElementById('timeline-container');
+            const card = document.createElement('div');
+            card.className = 'story-card';
+            
+            let imgHTML = tempImgSrc ? `<img src="${tempImgSrc}" class="story-image" style="display:block;">` : '';
+
+            card.innerHTML = `
+                <button class="delete-btn" onclick="this.parentElement.remove()">[삭제]</button>
+                <div class="story-date">${date}</div>
+                <div class="story-title">${title}</div>
+                ${imgHTML}
+                <div class="story-text">${content}</div>
+            `;
+            
+            container.appendChild(card);
+
+            // 초기화 및 닫기
+            document.getElementById('evDate').value = '';
+            document.getElementById('evTitle').value = '';
+            document.getElementById('evContent').value = '';
+            document.getElementById('temp-img-preview').style.display = 'none';
+            tempImgSrc = '';
+            toggleEditor();
+
+            // 추가 후 맨 아래로 스크롤
+            const wrap = document.getElementById('board-wrap');
+            wrap.scrollTo({ top: wrap.scrollHeight, behavior: 'smooth' });
+        }
+
+        // 아트보드 이미지로 내보내기 (가장 중요한 기능)
+        function exportArtboard() {
+            const target = document.getElementById('capture-area');
+            const wrap = document.getElementById('board-wrap');
+            const pairName = document.getElementById('pair-name').value || 'OC_PAIR';
+            
+            // 캡처를 위해 전체 스크롤 길이를 임시로 풀어서 모든 카드가 보이게 함
+            const originalOverflow = wrap.style.overflow;
+            const originalHeight = target.style.height;
+            wrap.style.overflow = 'visible';
+            target.style.height = 'auto';
+
+            html2canvas(target, {
+                backgroundColor: window.getComputedStyle(document.body).backgroundColor,
+                scale: 2, // 고해상도 추출
+                useCORS: true
+            }).then(canvas => {
+                const a = document.createElement('a');
+                a.href = canvas.toDataURL('image/png');
+                a.download = `ARTBOARD_${pairName}.png`;
+                a.click();
+
+                // 원상복구
+                wrap.style.overflow = originalOverflow;
+                target.style.height = originalHeight;
+            });
+        }
     </script>
 </body>
 </html>
