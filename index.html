@@ -1,54 +1,443 @@
 <!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Pair Archive</title>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+<div class="bg">
+  <div class="bg-image" id="bgImage"></div>
+
+  <div class="grid"></div>
+
+  <div class="glow"></div>
+</div>
+
+<div class="app">
+
+  <aside class="sidebar">
+
+    <div class="subtitle">
+      Pair
+    </div>
+
+    <input
+      id="pairName"
+      placeholder="페어명"
+    />
+
+    <div class="panel character-card">
+
+      <h3>Character A</h3>
+
+      <input
+        id="charAName"
+        placeholder="캐릭터 이름"
+      />
+
+      <textarea
+        id="charABio"
+        placeholder="캐릭터 소개"
+      ></textarea>
+
+    </div>
+
+    <div class="panel character-card">
+
+      <h3>Character B</h3>
+
+      <input
+        id="charBName"
+        placeholder="캐릭터 이름"
+      />
+
+      <textarea
+        id="charBBio"
+        placeholder="캐릭터 소개"
+      ></textarea>
+
+    </div>
+
+    <button
+      class="main-btn"
+      onclick="exportTXT()"
+    >
+      TXT 저장
+    </button>
+
+    <br><br>
+
+    <input
+      type="file"
+      accept=".txt"
+      onchange="importTXT(event)"
+    />
+
+  </aside>
+
+  <main class="main">
+
+    <div class="subtitle">
+      Archive
+    </div>
+
+    <h1 class="title">
+      Timeline
+    </h1>
+
+    <br>
+
+    <button
+      class="main-btn"
+      onclick="addTimeline()"
+    >
+      + 에피소드 추가
+    </button>
+
+    <div
+      class="timeline"
+      id="timeline"
+    ></div>
+
+  </main>
+
+  <aside class="settings">
+
+    <div class="subtitle">
+      Settings
+    </div>
+
+    <div class="setting-label">
+      메인 컬러
+    </div>
+
+    <input
+      type="color"
+      value="#91a2ff"
+      onchange="setAccent(this.value)"
+    />
+
+    <div class="setting-label">
+      배경 이미지
+    </div>
+
+    <input
+      type="file"
+      accept="image/*"
+      onchange="changeBG(event)"
+    />
+
+    <div class="setting-label">
+      배경 블러
+    </div>
+
+    <input
+      type="range"
+      min="0"
+      max="40"
+      value="0"
+      oninput="setBlur(this.value)"
+    />
+
+    <div class="setting-label">
+      배경 확대
+    </div>
+
+    <input
+      type="range"
+      min="1"
+      max="2"
+      step="0.01"
+      value="1"
+      oninput="setScale(this.value)"
+    />
+
+    <div class="setting-label">
+      배경 회전
+    </div>
+
+    <input
+      type="range"
+      min="-180"
+      max="180"
+      value="0"
+      oninput="setRotate(this.value)"
+    />
+
+  </aside>
+
+</div>
+
+<script>
+
+let state = JSON.parse(
+  localStorage.getItem('pairArchiveData')
+) || {
+
+  pairName: '',
+
+  charAName: '',
+  charABio: '',
+
+  charBName: '',
+  charBBio: '',
+
+  timelines: [],
+
+  bg: '',
+
+  blur: 0,
+
+  scale: 1,
+
+  rotate: 0,
+}
+
+const timelineEl =
+  document.getElementById('timeline')
+
+const bgImage =
+  document.getElementById('bgImage')
+
+function save() {
+
+  localStorage.setItem(
+    'pairArchiveData',
+    JSON.stringify(state)
+  )
+}
+
+function applyBG() {
+
+  bgImage.style.backgroundImage =
+    state.bg
+      ? `url(${state.bg})`
+      : 'none'
+
+  bgImage.style.filter =
+    `blur(${state.blur}px)`
+
+  bgImage.style.transform =
+    `scale(${state.scale + (state.blur * 0.01)})
+     rotate(${state.rotate}deg)`
+}
+
+function render() {
+
+  document.getElementById('pairName').value =
+    state.pairName
+
+  document.getElementById('charAName').value =
+    state.charAName
+
+  document.getElementById('charABio').value =
+    state.charABio
+
+  document.getElementById('charBName').value =
+    state.charBName
+
+  document.getElementById('charBBio').value =
+    state.charBBio
+
+  timelineEl.innerHTML = ''
+
+  state.timelines.forEach((item, index) => {
+
+    const div =
+      document.createElement('div')
+
+    div.className =
+      'panel timeline-item'
+
+    div.innerHTML = `
+
+      <div class="subtitle">
+        EPISODE ${index + 1}
+      </div>
+
+      <input
+        placeholder="날짜"
+        value="${item.date || ''}"
+        onchange="updateTimeline(${index}, 'date', this.value)"
+      >
+
+      <input
+        placeholder="에피소드 제목"
+        value="${item.title || ''}"
+        onchange="updateTimeline(${index}, 'title', this.value)"
+      >
+
+      <textarea
+        placeholder="서사를 입력하세요"
+        onchange="updateTimeline(${index}, 'content', this.value)"
+      >${item.content || ''}</textarea>
+
+      <input
+        type="file"
+        accept="image/*"
+        onchange="timelineImage(event, ${index})"
+      >
+
+      ${
+        item.image
+        ? `<img src="${item.image}" class="image-preview">`
+        : ''
+      }
+
+    `
+
+    timelineEl.appendChild(div)
+  })
+
+  applyBG()
+
+  save()
+}
+
+function addTimeline() {
+
+  state.timelines.push({
+
+    date: '',
+
+    title: '',
+
+    content: '',
+
+    image: '',
+  })
+
+  render()
+}
+
+function updateTimeline(index, key, value) {
+
+  state.timelines[index][key] =
+    value
+
+  save()
+}
+
+function timelineImage(event, index) {
+
+  const file =
+    event.target.files[0]
+
+  if (!file) return
+
+  const reader =
+    new FileReader()
+
+  reader.onload = () => {
+
+    state.timelines[index].image =
+      reader.result
+
+    render()
+  }
+
+  reader.readAsDataURL(file)
+}
+
+function setAccent(color) {
+
+  document.documentElement.style
+    .setProperty('--accent', color)
+}
+
+function changeBG(event) {
+
+  const file =
+    event.target.files[0]
+
+  if (!file) return
+
+  const reader =
+    new FileReader()
+
+  reader.onload = () => {
+
+    state.bg =
+      reader.result
+
+    applyBG()
+
+    save()
+  }
 
   reader.readAsDataURL(file)
 }
 
 function setBlur(value) {
+
   state.blur = value
+
   applyBG()
+
   save()
 }
 
 function setScale(value) {
+
   state.scale = value
+
   applyBG()
+
   save()
 }
 
 function setRotate(value) {
+
   state.rotate = value
+
   applyBG()
+
   save()
 }
 
 function exportTXT() {
 
-  const text = JSON.stringify(state, null, 2)
+  const text =
+    JSON.stringify(state, null, 2)
 
-  const blob = new Blob([text], {
-    type: 'text/plain'
-  })
+  const blob =
+    new Blob(
+      [text],
+      { type: 'text/plain' }
+    )
 
-  const a = document.createElement('a')
+  const a =
+    document.createElement('a')
 
-  a.href = URL.createObjectURL(blob)
+  a.href =
+    URL.createObjectURL(blob)
 
-  a.download = `${state.pairName || 'pair-archive'}.txt`
+  a.download =
+    `${state.pairName || 'pair-archive'}.txt`
 
   a.click()
 }
 
 function importTXT(event) {
 
-  const file = event.target.files[0]
+  const file =
+    event.target.files[0]
 
   if (!file) return
 
-  const reader = new FileReader()
+  const reader =
+    new FileReader()
 
   reader.onload = () => {
 
-    state = JSON.parse(reader.result)
+    state =
+      JSON.parse(reader.result)
 
     render()
   }
@@ -57,27 +446,42 @@ function importTXT(event) {
 }
 
 pairName.oninput = e => {
-  state.pairName = e.target.value
+
+  state.pairName =
+    e.target.value
+
   save()
 }
 
 charAName.oninput = e => {
-  state.charAName = e.target.value
+
+  state.charAName =
+    e.target.value
+
   save()
 }
 
 charABio.oninput = e => {
-  state.charABio = e.target.value
+
+  state.charABio =
+    e.target.value
+
   save()
 }
 
 charBName.oninput = e => {
-  state.charBName = e.target.value
+
+  state.charBName =
+    e.target.value
+
   save()
 }
 
 charBBio.oninput = e => {
-  state.charBBio = e.target.value
+
+  state.charBBio =
+    e.target.value
+
   save()
 }
 
