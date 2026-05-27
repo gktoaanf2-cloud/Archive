@@ -22,7 +22,7 @@
 
 <body>
 
-<!-- BACKGROUND -->
+<!-- BG -->
 
 <div
   class="bg"
@@ -38,7 +38,7 @@
 
 </div>
 
-<!-- HEADER -->
+<!-- TOPBAR -->
 
 <header class="topbar">
 
@@ -62,7 +62,7 @@
 
     <button
       class="top-btn"
-      onclick="openCreatePanel()"
+      onclick="openEditor()"
     >
       NEW EVENT
     </button>
@@ -87,40 +87,36 @@
 
   <!-- LEFT -->
 
-  <aside class="character-side">
+  <aside class="character-panel">
 
-    <div class="character-panel">
+    <div
+      class="profile-image"
+      id="profileA"
+    ></div>
 
-      <div
-        class="profile-image"
-        id="profileA"
-      ></div>
+    <input
+      type="file"
+      accept="image/*"
+      onchange="uploadCharacter(event, 'A')"
+    />
 
-      <input
-        type="file"
-        accept="image/*"
-        onchange="uploadCharacter(event, 'A')"
-      />
+    <input
+      id="charAName"
+      class="character-name"
+      placeholder="Character A"
+    />
 
-      <input
-        id="charAName"
-        class="character-name"
-        placeholder="Character A"
-      />
-
-      <textarea
-        id="charABio"
-        class="character-bio"
-        placeholder="Character introduction"
-      ></textarea>
-
-    </div>
+    <textarea
+      id="charABio"
+      class="character-bio"
+      placeholder="Character introduction"
+    ></textarea>
 
   </aside>
 
   <!-- CENTER -->
 
-  <main class="story-wrap">
+  <main class="story-section">
 
     <div class="story-header">
 
@@ -140,7 +136,7 @@
 
     </div>
 
-    <!-- STORY MAP -->
+    <!-- MAP -->
 
     <div
       class="story-map"
@@ -151,44 +147,40 @@
 
   <!-- RIGHT -->
 
-  <aside class="character-side">
+  <aside class="character-panel">
 
-    <div class="character-panel">
+    <div
+      class="profile-image"
+      id="profileB"
+    ></div>
 
-      <div
-        class="profile-image"
-        id="profileB"
-      ></div>
+    <input
+      type="file"
+      accept="image/*"
+      onchange="uploadCharacter(event, 'B')"
+    />
 
-      <input
-        type="file"
-        accept="image/*"
-        onchange="uploadCharacter(event, 'B')"
-      />
+    <input
+      id="charBName"
+      class="character-name"
+      placeholder="Character B"
+    />
 
-      <input
-        id="charBName"
-        class="character-name"
-        placeholder="Character B"
-      />
-
-      <textarea
-        id="charBBio"
-        class="character-bio"
-        placeholder="Character introduction"
-      ></textarea>
-
-    </div>
+    <textarea
+      id="charBBio"
+      class="character-bio"
+      placeholder="Character introduction"
+    ></textarea>
 
   </aside>
 
 </div>
 
-<!-- CREATE / EDIT PANEL -->
+<!-- EDITOR -->
 
 <div
-  class="editor-panel"
-  id="editorPanel"
+  class="editor"
+  id="editor"
 >
 
   <div class="editor-top">
@@ -223,10 +215,9 @@
 
   <input
     type="range"
-    id="eventRelation"
     min="0"
     max="100"
-    value="50"
+    id="eventRelation"
   />
 
   <input
@@ -236,7 +227,7 @@
   />
 
   <button
-    class="create-btn"
+    class="complete-btn"
     onclick="saveEvent()"
   >
     COMPLETE
@@ -246,7 +237,7 @@
 
 <!-- SETTINGS -->
 
-<div class="settings-panel">
+<div class="settings">
 
   <div class="settings-title">
     THEME
@@ -317,11 +308,35 @@
     oninput="setRotate(this.value)"
   />
 
+  <div class="slider-label">
+    X
+  </div>
+
+  <input
+    type="range"
+    min="-500"
+    max="500"
+    value="0"
+    oninput="setPosX(this.value)"
+  />
+
+  <div class="slider-label">
+    Y
+  </div>
+
+  <input
+    type="range"
+    min="-500"
+    max="500"
+    value="0"
+    oninput="setPosY(this.value)"
+  />
+
 </div>
 
 <script>
 
-let editIndex = null
+let editingIndex = null
 
 let tempImage = ''
 
@@ -352,6 +367,10 @@ let state = JSON.parse(
   scale: 1,
 
   rotate: 0,
+
+  posX: 0,
+
+  posY: 0,
 }
 
 const storyMap =
@@ -383,7 +402,8 @@ function applyBG() {
     `blur(${state.blur}px)`
 
   bgImage.style.transform = `
-    scale(${state.scale})
+    translate(${state.posX}px, ${state.posY}px)
+    scale(${state.scale + (state.blur * 0.01)})
     rotate(${state.rotate}deg)
   `
 }
@@ -459,7 +479,7 @@ function render() {
         <div class="card-content">
           ${
             card.content
-              ? card.content.substring(0, 90)
+              ? card.content.substring(0, 120)
               : 'Narrative'
           }
         </div>
@@ -479,11 +499,11 @@ function render() {
   save()
 }
 
-function openCreatePanel() {
+function openEditor() {
 
-  editIndex = null
+  editingIndex = null
 
-  editorPanel.classList.add(
+  editor.classList.add(
     'editor-open'
   )
 
@@ -503,9 +523,9 @@ function openEdit(index) {
   const card =
     state.cards[index]
 
-  editIndex = index
+  editingIndex = index
 
-  editorPanel.classList.add(
+  editor.classList.add(
     'editor-open'
   )
 
@@ -527,7 +547,7 @@ function openEdit(index) {
 
 function closeEditor() {
 
-  editorPanel.classList.remove(
+  editor.classList.remove(
     'editor-open'
   )
 }
@@ -572,14 +592,14 @@ function saveEvent() {
   }
 
   if (
-    editIndex === null
+    editingIndex === null
   ) {
 
     state.cards.push(payload)
 
   } else {
 
-    state.cards[editIndex] =
+    state.cards[editingIndex] =
       payload
   }
 
@@ -698,9 +718,27 @@ function setRotate(value) {
   save()
 }
 
+function setPosX(value) {
+
+  state.posX = value
+
+  applyBG()
+
+  save()
+}
+
+function setPosY(value) {
+
+  state.posY = value
+
+  applyBG()
+
+  save()
+}
+
 async function exportPNG() {
 
-  const node =
+  const board =
     document.getElementById(
       'exportBoard'
     )
@@ -709,10 +747,10 @@ async function exportPNG() {
 
     const dataUrl =
       await domtoimage.toPng(
-        node,
+        board,
         {
           quality: 1,
-          bgcolor: '#070b14',
+          bgcolor: '#07090f',
           cacheBust: true,
         }
       )
