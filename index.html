@@ -9,7 +9,7 @@
   content="width=device-width, initial-scale=1.0"
 />
 
-<title>Pair Archive System</title>
+<title>Pair Archive</title>
 
 <link
   rel="stylesheet"
@@ -35,11 +35,7 @@
 
   <div class="grid"></div>
 
-  <div class="radial radial-a"></div>
-
-  <div class="radial radial-b"></div>
-
-  <div class="diamond-overlay"></div>
+  <div class="noise"></div>
 
 </div>
 
@@ -47,24 +43,24 @@
 
 <div class="app">
 
-  <!-- SIDEBAR -->
+  <!-- SIDE -->
 
   <aside class="sidebar">
 
-    <div class="sidebar-scroll">
+    <div class="sidebar-inner">
 
-      <div class="logo-wrap">
+      <div class="logo-box">
 
-        <div class="logo-ring"></div>
+        <div class="logo-circle"></div>
 
         <div>
 
-          <div class="subtitle">
-            ARCHIVE SYSTEM
+          <div class="tiny-label">
+            PAIR ARCHIVE
           </div>
 
           <div class="logo-title">
-            Pair Archive
+            Narrative
           </div>
 
         </div>
@@ -73,22 +69,22 @@
 
       <!-- PROJECT -->
 
-      <div class="panel">
+      <div class="block">
 
-        <div class="panel-title">
+        <div class="block-title">
           PROJECT
         </div>
 
         <input
           id="projectName"
-          placeholder="프로젝트 이름"
+          placeholder="프로젝트"
         />
 
         <button
-          class="main-btn full"
+          class="line-btn"
           onclick="saveProject()"
         >
-          프로젝트 저장
+          SAVE
         </button>
 
         <select
@@ -100,10 +96,10 @@
 
       <!-- PAIR -->
 
-      <div class="panel">
+      <div class="block">
 
-        <div class="panel-title">
-          PAIR INFO
+        <div class="block-title">
+          PAIR
         </div>
 
         <input
@@ -118,20 +114,20 @@
 
       </div>
 
-      <!-- CHAR A -->
+      <!-- CHAR -->
 
-      <div class="panel character-card">
+      <div class="block profile-block">
 
-        <div class="character-top">
+        <div class="profile-top">
 
           <div
-            class="profile-preview"
+            class="profile"
             id="profileA"
           ></div>
 
-          <div>
+          <div class="profile-info">
 
-            <div class="character-title">
+            <div class="profile-name">
               Character A
             </div>
 
@@ -147,30 +143,28 @@
 
         <input
           id="charAName"
-          placeholder="캐릭터 이름"
+          placeholder="이름"
         />
 
         <textarea
           id="charABio"
-          placeholder="캐릭터 소개"
+          placeholder="소개"
         ></textarea>
 
       </div>
 
-      <!-- CHAR B -->
+      <div class="block profile-block">
 
-      <div class="panel character-card">
-
-        <div class="character-top">
+        <div class="profile-top">
 
           <div
-            class="profile-preview"
+            class="profile"
             id="profileB"
           ></div>
 
-          <div>
+          <div class="profile-info">
 
-            <div class="character-title">
+            <div class="profile-name">
               Character B
             </div>
 
@@ -186,36 +180,36 @@
 
         <input
           id="charBName"
-          placeholder="캐릭터 이름"
+          placeholder="이름"
         />
 
         <textarea
           id="charBBio"
-          placeholder="캐릭터 소개"
+          placeholder="소개"
         ></textarea>
 
       </div>
 
       <!-- EXPORT -->
 
-      <div class="panel">
+      <div class="block">
 
-        <div class="panel-title">
+        <div class="block-title">
           EXPORT
         </div>
 
         <button
-          class="main-btn full"
-          onclick="exportTXT()"
+          class="line-btn"
+          onclick="exportPNG()"
         >
-          TXT 저장
+          PNG EXPORT
         </button>
 
         <button
-          class="main-btn full"
-          onclick="exportPNG()"
+          class="line-btn"
+          onclick="exportTXT()"
         >
-          PNG 저장
+          TXT EXPORT
         </button>
 
         <input
@@ -226,198 +220,131 @@
 
       </div>
 
+      <!-- THEME -->
+
+      <div class="block">
+
+        <div class="block-title">
+          THEME
+        </div>
+
+        <div class="color-grid">
+
+          <input
+            type="color"
+            value="#91a2ff"
+            onchange="setAccent(this.value)"
+          />
+
+          <input
+            type="color"
+            value="#63ffe9"
+            onchange="setAccent2(this.value)"
+          />
+
+          <input
+            type="color"
+            value="#101726"
+            onchange="setPanel(this.value)"
+          />
+
+        </div>
+
+        <input
+          type="file"
+          accept="image/*"
+          onchange="changeBG(event)"
+        />
+
+      </div>
+
     </div>
 
   </aside>
 
   <!-- MAIN -->
 
-  <main
-    class="main"
-    id="captureTarget"
-  >
+  <main class="main">
 
-    <!-- HERO -->
-
-    <div class="hero">
-
-      <div>
-
-        <div class="subtitle">
-          STORY TIMELINE
-        </div>
-
-        <h1 class="title">
-          Narrative Flow
-        </h1>
-
-      </div>
-
-      <div class="hero-buttons">
-
-        <button
-          class="main-btn"
-          onclick="addChapter()"
-        >
-          + 챕터
-        </button>
-
-        <button
-          class="main-btn"
-          onclick="addTimeline()"
-        >
-          + 에피소드
-        </button>
-
-      </div>
-
-    </div>
-
-    <!-- REL GRAPH -->
-
-    <div class="relation-wrap panel">
-
-      <div class="panel-title">
-        RELATION FLOW
-      </div>
-
-      <canvas
-        id="relationCanvas"
-        width="1000"
-        height="240"
-      ></canvas>
-
-    </div>
-
-    <!-- TIMELINE -->
+    <!-- EXPORT BOARD -->
 
     <div
-      class="timeline-wrap"
-      id="timeline"
-    ></div>
+      class="board"
+      id="exportBoard"
+    >
+
+      <!-- TOP -->
+
+      <div class="board-top">
+
+        <div>
+
+          <div class="tiny-label">
+            STORY TIMELINE
+          </div>
+
+          <h1 class="board-title">
+            Narrative Flow
+          </h1>
+
+        </div>
+
+        <div class="board-meta">
+
+          <div id="pairTitleRender">
+            Pair
+          </div>
+
+          <div id="pairTagRender">
+            Relationship
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- RELATION -->
+
+      <div class="relation-panel">
+
+        <canvas
+          id="relationCanvas"
+          width="1200"
+          height="180"
+        ></canvas>
+
+      </div>
+
+      <!-- TIMELINE -->
+
+      <div
+        class="timeline"
+        id="timeline"
+      ></div>
+
+    </div>
+
+    <!-- FLOAT BUTTON -->
+
+    <div class="floating-buttons">
+
+      <button
+        class="circle-btn"
+        onclick="addChapter()"
+      >
+        +
+      </button>
+
+      <button
+        class="circle-btn"
+        onclick="addTimeline()"
+      >
+        ●
+      </button>
+
+    </div>
 
   </main>
-
-  <!-- SETTINGS -->
-
-  <aside class="settings">
-
-    <div class="panel">
-
-      <div class="panel-title">
-        THEME
-      </div>
-
-      <div class="setting-label">
-        Accent
-      </div>
-
-      <input
-        type="color"
-        value="#91a2ff"
-        onchange="setAccent(this.value)"
-      />
-
-      <div class="setting-label">
-        Accent 2
-      </div>
-
-      <input
-        type="color"
-        value="#63ffe9"
-        onchange="setAccent2(this.value)"
-      />
-
-      <div class="setting-label">
-        Panel
-      </div>
-
-      <input
-        type="color"
-        value="#141a2d"
-        onchange="setPanel(this.value)"
-      />
-
-    </div>
-
-    <!-- BG -->
-
-    <div class="panel">
-
-      <div class="panel-title">
-        BACKGROUND
-      </div>
-
-      <input
-        type="file"
-        accept="image/*"
-        onchange="changeBG(event)"
-      />
-
-      <div class="setting-label">
-        Blur
-      </div>
-
-      <input
-        type="range"
-        min="0"
-        max="40"
-        value="0"
-        oninput="setBlur(this.value)"
-      />
-
-      <div class="setting-label">
-        Scale
-      </div>
-
-      <input
-        type="range"
-        min="1"
-        max="2"
-        step="0.01"
-        value="1"
-        oninput="setScale(this.value)"
-      />
-
-      <div class="setting-label">
-        Rotate
-      </div>
-
-      <input
-        type="range"
-        min="-180"
-        max="180"
-        value="0"
-        oninput="setRotate(this.value)"
-      />
-
-      <div class="setting-label">
-        X
-      </div>
-
-      <input
-        type="range"
-        min="-500"
-        max="500"
-        value="0"
-        oninput="setPosX(this.value)"
-      />
-
-      <div class="setting-label">
-        Y
-      </div>
-
-      <input
-        type="range"
-        min="-500"
-        max="500"
-        value="0"
-        oninput="setPosY(this.value)"
-      />
-
-    </div>
-
-  </aside>
 
 </div>
 
@@ -549,12 +476,9 @@ function applyBG() {
       ? `url(${state.bg})`
       : 'none'
 
-  bgImage.style.filter =
-    `blur(${state.blur}px)`
-
   bgImage.style.transform = `
     translate(${state.posX}px, ${state.posY}px)
-    scale(${state.scale + (state.blur * 0.01)})
+    scale(${state.scale})
     rotate(${state.rotate}deg)
   `
 }
@@ -569,6 +493,12 @@ function render() {
 
   pairTag.value =
     state.pairTag
+
+  pairTitleRender.innerText =
+    state.pairName || 'Pair'
+
+  pairTagRender.innerText =
+    state.pairTag || 'Relationship'
 
   charAName.value =
     state.charAName
@@ -596,17 +526,17 @@ function render() {
 
   state.timelines.forEach((item, index) => {
 
-    const card =
+    const node =
       document.createElement('div')
 
     if (item.type === 'chapter') {
 
-      card.className =
-        'chapter-block'
+      node.className =
+        'chapter-row'
 
-      card.innerHTML = `
+      node.innerHTML = `
 
-        <div class="chapter-diamond"></div>
+        <div class="chapter-line"></div>
 
         <input
           class="chapter-input"
@@ -618,69 +548,57 @@ function render() {
 
     } else {
 
-      card.className =
-        'timeline-node'
+      node.className =
+        'timeline-row'
 
-      card.innerHTML = `
+      node.innerHTML = `
 
-        <div class="timeline-line"></div>
+        <div class="timeline-left">
 
-        <div class="timeline-dot"></div>
+          <div class="timeline-dot"></div>
+
+          <div class="timeline-date">
+            ${item.date || 'DATE'}
+          </div>
+
+        </div>
 
         <div class="timeline-card">
 
-          <div class="timeline-top">
+          <div class="timeline-head">
 
-            <div class="episode-id">
-              EP ${index + 1}
-            </div>
+            <input
+              class="timeline-title"
+              placeholder="에피소드 제목"
+              value="${item.title || ''}"
+              onchange="updateTimeline(${index}, 'title', this.value)"
+            >
 
-            <div class="timeline-date-wrap">
-
-              <input
-                class="mini-input"
-                placeholder="DATE"
-                value="${item.date || ''}"
-                onchange="updateTimeline(${index}, 'date', this.value)"
-              >
-
-            </div>
+            <input
+              class="timeline-date-input"
+              placeholder="날짜"
+              value="${item.date || ''}"
+              onchange="updateTimeline(${index}, 'date', this.value)"
+            >
 
           </div>
 
-          <input
-            class="timeline-title"
-            placeholder="에피소드 제목"
-            value="${item.title || ''}"
-            onchange="updateTimeline(${index}, 'title', this.value)"
-          >
+          <textarea
+            class="compact-area"
+            placeholder="서사 입력"
+            oninput="autoResize(this)"
+            onchange="updateTimeline(${index}, 'content', this.value)"
+          >${item.content || ''}</textarea>
 
-          <details>
+          <div class="timeline-bottom">
 
-            <summary>
-              상세 서사 펼치기
-            </summary>
-
-            <textarea
-              placeholder="서사를 입력하세요"
-              onchange="updateTimeline(${index}, 'content', this.value)"
-            >${item.content || ''}</textarea>
-
-            <div class="relation-box">
-
-              <div class="relation-label">
-                관계 변화
-              </div>
-
-              <input
-                type="range"
-                min="0"
-                max="100"
-                value="${item.relation || 50}"
-                onchange="updateTimeline(${index}, 'relation', this.value)"
-              />
-
-            </div>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value="${item.relation || 50}"
+              onchange="updateTimeline(${index}, 'relation', this.value)"
+            >
 
             <input
               type="file"
@@ -688,24 +606,24 @@ function render() {
               onchange="timelineImage(event, ${index})"
             >
 
-            ${
-              item.image
-              ? `
-                <img
-                  src="${item.image}"
-                  class="image-preview"
-                >
-              `
-              : ''
-            }
+          </div>
 
-          </details>
+          ${
+            item.image
+            ? `
+              <img
+                src="${item.image}"
+                class="episode-image"
+              >
+            `
+            : ''
+          }
 
         </div>
       `
     }
 
-    timelineEl.appendChild(card)
+    timelineEl.appendChild(node)
   })
 
   applyBG()
@@ -713,6 +631,14 @@ function render() {
   renderGraph()
 
   save()
+}
+
+function autoResize(el) {
+
+  el.style.height = 'auto'
+
+  el.style.height =
+    el.scrollHeight + 'px'
 }
 
 function addTimeline() {
@@ -727,9 +653,9 @@ function addTimeline() {
 
     content: '',
 
-    image: '',
-
     relation: 50,
+
+    image: '',
   })
 
   render()
@@ -849,51 +775,6 @@ function changeBG(event) {
   reader.readAsDataURL(file)
 }
 
-function setBlur(value) {
-
-  state.blur = value
-
-  applyBG()
-
-  save()
-}
-
-function setScale(value) {
-
-  state.scale = value
-
-  applyBG()
-
-  save()
-}
-
-function setRotate(value) {
-
-  state.rotate = value
-
-  applyBG()
-
-  save()
-}
-
-function setPosX(value) {
-
-  state.posX = value
-
-  applyBG()
-
-  save()
-}
-
-function setPosY(value) {
-
-  state.posY = value
-
-  applyBG()
-
-  save()
-}
-
 function exportTXT() {
 
   const text =
@@ -942,25 +823,37 @@ function importTXT(event) {
 
 async function exportPNG() {
 
-  document.body.classList.add(
-    'export-mode'
-  )
+  const board =
+    document.getElementById(
+      'exportBoard'
+    )
+
+  const clone =
+    board.cloneNode(true)
+
+  clone.style.width = '1400px'
+
+  clone.style.position = 'absolute'
+
+  clone.style.left = '-99999px'
+
+  clone.style.top = '0'
+
+  clone.style.padding = '60px'
+
+  document.body.appendChild(clone)
 
   const canvas =
     await html2canvas(
-      document.getElementById(
-        'captureTarget'
-      ),
+      clone,
       {
         backgroundColor: null,
+        scale: 2,
         useCORS: true,
-        scale: 2
       }
     )
 
-  document.body.classList.remove(
-    'export-mode'
-  )
+  document.body.removeChild(clone)
 
   const link =
     document.createElement('a')
@@ -969,7 +862,7 @@ async function exportPNG() {
     `${state.projectName || 'pair'}.png`
 
   link.href =
-    canvas.toDataURL()
+    canvas.toDataURL('image/png')
 
   link.click()
 }
@@ -999,7 +892,7 @@ function renderGraph() {
   ctx.strokeStyle =
     '#91a2ff'
 
-  ctx.lineWidth = 4
+  ctx.lineWidth = 2
 
   ctx.beginPath()
 
@@ -1009,7 +902,7 @@ function renderGraph() {
       80 + index * 120
 
     const y =
-      200 - item.relation
+      150 - item.relation
 
     if (index === 0) {
 
@@ -1029,7 +922,7 @@ function renderGraph() {
       80 + index * 120
 
     const y =
-      200 - item.relation
+      150 - item.relation
 
     ctx.beginPath()
 
@@ -1039,7 +932,7 @@ function renderGraph() {
     ctx.arc(
       x,
       y,
-      7,
+      4,
       0,
       Math.PI * 2
     )
@@ -1086,7 +979,7 @@ charBBio.oninput = e => {
 new Sortable(
   timelineEl,
   {
-    animation: 200,
+    animation: 160,
 
     onEnd: function(evt) {
 
