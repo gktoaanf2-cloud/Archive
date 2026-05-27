@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OC CHRONICLE - ABSOLUTE FINAL V2</title>
+    <title>OC CHRONICLE - V2.1 STABLE</title>
     <link rel="preload" as="style" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
@@ -94,7 +94,7 @@
         .card-date { font-size: 9px; font-weight: 700; color: var(--c-sub); letter-spacing: 0.2em; margin-top: 5px; margin-bottom: 12px; }
         .card-title { font-size: 16px; font-weight: 800; line-height: 1.4; margin-bottom: 15px; color: var(--text-pri); }
         
-        .card-img-memo { position: absolute; top: -15px; right: -15px; width: 70px; height: 70px; border: 1px solid var(--line); border-top: 8px solid rgba(255,255,255,0.05); background-color: var(--c-bg); background-size: cover; background-position: center; box-shadow: 2px 5px 15px rgba(0,0,0,0.8); transform: rotate(5deg); z-index: 5; transition: 0.3s; filter: grayscale(20%); }
+        .card-img-memo { position: absolute; top: -15px; right: -15px; width: 70px; height: 70px; border: 1px solid var(--line); border-top: 8px solid rgba(255,255,255,0.05); background-color: var(--c-bg); background-size: cover; background-position: center; box-shadow: 2px 5px 15px rgba(0,0,0,0.8); transform: rotate(5deg); z-index: 5; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); filter: grayscale(20%); }
         .story-card:hover .card-img-memo { transform: rotate(0deg) scale(2) translate(-10px, 10px); z-index: 20; filter: grayscale(0%); border-top-color: var(--c-main); }
         .card-desc { font-size: 12px; line-height: 1.9; color: var(--text-mut); white-space: pre-wrap; word-break: keep-all; }
         
@@ -121,6 +121,7 @@
         .chapter-text-content:hover .ch-controls { opacity: 0.5; }
         .ch-controls button { background: none; border: none; font-size: 10px; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .ch-controls button:hover { opacity: 1 !important; }
+        .ch-del-btn { color: #ff5555; }
 
         /* 다꾸 스티커 */
         .sticker { position: absolute; cursor: move; z-index: 50; background-size: contain; background-repeat: no-repeat; background-position: center; border: 1px solid transparent; transition: border 0.2s; }
@@ -132,7 +133,7 @@
         .sticker-tip { display:none; position:absolute; bottom:-20px; left:50%; transform:translateX(-50%); font-size:9px; color:var(--c-main); white-space:nowrap; }
         .sticker.active .sticker-tip { display:block; }
 
-        /* 캡처/전시관 모드 */
+        /* 캡처/전시관 모달 숨김 */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 999; display: none; justify-content: center; align-items: center; }
         .editor-box { width: 400px; background: #0a0b0d; border: 1px solid var(--line); border-top: 2px solid var(--c-main); padding: 30px; display: flex; flex-direction: column; gap: 15px; }
         .editor-tabs { display: flex; gap: 15px; border-bottom: 1px solid var(--line); padding-bottom: 10px; margin-bottom: 10px; }
@@ -168,7 +169,7 @@
         <main class="center-board" id="scroll-board">
             <div class="hud-panel" id="hud-panel" data-html2canvas-ignore="true">
                 <div class="hud-top">
-                    <div class="sys-title">CHRONICLE_V2</div>
+                    <div class="sys-title">CHRONICLE_V2.1</div>
                     <div style="display:flex; gap: 10px;">
                         <button class="btn btn-sub" onclick="openGuide()">📖 배포 가이드</button>
                         <button class="btn btn-sub" onclick="document.getElementById('settings-bar').classList.toggle('active')">⚙️ SETTING</button>
@@ -267,8 +268,22 @@
     </div>
 
     <script>
-        let appData = { pair:{title:'',sub:'',date:''}, c1:{img:'',name:'',bio:''}, c2:{img:'',name:'',bio:''}, theme:{main:'#d1bda0',sub:'#6d827c'}, bg:{img:'',blur:0,opacity:3}, settings:{grid:true,numStyle:'arabic'}, timeline:[], stickers:[] };
+        // [V2.1 절대 방어형 데이터 선언]
+        let defaultData = { pair:{title:'',sub:'',date:''}, c1:{img:'',name:'',bio:''}, c2:{img:'',name:'',bio:''}, theme:{main:'#d1bda0',sub:'#6d827c'}, bg:{img:'',blur:0,opacity:3}, settings:{grid:true,numStyle:'arabic'}, timeline:[], stickers:[] };
+        let appData = JSON.parse(JSON.stringify(defaultData)); 
         let tempImg = ''; let editingId = null;
+
+        /* 방어형 데이터 병합 엔진 (구버전 호환용) */
+        function mergeData(parsed) {
+            appData.pair = { ...defaultData.pair, ...(parsed.pair || {}) };
+            appData.c1 = { ...defaultData.c1, ...(parsed.c1 || {}) };
+            appData.c2 = { ...defaultData.c2, ...(parsed.c2 || {}) };
+            appData.theme = { ...defaultData.theme, ...(parsed.theme || {}) };
+            appData.bg = { ...defaultData.bg, ...(parsed.bg || {}) };
+            appData.settings = { ...defaultData.settings, ...(parsed.settings || {}) };
+            appData.timeline = parsed.timeline || [];
+            appData.stickers = parsed.stickers || [];
+        }
 
         function compressImage(file, callback) {
             const reader = new FileReader();
@@ -288,10 +303,11 @@
         }
 
         window.onload = () => {
-            const saved = localStorage.getItem('oc_archive_v17'); // 버전 승격
+            const saved = localStorage.getItem('oc_archive_v18'); 
             if(saved) { 
-                appData = JSON.parse(saved); applyUI(); 
+                try { mergeData(JSON.parse(saved)); } catch(e){} 
             }
+            applyUI(); 
             document.getElementById('scroll-board').addEventListener('mousedown', (e) => {
                 if(!e.target.closest('.sticker')) document.querySelectorAll('.sticker').forEach(s => s.classList.remove('active'));
             });
@@ -315,7 +331,7 @@
             appData.c1.name = document.getElementById('c1-name').value; appData.c1.bio = document.getElementById('c1-bio').value;
             appData.c2.name = document.getElementById('c2-name').value; appData.c2.bio = document.getElementById('c2-bio').value;
             appData.theme.main = document.getElementById('theme-main').value; appData.theme.sub = document.getElementById('theme-sub').value;
-            localStorage.setItem('oc_archive_v17', JSON.stringify(appData));
+            localStorage.setItem('oc_archive_v18', JSON.stringify(appData));
         }
 
         function calcDday() {
@@ -349,6 +365,14 @@
         }
 
         function toRoman(num) { const roman = {M:1000, CM:900, D:500, CD:400, C:100, XC:90, L:50, XL:40, X:10, IX:9, V:5, IV:4, I:1}; let str = ''; for (let i of Object.keys(roman)) { let q = Math.floor(num / roman[i]); num -= q * roman[i]; str += i.repeat(q); } return str; }
+
+        function openGuide() { document.getElementById('guide-modal').style.display = 'flex'; }
+        
+        function resetAllData() {
+            if(confirm("경고: 모든 데이터가 영구적으로 삭제됩니다!\n정말 초기화하시겠습니까?")) {
+                localStorage.removeItem('oc_archive_v18'); location.reload();
+            }
+        }
 
         function openModal(type) { editingId = null; document.getElementById('editor-modal').style.display = 'flex'; switchTab(type); }
         function closeModal() { document.getElementById('editor-modal').style.display = 'none'; }
@@ -406,7 +430,6 @@
             if (tempRow.length > 0) currentRows.push(tempRow); flushRows();
         }
 
-        /* 다꾸 스티커 */
         let highestZ = 50; let draggingSticker = null; let sStartX, sStartY;
         function addSticker(e) { if(e.target.files[0]) compressImage(e.target.files[0], d => { appData.stickers.push({ id:Date.now(), img:d, x:400, y:300, w:150, h:150, r:0, z:++highestZ }); saveData(); renderStickers(); }); }
         function renderStickers() {
@@ -424,7 +447,6 @@
         function changeStickerZ(id, dir) { const s = appData.stickers.find(i => i.id === id); if(s) { s.z += (dir * 2); renderStickers(); saveData(); } }
         function deleteSticker(id) { appData.stickers = appData.stickers.filter(s => s.id !== id); saveData(); renderStickers(); }
 
-        /* [텍스트 잘림 픽스 엔진] */
         function captureSetup() {
             const wrapper = document.getElementById('capture-area'); wrapper.classList.add('capture-mode');
             const inputs = wrapper.querySelectorAll('input.char-input, textarea.char-input, input.pair-input, input.ph-date-input');
@@ -438,42 +460,29 @@
         function captureRestore() {
             const wrapper = document.getElementById('capture-area'); wrapper.classList.remove('capture-mode');
             wrapper.querySelectorAll('.static-text-clone').forEach(d => d.remove());
-            wrapper.querySelectorAll('input.char-input, textarea.char-input, input.pair-input, input.ph-date-input').forEach(i => i.display = '');
-            applyUI(); // 원본 폼 다시 복구
+            wrapper.querySelectorAll('input.char-input, textarea.char-input, input.pair-input, input.ph-date-input').forEach(i => i.style.display = '');
+            applyUI(); 
         }
 
-        /* 📸 이미지 렌더링 */
         function exportImage() {
             const wrapper = document.getElementById('capture-area'); const board = document.getElementById('scroll-board');
-            const w = wrapper.offsetWidth; const h = board.scrollHeight;
-            const backupW = wrapper.style.width; const backupH = wrapper.style.height; const backupOverflow = board.style.overflowY;
-            wrapper.style.width = w + 'px'; wrapper.style.height = h + 'px'; board.style.overflowY = 'visible';
-            captureSetup();
-            document.fonts.ready.then(() => {
-                setTimeout(() => {
-                    html2canvas(wrapper, { backgroundColor: "#0a0b0d", scale: 1, useCORS: true, width: w, height: h, logging: false })
-                    .then(canvas => {
-                        const a = document.createElement('a'); a.href = canvas.toDataURL("image/jpeg", 0.9);
-                        a.download = `CHRONICLE_${appData.pair.title || 'ARCHIVE'}.jpg`; a.click();
-                        wrapper.style.width = backupW; wrapper.style.height = backupH; board.style.overflowY = backupOverflow; captureRestore();
-                    });
-                }, 500); 
-            });
+            const w = wrapper.offsetWidth; const h = board.scrollHeight; const backupW = wrapper.style.width; const backupH = wrapper.style.height; const backupOverflow = board.style.overflowY;
+            wrapper.style.width = w + 'px'; wrapper.style.height = h + 'px'; board.style.overflowY = 'visible'; captureSetup();
+            document.fonts.ready.then(() => { setTimeout(() => {
+                html2canvas(wrapper, { backgroundColor: "#0a0b0d", scale: 1, useCORS: true, width: w, height: h, logging: false })
+                .then(canvas => { const a = document.createElement('a'); a.href = canvas.toDataURL("image/jpeg", 0.9); a.download = `CHRONICLE_${appData.pair.title || 'ARCHIVE'}.jpg`; a.click(); wrapper.style.width = backupW; wrapper.style.height = backupH; board.style.overflowY = backupOverflow; captureRestore(); });
+            }, 500); });
         }
 
-        /* 🌐 [테마 박제 엔진 탑재] HTML 전시관 내보내기 */
         function exportHTMLViewer() {
-            const wrapper = document.getElementById('capture-area');
-            captureSetup(); 
-
+            const wrapper = document.getElementById('capture-area'); captureSetup(); 
             const clone = wrapper.cloneNode(true);
-            clone.classList.remove('capture-mode'); // 전시관은 락 해제
+            clone.classList.remove('capture-mode'); 
             clone.querySelector('#hud-panel')?.remove();
             clone.querySelectorAll('.card-controls, .ch-controls, .sticker-controls, .sticker-tip, input[type="file"], .del-btn').forEach(el => el.remove());
             clone.querySelectorAll('*').forEach(el => { el.removeAttribute('onclick'); el.removeAttribute('oninput'); el.removeAttribute('onchange'); el.removeAttribute('onmousedown'); });
             clone.querySelector('#scroll-board').style.pointerEvents = 'auto';
 
-            // [핵심] 현재 라이브 테마 컬러 추출
             const activeMain = getComputedStyle(document.documentElement).getPropertyValue('--c-main').trim();
             const activeSub = getComputedStyle(document.documentElement).getPropertyValue('--c-sub').trim();
             const activeBg = getComputedStyle(document.documentElement).getPropertyValue('--c-bg').trim();
@@ -484,7 +493,6 @@
                     body { overflow: auto; background: var(--c-bg); }
                     .sticker { pointer-events: none !important; border:none !important; }
                     .static-text-clone { display: flex !important; }
-                    /* 호버 부활 */
                     .story-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 10; border-color: var(--c-main); }
                     .story-card:hover .card-img-memo { transform: rotate(0deg) scale(2) translate(-10px, 10px) !important; z-index: 20; filter: grayscale(0%); border-top-color: var(--c-main); }
                 </style>
@@ -492,18 +500,31 @@
 
             const htmlHeader = `<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><title>${appData.pair.title || 'ARCHIVE'}</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css"><style>${document.getElementById('core-css').innerHTML}</style>${exhibitionStyle}</head><body>`;
             const finalHTML = htmlHeader + clone.outerHTML + `</body></html>`;
-            
             const blob = new Blob([finalHTML], {type: "text/html;charset=utf-8"});
             const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
             a.download = `VIEWER_${appData.pair.title || 'ARCHIVE'}.html`; a.click();
-
-            captureRestore();
-            alert("테마 컬러가 완벽하게 박제된 전시관 HTML이 생성되었습니다!");
+            captureRestore(); alert("완벽한 전시관 HTML이 생성되었습니다!");
         }
 
-        function resetAllData() { if(confirm("모든 데이터를 초기화하시겠습니까? 백업되지 않은 데이터는 복구 불가합니다.")) { localStorage.removeItem('oc_archive_v17'); location.reload(); } }
+        /* [V2.1 치명적 에러 픽스: 로딩 데이터 병합 엔진] */
+        function importData(e) { 
+            const f = e.target.files[0]; if(!f) return; 
+            const r = new FileReader(); 
+            r.onload = ev => { 
+                try {
+                    const parsed = JSON.parse(ev.target.result);
+                    mergeData(parsed); // 구버전 데이터 완벽 호환 병합
+                    applyUI(); 
+                    saveData(); 
+                    alert("데이터 로드 완료!"); 
+                } catch(err) {
+                    alert("파일이 손상되었거나 형식이 맞지 않습니다.");
+                }
+                e.target.value = ''; // 연속 로드 버그 방지
+            }; 
+            r.readAsText(f); 
+        }
         function exportData() { saveData(); const b = new Blob([JSON.stringify(appData)], {type: 'text/plain'}); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `ARCHIVE_DATA.txt`; a.click(); }
-        function importData(e) { const f = e.target.files[0]; if(!f) return; const r = new FileReader(); r.onload = ev => { appData = JSON.parse(ev.target.result); applyUI(); saveData(); alert("데이터 로드 완료!"); }; r.readAsText(f); }
     </script>
 </body>
 </html>
