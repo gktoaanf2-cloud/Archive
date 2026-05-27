@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OC CHRONICLE - ABSOLUTE FINAL</title>
+    <title>OC CHRONICLE - ABSOLUTE FINAL V2</title>
     <link rel="preload" as="style" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
@@ -94,11 +94,10 @@
         .card-date { font-size: 9px; font-weight: 700; color: var(--c-sub); letter-spacing: 0.2em; margin-top: 5px; margin-bottom: 12px; }
         .card-title { font-size: 16px; font-weight: 800; line-height: 1.4; margin-bottom: 15px; color: var(--text-pri); }
         
-        .card-img-memo { position: absolute; top: -15px; right: -15px; width: 70px; height: 70px; border: 1px solid var(--line); border-top: 8px solid rgba(255,255,255,0.05); background-color: var(--c-bg); background-size: cover; background-position: center; box-shadow: 2px 5px 15px rgba(0,0,0,0.8); transform: rotate(5deg); z-index: 5; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); filter: grayscale(20%); }
+        .card-img-memo { position: absolute; top: -15px; right: -15px; width: 70px; height: 70px; border: 1px solid var(--line); border-top: 8px solid rgba(255,255,255,0.05); background-color: var(--c-bg); background-size: cover; background-position: center; box-shadow: 2px 5px 15px rgba(0,0,0,0.8); transform: rotate(5deg); z-index: 5; transition: 0.3s; filter: grayscale(20%); }
         .story-card:hover .card-img-memo { transform: rotate(0deg) scale(2) translate(-10px, 10px); z-index: 20; filter: grayscale(0%); border-top-color: var(--c-main); }
         .card-desc { font-size: 12px; line-height: 1.9; color: var(--text-mut); white-space: pre-wrap; word-break: keep-all; }
         
-        /* 카드 컨트롤러 */
         .card-controls { position: absolute; bottom: 15px; right: 15px; display: flex; gap: 8px; opacity: 0; transition: 0.2s; }
         .story-card:hover .card-controls { opacity: 0.5; }
         .card-controls button { background: none; border: none; font-size: 9px; cursor: pointer; letter-spacing: 0.1em; transition: 0.2s; }
@@ -106,25 +105,24 @@
         .btn-edit { color: var(--c-main); }
         .btn-del { color: #ff5555; }
 
-        /* 챕터 분기점 (미니멀 디자인) */
+        /* 챕터 분기점 */
         .chapter-divider { width: 100%; display: flex; align-items: center; justify-content: center; margin: 60px 0; position: relative; z-index: 5; }
-        .chapter-divider::before { content: ''; position: absolute; top: -30px; bottom: -30px; width: 1px; background: var(--c-sub); opacity: 0.3; z-index: 0; }
+        .chapter-divider::before { content: ''; position: absolute; top: -30px; bottom: -30px; width: 1px; background: var(--line); z-index: 0; }
         
-        .chapter-text-content { position: relative; z-index: 2; text-align: center; display: flex; flex-direction: column; align-items: center; background: var(--c-bg); padding: 20px 45px; border: 1px solid var(--line); border-top: 2px solid var(--c-main); box-shadow: 0 10px 30px rgba(0,0,0,0.8); min-width: 220px; transition: 0.3s; }
+        .chapter-text-content { position: relative; z-index: 2; text-align: center; display: flex; flex-direction: column; align-items: center; background: var(--c-bg); padding: 25px 50px; border: 1px solid var(--line); border-top: 2px solid var(--c-main); box-shadow: 0 10px 30px rgba(0,0,0,0.8); min-width: 220px; transition: 0.3s; }
         .chapter-text-content:hover { border-color: var(--c-main); }
         
         .ch-label { font-size: 10px; font-weight: 800; letter-spacing: 0.4em; color: var(--text-mut); margin-bottom: 5px; text-transform: uppercase; }
         .ch-number { font-size: 24px; font-weight: 900; letter-spacing: 0.1em; color: var(--c-main); margin-bottom: 12px; font-family: 'Times New Roman', serif; }
         .ch-title { font-size: 18px; font-weight: 900; color: #fff; margin-bottom: 5px; letter-spacing: 0.05em; }
-        .ch-sub { font-size: 11px; color: var(--c-sub); letter-spacing: 0.2em; }
+        .ch-sub { font-size: 10px; color: var(--c-sub); letter-spacing: 0.2em; }
 
         .ch-controls { position: absolute; right: 10px; top: 10px; display: flex; gap: 8px; opacity: 0; transition: 0.2s; }
         .chapter-text-content:hover .ch-controls { opacity: 0.5; }
         .ch-controls button { background: none; border: none; font-size: 10px; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .ch-controls button:hover { opacity: 1 !important; }
-        .ch-del-btn { color: #ff5555; }
 
-        /* 다꾸 스티커 시스템 */
+        /* 다꾸 스티커 */
         .sticker { position: absolute; cursor: move; z-index: 50; background-size: contain; background-repeat: no-repeat; background-position: center; border: 1px solid transparent; transition: border 0.2s; }
         .sticker.active { border: 1px dashed var(--c-main); background-color: rgba(255,255,255,0.05); }
         .sticker-controls { position: absolute; top: -30px; left: 50%; transform: translateX(-50%); display: none; background: rgba(0,0,0,0.8); border: 1px solid var(--c-main); padding: 4px 8px; border-radius: 4px; gap: 8px; font-size: 10px; white-space: nowrap; pointer-events: auto; }
@@ -134,7 +132,7 @@
         .sticker-tip { display:none; position:absolute; bottom:-20px; left:50%; transform:translateX(-50%); font-size:9px; color:var(--c-main); white-space:nowrap; }
         .sticker.active .sticker-tip { display:block; }
 
-        /* 모달 및 상태 숨김 (전시관/캡처용) */
+        /* 캡처/전시관 모드 */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 999; display: none; justify-content: center; align-items: center; }
         .editor-box { width: 400px; background: #0a0b0d; border: 1px solid var(--line); border-top: 2px solid var(--c-main); padding: 30px; display: flex; flex-direction: column; gap: 15px; }
         .editor-tabs { display: flex; gap: 15px; border-bottom: 1px solid var(--line); padding-bottom: 10px; margin-bottom: 10px; }
@@ -142,17 +140,13 @@
         .tab-btn.active { color: var(--c-main); }
         .editor-input { background: transparent; border: 1px solid var(--line); color: var(--text-pri); padding: 12px; font-family: inherit; font-size: 11px; letter-spacing: 0.05em; transition: 0.2s; }
         .editor-input:focus { border-color: var(--c-main); }
-        #form-story, #form-chapter { display: flex; flex-direction: column; gap: 12px; }
-        #form-chapter { display: none; }
         
-        /* 캡처 안전 모드 (HTML 전시관에서는 제거됨) */
         .capture-mode .story-card { backdrop-filter: none !important; }
         .capture-mode .pillar-img { filter: grayscale(0%) !important; }
         .capture-mode .card-img-memo { transform: rotate(0deg) scale(1) translate(0,0) !important; filter: grayscale(0%) !important; border-top-color: var(--c-main) !important;}
         .capture-mode .sticker { border-color: transparent !important; background-color: transparent !important; }
         .capture-mode .sticker-controls, .capture-mode .sticker-tip { display: none !important; }
 
-        /* 텍스트 렌더링 방어용 정적 블록 클래스 */
         .static-text-clone { white-space: pre-wrap; word-break: break-word; overflow: hidden; display: flex; }
     </style>
 </head>
@@ -203,14 +197,14 @@
                         <button class="btn btn-sub" onclick="exportData()">TXT 백업</button>
                         <button class="btn btn-sub" onclick="document.getElementById('import-file').click()">TXT 로드</button>
                         <input type="file" id="import-file" hidden accept=".txt" onchange="importData(event)">
-                        <button class="btn btn-danger" style="margin-left:5px;" onclick="resetAllData()">💣 리셋</button>
+                        <button class="btn btn-danger" onclick="resetAllData()">💣 리셋</button>
                     </div>
                 </div>
             </div>
 
             <header class="pair-header">
                 <input type="text" id="pair-title" class="pair-input ph-title" placeholder="ENTER PAIR NAME" oninput="saveData()">
-                <input type="text" id="pair-sub" class="pair-input ph-sub" placeholder="서브 문구를 입력하세요 (예: 별들이 쏟아지던 밤)" oninput="saveData()">
+                <input type="text" id="pair-sub" class="pair-input ph-sub" placeholder="서브 문구를 입력하세요" oninput="saveData()">
                 <div class="ph-dday-wrap">
                     <input type="date" id="pair-date" class="ph-date-input" onchange="calcDday(); saveData()">
                     <span id="dday-result" class="ph-dday-text">D-DAY</span>
@@ -218,7 +212,6 @@
             </header>
 
             <div class="timeline-container" id="timeline-box"></div>
-            
             <div id="sticker-layer"></div>
         </main>
 
@@ -239,21 +232,18 @@
                 <button class="tab-btn" id="tab-chapter" onclick="switchTab('chapter')">챕터 분기</button>
                 <button class="btn btn-sub" style="margin-left:auto; padding:0;" onclick="closeModal()">X</button>
             </div>
-            
-            <div id="form-story">
+            <div id="form-story" style="display: flex; flex-direction: column; gap: 12px;">
                 <input type="text" id="evDate" class="editor-input" placeholder="DATE (예: 2026.05.27)">
                 <input type="text" id="evTitle" class="editor-input" placeholder="서사 제목">
                 <label class="btn" style="text-align:center; background:rgba(255,255,255,0.02); border-color:var(--line);">
-                    + 이미지 첨부 (메모지로 부착됨)
+                    + 이미지 첨부 (메모지)
                     <input type="file" hidden accept="image/*" onchange="setTempImg(event)">
                 </label>
                 <div id="evPreview" style="display:none; height:80px; background-size:cover; background-position:center; border:1px solid var(--line);"></div>
                 <textarea id="evContent" class="editor-input" style="height:120px; resize:none;" placeholder="서사 내용 작성..."></textarea>
                 <button class="btn" style="background:var(--c-main); color:#000;" onclick="addItem('story')">저장</button>
             </div>
-            
-            <div id="form-chapter">
-                <div style="font-size:10px; color:var(--c-main); text-align:center; margin-bottom:5px;">※ 챕터 번호는 자동 부여됩니다.</div>
+            <div id="form-chapter" style="display: none; flex-direction: column; gap: 12px;">
                 <input type="text" id="chTitle" class="editor-input" placeholder="에피소드 타이틀">
                 <input type="text" id="chSub" class="editor-input" placeholder="서브 문구 / 날짜">
                 <button class="btn" style="background:var(--c-main); color:#000;" onclick="addItem('chapter')">챕터 저장</button>
@@ -264,33 +254,21 @@
     <div class="modal-overlay" id="guide-modal" data-html2canvas-ignore="true">
         <div class="editor-box" style="width: 450px;">
             <div style="font-size:16px; font-weight:bold; color:var(--c-main); border-bottom:1px solid var(--line); padding-bottom:10px; margin-bottom:10px;">
-                🌐 전시관 공유 가이드 (Netlify Drop)
+                🌐 전시관 공유 가이드
                 <button class="btn btn-sub" style="float:right; padding:0;" onclick="document.getElementById('guide-modal').style.display='none'">X</button>
             </div>
             <div style="font-size:12px; line-height:1.8; color:var(--text-pri);">
-                다른 사람에게 완성된 이 페이지를 '링크'로 보여주고 싶다면?<br><br>
-                <span style="color:var(--c-sub);">1.</span> 우측 상단의 <b>[HTML 전시관 내보내기]</b> 버튼을 누릅니다.<br>
-                <span style="color:var(--c-sub);">2.</span> 다운로드된 HTML 파일은 타인이 수정할 수 없는 관람 전용 회지입니다.<br>
-                <span style="color:var(--c-sub);">3.</span> 인터넷 창을 열고 <b>[ app.netlify.com/drop ]</b> 에 접속합니다.<br>
-                <span style="color:var(--c-sub);">4.</span> 다운받은 HTML 파일을 중앙 원 안으로 드래그 앤 드롭합니다.<br>
-                <span style="color:var(--c-sub);">5.</span> 3초 뒤 초록색 링크가 생성됩니다. 그 링크를 앤오님께 공유하세요!<br>
+                <span style="color:var(--c-sub);">1.</span> 우측 상단의 <b>[HTML 전시관 내보내기]</b> 버튼을 클릭합니다.<br>
+                <span style="color:var(--c-sub);">2.</span> 다운로드된 HTML 파일은 애니메이션이 포함된 감상 전용 파일입니다.<br>
+                <span style="color:var(--c-sub);">3.</span> <b>[app.netlify.com/drop]</b> 에 접속하여 파일을 드래그합니다.<br>
+                <span style="color:var(--c-sub);">4.</span> 생성된 링크를 모두에게 공개하세요!
             </div>
         </div>
     </div>
 
     <script>
-        let appData = {
-            pair: { title: '', sub: '', date: '' },
-            c1: { img: '', name: '', bio: '' },
-            c2: { img: '', name: '', bio: '' },
-            theme: { main: '#d1bda0', sub: '#6d827c' },
-            bg: { img: '', blur: 0, opacity: 3 },
-            settings: { grid: true, numStyle: 'arabic' },
-            timeline: [],
-            stickers: []
-        };
-        let tempImg = '';
-        let editingId = null; 
+        let appData = { pair:{title:'',sub:'',date:''}, c1:{img:'',name:'',bio:''}, c2:{img:'',name:'',bio:''}, theme:{main:'#d1bda0',sub:'#6d827c'}, bg:{img:'',blur:0,opacity:3}, settings:{grid:true,numStyle:'arabic'}, timeline:[], stickers:[] };
+        let tempImg = ''; let editingId = null;
 
         function compressImage(file, callback) {
             const reader = new FileReader();
@@ -310,109 +288,91 @@
         }
 
         window.onload = () => {
-            const saved = localStorage.getItem('oc_archive_v16'); // 버전 16으로 승격
+            const saved = localStorage.getItem('oc_archive_v17'); // 버전 승격
             if(saved) { 
-                const parsed = JSON.parse(saved);
-                appData = { ...appData, ...parsed }; 
-                if(!appData.pair) appData.pair = { title: '', sub: '', date: '' };
-                if(!appData.stickers) appData.stickers = [];
-                applyUI(); 
+                appData = JSON.parse(saved); applyUI(); 
             }
             document.getElementById('scroll-board').addEventListener('mousedown', (e) => {
-                if(!e.target.closest('.sticker')) {
-                    document.querySelectorAll('.sticker').forEach(s => s.classList.remove('active'));
-                }
+                if(!e.target.closest('.sticker')) document.querySelectorAll('.sticker').forEach(s => s.classList.remove('active'));
             });
         };
 
         function applyUI() {
-            document.getElementById('pair-title').value = appData.pair.title; document.getElementById('pair-sub').value = appData.pair.sub; document.getElementById('pair-date').value = appData.pair.date; calcDday();
-            document.getElementById('c1-name').value = appData.c1.name; document.getElementById('c1-bio').value = appData.c1.bio;
+            document.getElementById('pair-title').value = appData.pair.title || ''; document.getElementById('pair-sub').value = appData.pair.sub || ''; document.getElementById('pair-date').value = appData.pair.date || ''; calcDday();
+            document.getElementById('c1-name').value = appData.c1.name || ''; document.getElementById('c1-bio').value = appData.c1.bio || '';
             if(appData.c1.img) document.getElementById('char1-img').style.backgroundImage = `url(${appData.c1.img})`;
-            document.getElementById('c2-name').value = appData.c2.name; document.getElementById('c2-bio').value = appData.c2.bio;
+            document.getElementById('c2-name').value = appData.c2.name || ''; document.getElementById('c2-bio').value = appData.c2.bio || '';
             if(appData.c2.img) document.getElementById('char2-img').style.backgroundImage = `url(${appData.c2.img})`;
             document.getElementById('theme-main').value = appData.theme.main; document.getElementById('theme-sub').value = appData.theme.sub;
             updateColors();
             if(appData.bg.img) document.getElementById('bg-canvas').style.backgroundImage = `url(${appData.bg.img})`;
             document.getElementById('bg-opacity').value = appData.bg.opacity; document.getElementById('bg-blur').value = appData.bg.blur;
-            updateBgStyle();
-            applySettingsUI(); renderTimeline(); renderStickers();
+            updateBgStyle(); applySettingsUI(); renderTimeline(); renderStickers();
         }
 
         function saveData() {
-            appData.pair.title = document.getElementById('pair-title').value; appData.pair.sub = document.getElementById('pair-sub').value; appData.pair.date = document.getElementById('pair-date').value;
+            appData.pair = { title: document.getElementById('pair-title').value, sub: document.getElementById('pair-sub').value, date: document.getElementById('pair-date').value };
             appData.c1.name = document.getElementById('c1-name').value; appData.c1.bio = document.getElementById('c1-bio').value;
             appData.c2.name = document.getElementById('c2-name').value; appData.c2.bio = document.getElementById('c2-bio').value;
             appData.theme.main = document.getElementById('theme-main').value; appData.theme.sub = document.getElementById('theme-sub').value;
-            appData.bg.opacity = document.getElementById('bg-opacity').value; appData.bg.blur = document.getElementById('bg-blur').value;
-            try { localStorage.setItem('oc_archive_v16', JSON.stringify(appData)); } catch(e) {}
+            localStorage.setItem('oc_archive_v17', JSON.stringify(appData));
         }
 
         function calcDday() {
             const dateStr = document.getElementById('pair-date').value; const res = document.getElementById('dday-result');
             if(!dateStr) { res.innerText = "D-DAY"; return; }
-            const start = new Date(dateStr); const today = new Date(); const diffTime = today - start; const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            if(diffDays > 0) res.innerText = `D+${diffDays}`; else if(diffDays < 0) res.innerText = `D${diffDays}`; else res.innerText = `D-DAY`;
+            const diffDays = Math.ceil((new Date() - new Date(dateStr)) / (1000 * 60 * 60 * 24));
+            res.innerText = diffDays > 0 ? `D+${diffDays}` : (diffDays < 0 ? `D${diffDays}` : `D-DAY`);
         }
 
-        function updateColors() { const m = document.getElementById('theme-main').value; const s = document.getElementById('theme-sub').value; document.documentElement.style.setProperty('--c-main', m); document.documentElement.style.setProperty('--c-sub', s); document.documentElement.style.setProperty('--line', m + '25'); saveData(); }
-        function updateBgStyle() { document.getElementById('bg-canvas').style.opacity = document.getElementById('bg-opacity').value / 10; document.getElementById('bg-canvas').style.filter = `blur(${document.getElementById('bg-blur').value}px)`; saveData(); }
-        function handleBgUpload(e) { if(e.target.files[0]) { compressImage(e.target.files[0], (compressedData) => { appData.bg.img = compressedData; document.getElementById('bg-canvas').style.backgroundImage = `url(${appData.bg.img})`; saveData(); }); } }
-        function handleImgUpload(e, imgId, key) { if(e.target.files[0]) { compressImage(e.target.files[0], (compressedData) => { appData[key].img = compressedData; document.getElementById(imgId).style.backgroundImage = `url(${appData[key].img})`; saveData(); }); } }
+        function updateColors() {
+            const m = document.getElementById('theme-main').value; const s = document.getElementById('theme-sub').value;
+            document.documentElement.style.setProperty('--c-main', m); document.documentElement.style.setProperty('--c-sub', s);
+            document.documentElement.style.setProperty('--line', m + '25'); saveData();
+        }
+
+        function updateBgStyle() {
+            appData.bg.opacity = document.getElementById('bg-opacity').value; appData.bg.blur = document.getElementById('bg-blur').value;
+            document.getElementById('bg-canvas').style.opacity = appData.bg.opacity / 10;
+            document.getElementById('bg-canvas').style.filter = `blur(${appData.bg.blur}px)`; saveData();
+        }
+
+        function handleBgUpload(e) { if(e.target.files[0]) compressImage(e.target.files[0], d => { appData.bg.img = d; document.getElementById('bg-canvas').style.backgroundImage = `url(${d})`; saveData(); }); }
+        function handleImgUpload(e, id, key) { if(e.target.files[0]) compressImage(e.target.files[0], d => { appData[key].img = d; document.getElementById(id).style.backgroundImage = `url(${d})`; saveData(); }); }
 
         function toggleGrid() { appData.settings.grid = !appData.settings.grid; applySettingsUI(); saveData(); }
-        function toggleNumStyle() { appData.settings.numStyle = appData.settings.numStyle === 'arabic' ? 'roman' : 'arabic'; applySettingsUI(); saveData(); renderTimeline(); }
+        function toggleNumStyle() { appData.settings.numStyle = appData.settings.numStyle === 'arabic' ? 'roman' : 'arabic'; applySettingsUI(); renderTimeline(); saveData(); }
         function applySettingsUI() {
-            const gridEl = document.getElementById('bg-grid'); const gridBtn = document.getElementById('grid-toggle-btn');
-            if(appData.settings.grid) { gridEl.style.display = 'block'; gridBtn.innerText = '격자 [ON]'; gridBtn.classList.add('btn-active'); } else { gridEl.style.display = 'none'; gridBtn.innerText = '격자 [OFF]'; gridBtn.classList.remove('btn-active'); }
-            const numBtn = document.getElementById('num-style-btn'); numBtn.innerText = appData.settings.numStyle === 'arabic' ? '챕터 [01]' : '챕터 [ I ]';
-            if(appData.settings.numStyle === 'roman') numBtn.classList.add('btn-active'); else numBtn.classList.remove('btn-active');
+            document.getElementById('bg-grid').style.display = appData.settings.grid ? 'block' : 'none';
+            document.getElementById('grid-toggle-btn').innerText = `격자 [${appData.settings.grid ? 'ON' : 'OFF'}]`;
+            document.getElementById('num-style-btn').innerText = `챕터 [${appData.settings.numStyle === 'arabic' ? '01' : ' I '}]`;
         }
 
         function toRoman(num) { const roman = {M:1000, CM:900, D:500, CD:400, C:100, XC:90, L:50, XL:40, X:10, IX:9, V:5, IV:4, I:1}; let str = ''; for (let i of Object.keys(roman)) { let q = Math.floor(num / roman[i]); num -= q * roman[i]; str += i.repeat(q); } return str; }
 
-        function openGuide() { document.getElementById('guide-modal').style.display = 'flex'; }
-        
-        /* [핵심 기능] 데이터 전체 초기화(리셋) */
-        function resetAllData() {
-            if(confirm("경고: 모든 서사, 캐릭터, 스티커 및 설정 데이터가 영구적으로 삭제됩니다!\n정말 초기화하시겠습니까?")) {
-                localStorage.removeItem('oc_archive_v16');
-                location.reload();
-            }
-        }
-
-        function openModal(type) { 
-            editingId = null; document.getElementById('editor-modal').style.display = 'flex'; 
-            document.getElementById('evDate').value = ''; document.getElementById('evTitle').value = ''; document.getElementById('evContent').value = ''; document.getElementById('evPreview').style.display = 'none'; tempImg = '';
-            document.getElementById('chTitle').value = ''; document.getElementById('chSub').value = '';
-            switchTab(type); 
-        }
-        function closeModal() { document.getElementById('editor-modal').style.display = 'none'; editingId = null; }
+        function openModal(type) { editingId = null; document.getElementById('editor-modal').style.display = 'flex'; switchTab(type); }
+        function closeModal() { document.getElementById('editor-modal').style.display = 'none'; }
         function switchTab(type) { document.getElementById('tab-story').classList.toggle('active', type === 'story'); document.getElementById('tab-chapter').classList.toggle('active', type === 'chapter'); document.getElementById('form-story').style.display = type === 'story' ? 'flex' : 'none'; document.getElementById('form-chapter').style.display = type === 'chapter' ? 'flex' : 'none'; }
-        function setTempImg(e) { if(e.target.files[0]) { compressImage(e.target.files[0], (compressedData) => { tempImg = compressedData; const preview = document.getElementById('evPreview'); preview.style.backgroundImage = `url(${tempImg})`; preview.style.display = 'block'; }); } }
+        function setTempImg(e) { if(e.target.files[0]) compressImage(e.target.files[0], d => { tempImg = d; const p = document.getElementById('evPreview'); p.style.backgroundImage = `url(${d})`; p.style.display = 'block'; }); }
 
         function editItem(id) {
             const item = appData.timeline.find(i => i.id === id); if(!item) return;
             editingId = id; document.getElementById('editor-modal').style.display = 'flex';
             if(item.type === 'story') {
-                switchTab('story');
-                document.getElementById('evDate').value = item.date; document.getElementById('evTitle').value = item.title; document.getElementById('evContent').value = item.content;
-                tempImg = item.img || ''; const preview = document.getElementById('evPreview');
-                if(tempImg) { preview.style.backgroundImage = `url(${tempImg})`; preview.style.display = 'block'; } else { preview.style.display = 'none'; }
+                switchTab('story'); document.getElementById('evDate').value = item.date; document.getElementById('evTitle').value = item.title; document.getElementById('evContent').value = item.content; tempImg = item.img || '';
+                const p = document.getElementById('evPreview'); if(tempImg){ p.style.backgroundImage=`url(${tempImg})`; p.style.display='block';} else p.style.display='none';
             } else { switchTab('chapter'); document.getElementById('chTitle').value = item.title; document.getElementById('chSub').value = item.sub; }
         }
 
         function addItem(type) {
             if(type === 'story') {
                 const title = document.getElementById('evTitle').value; if(!title) return alert("제목 필수.");
-                if(editingId) {
-                    const item = appData.timeline.find(i => i.id === editingId);
-                    item.date = document.getElementById('evDate').value; item.title = title; item.content = document.getElementById('evContent').value; item.img = tempImg;
-                } else { appData.timeline.push({ type: 'story', id: Date.now(), date: document.getElementById('evDate').value, title: title, content: document.getElementById('evContent').value, img: tempImg }); }
+                if(editingId) { const i = appData.timeline.find(x => x.id === editingId); i.date = document.getElementById('evDate').value; i.title = title; i.content = document.getElementById('evContent').value; i.img = tempImg; }
+                else appData.timeline.push({ type:'story', id:Date.now(), date:document.getElementById('evDate').value, title:title, content:document.getElementById('evContent').value, img:tempImg });
             } else {
-                const chTitle = document.getElementById('chTitle').value; if(!chTitle) return alert("타이틀 필수.");
-                if(editingId) { const item = appData.timeline.find(i => i.id === editingId); item.title = chTitle; item.sub = document.getElementById('chSub').value; } 
-                else { appData.timeline.push({ type: 'chapter', id: Date.now(), title: chTitle, sub: document.getElementById('chSub').value }); }
+                const title = document.getElementById('chTitle').value; if(!title) return alert("타이틀 필수.");
+                if(editingId) { const i = appData.timeline.find(x => x.id === editingId); i.title = title; i.sub = document.getElementById('chSub').value; }
+                else appData.timeline.push({ type:'chapter', id:Date.now(), title:title, sub:document.getElementById('chSub').value });
             }
             closeModal(); saveData(); renderTimeline();
         }
@@ -421,206 +381,129 @@
         function renderTimeline() {
             const box = document.getElementById('timeline-box'); box.innerHTML = '';
             let currentRows = []; let storyCounter = 1; let chapterCounter = 1;
-
             function flushRows() {
                 for(let i=0; i<currentRows.length; i++) {
-                    const rowItems = currentRows[i]; const isReverse = (i % 2 !== 0); const isLastRow = (i === currentRows.length - 1);
-                    const rowClass = isReverse ? 'timeline-row row-reverse' : 'timeline-row row-normal';
-                    const curveClass = !isLastRow ? ' has-curve' : '';
-                    let rowHtml = `<div class="${rowClass}${curveClass}">`;
-
+                    const rowItems = currentRows[i]; const isRev = (i % 2 !== 0); const isLast = (i === currentRows.length - 1);
+                    let rowHtml = `<div class="timeline-row ${isRev ? 'row-reverse' : 'row-normal'}${!isLast ? ' has-curve' : ''}">`;
                     rowItems.forEach(item => {
-                        const imgHTML = item.img ? `<div class="card-img-memo" style="background-image: url(${item.img})"></div>` : '';
                         const formattedNum = storyCounter.toString().padStart(2, '0');
-                        rowHtml += `
-                            <div class="story-card">
-                                <div class="card-no">No.${formattedNum}</div>
-                                ${imgHTML}
-                                <div class="card-date">${item.date}</div>
-                                <div class="card-title">${item.title}</div>
-                                <div class="card-desc">${item.content}</div>
-                                <div class="card-controls" data-html2canvas-ignore="true">
-                                    <button class="btn-edit" onclick="editItem(${item.id})">수정</button>
-                                    <button class="btn-del" onclick="deleteItem(${item.id})">삭제</button>
-                                </div>
-                            </div>
-                        `;
+                        rowHtml += `<div class="story-card"><div class="card-no">No.${formattedNum}</div>${item.img ? `<div class="card-img-memo" style="background-image: url(${item.img})"></div>` : ''}<div class="card-date">${item.date}</div><div class="card-title">${item.title}</div><div class="card-desc">${item.content}</div><div class="card-controls" data-html2canvas-ignore="true"><button class="btn-edit" onclick="editItem(${item.id})">수정</button><button class="btn-del" onclick="deleteItem(${item.id})">삭제</button></div></div>`;
                         storyCounter++;
                     });
                     rowHtml += `</div>`; box.innerHTML += rowHtml;
                 }
-                currentRows = []; 
+                currentRows = [];
             }
-
             let tempRow = [];
             appData.timeline.forEach(item => {
                 if (item.type === 'chapter') {
-                    if (tempRow.length > 0) { currentRows.push(tempRow); tempRow = []; }
-                    flushRows(); 
-                    const chNumFormat = appData.settings.numStyle === 'arabic' ? chapterCounter.toString().padStart(2, '0') : toRoman(chapterCounter);
-                    box.innerHTML += `
-                        <div class="chapter-divider">
-                            <div class="chapter-text-content">
-                                <div class="ch-controls" data-html2canvas-ignore="true">
-                                    <button class="btn-edit" onclick="editItem(${item.id})">수정</button>
-                                    <button class="ch-del-btn" onclick="deleteItem(${item.id})">X</button>
-                                </div>
-                                <div class="ch-label">CHAPTER</div>
-                                <div class="ch-number">${chNumFormat}</div>
-                                <div class="ch-title">${item.title}</div>
-                                <div class="ch-sub">${item.sub}</div>
-                            </div>
-                        </div>
-                    `;
+                    if (tempRow.length > 0) { currentRows.push(tempRow); tempRow = []; } flushRows();
+                    const chNum = appData.settings.numStyle === 'arabic' ? chapterCounter.toString().padStart(2, '0') : toRoman(chapterCounter);
+                    box.innerHTML += `<div class="chapter-divider"><div class="chapter-text-content"><div class="ch-controls" data-html2canvas-ignore="true"><button class="btn-edit" onclick="editItem(${item.id})">수정</button><button class="ch-del-btn" onclick="deleteItem(${item.id})">X</button></div><div class="ch-label">CHAPTER</div><div class="ch-number">${chNum}</div><div class="ch-title">${item.title}</div><div class="ch-sub">${item.sub}</div></div></div>`;
                     chapterCounter++;
-                } else {
-                    tempRow.push(item);
-                    if (tempRow.length === 3) { currentRows.push(tempRow); tempRow = []; }
-                }
+                } else { tempRow.push(item); if (tempRow.length === 3) { currentRows.push(tempRow); tempRow = []; } }
             });
-            if (tempRow.length > 0) currentRows.push(tempRow);
-            flushRows(); 
+            if (tempRow.length > 0) currentRows.push(tempRow); flushRows();
         }
 
-        /* 다꾸 스티커 엔진 */
+        /* 다꾸 스티커 */
         let highestZ = 50; let draggingSticker = null; let sStartX, sStartY;
-
-        function addSticker(e) {
-            if(e.target.files[0]) {
-                compressImage(e.target.files[0], (compressedData) => {
-                    const board = document.getElementById('scroll-board');
-                    const newSticker = { id: Date.now(), img: compressedData, x: board.scrollLeft + 400, y: board.scrollTop + 300, w: 150, h: 150, r: 0, z: ++highestZ };
-                    appData.stickers.push(newSticker); saveData(); renderStickers();
-                });
-            }
-        }
+        function addSticker(e) { if(e.target.files[0]) compressImage(e.target.files[0], d => { appData.stickers.push({ id:Date.now(), img:d, x:400, y:300, w:150, h:150, r:0, z:++highestZ }); saveData(); renderStickers(); }); }
         function renderStickers() {
             const layer = document.getElementById('sticker-layer'); layer.innerHTML = '';
             appData.stickers.forEach(s => {
-                if(s.z > highestZ) highestZ = s.z;
-                const el = document.createElement('div'); el.className = 'sticker';
-                el.style.backgroundImage = `url(${s.img})`; el.style.width = s.w + 'px'; el.style.height = s.h + 'px'; el.style.left = s.x + 'px'; el.style.top = s.y + 'px'; el.style.transform = `rotate(${s.r}deg)`; el.style.zIndex = s.z;
-                el.innerHTML = `
-                    <div class="sticker-controls" data-html2canvas-ignore="true">
-                        <button onclick="changeStickerZ(${s.id}, 1)">▲ 위로</button>
-                        <button onclick="changeStickerZ(${s.id}, -1)">▼ 아래로</button>
-                        <button style="color:#ff5555;" onclick="deleteSticker(${s.id})">X 삭제</button>
-                    </div>
-                    <div class="sticker-tip" data-html2canvas-ignore="true">드래그(이동) / 휠(크기) / Shift+휠(회전)</div>
-                `;
-                el.addEventListener('mousedown', (e) => {
-                    if(e.target.closest('.sticker-controls')) return;
-                    document.querySelectorAll('.sticker').forEach(st => st.classList.remove('active'));
-                    el.classList.add('active'); s.z = ++highestZ; el.style.zIndex = s.z; 
-                    draggingSticker = s; sStartX = e.clientX - s.x; sStartY = e.clientY - s.y;
-                });
-                el.addEventListener('wheel', (e) => {
-                    if(!el.classList.contains('active')) return; e.preventDefault();
-                    if(e.shiftKey) { s.r += e.deltaY * 0.1; } else { let delta = e.deltaY * 0.2; s.w -= delta; s.h -= delta; if(s.w < 30) s.w = 30; if(s.h < 30) s.h = 30; }
-                    el.style.width = s.w + 'px'; el.style.height = s.h + 'px'; el.style.transform = `rotate(${s.r}deg)`; saveData();
-                }, {passive: false});
+                const el = document.createElement('div'); el.className = 'sticker'; el.style.backgroundImage = `url(${s.img})`; el.style.width = s.w + 'px'; el.style.height = s.h + 'px'; el.style.left = s.x + 'px'; el.style.top = s.y + 'px'; el.style.transform = `rotate(${s.r}deg)`; el.style.zIndex = s.z;
+                el.innerHTML = `<div class="sticker-controls" data-html2canvas-ignore="true"><button onclick="changeStickerZ(${s.id}, 1)">▲</button><button onclick="changeStickerZ(${s.id}, -1)">▼</button><button style="color:#ff5555;" onclick="deleteSticker(${s.id})">X</button></div><div class="sticker-tip" data-html2canvas-ignore="true">드래그/휠/Shift+휠</div>`;
+                el.addEventListener('mousedown', e => { if(e.target.closest('.sticker-controls')) return; document.querySelectorAll('.sticker').forEach(st => st.classList.remove('active')); el.classList.add('active'); s.z = ++highestZ; el.style.zIndex = s.z; draggingSticker = s; sStartX = e.clientX - s.x; sStartY = e.clientY - s.y; });
+                el.addEventListener('wheel', e => { if(!el.classList.contains('active')) return; e.preventDefault(); if(e.shiftKey) s.r += e.deltaY * 0.1; else { let d = e.deltaY * 0.2; s.w -= d; s.h -= d; if(s.w < 30) s.w = 30; } el.style.width = s.w + 'px'; el.style.height = s.h + 'px'; el.style.transform = `rotate(${s.r}deg)`; saveData(); }, {passive: false});
                 layer.appendChild(el);
             });
         }
-        window.addEventListener('mousemove', (e) => { if(draggingSticker) { draggingSticker.x = e.clientX - sStartX; draggingSticker.y = e.clientY - sStartY; renderStickers(); } });
+        window.addEventListener('mousemove', e => { if(draggingSticker) { draggingSticker.x = e.clientX - sStartX; draggingSticker.y = e.clientY - sStartY; renderStickers(); } });
         window.addEventListener('mouseup', () => { if(draggingSticker){ draggingSticker = null; saveData(); }});
         function changeStickerZ(id, dir) { const s = appData.stickers.find(i => i.id === id); if(s) { s.z += (dir * 2); renderStickers(); saveData(); } }
         function deleteSticker(id) { appData.stickers = appData.stickers.filter(s => s.id !== id); saveData(); renderStickers(); }
 
-        /* [텍스트 잘림 방어 엔진] */
+        /* [텍스트 잘림 픽스 엔진] */
         function captureSetup() {
-            const wrapper = document.getElementById('capture-area');
-            wrapper.classList.add('capture-mode');
-            document.querySelectorAll('.sticker').forEach(s => s.classList.remove('active'));
-
+            const wrapper = document.getElementById('capture-area'); wrapper.classList.add('capture-mode');
             const inputs = wrapper.querySelectorAll('input.char-input, textarea.char-input, input.pair-input, input.ph-date-input');
             inputs.forEach(inp => {
-                const div = document.createElement('div');
-                div.className = inp.className + ' static-text-clone';
-                div.innerHTML = inp.value.replace(/\n/g, '<br>');
-                div.style.color = window.getComputedStyle(inp).color; div.style.fontSize = window.getComputedStyle(inp).fontSize; div.style.fontWeight = window.getComputedStyle(inp).fontWeight; div.style.letterSpacing = window.getComputedStyle(inp).letterSpacing; div.style.textAlign = window.getComputedStyle(inp).textAlign; div.style.minHeight = inp.offsetHeight + 'px';
-                if(inp.style.textAlign === 'right') div.style.justifyContent = 'flex-end'; else if(inp.classList.contains('pair-input') || inp.classList.contains('ph-date-input')) div.style.justifyContent = 'center';
+                const div = document.createElement('div'); div.className = inp.className + ' static-text-clone'; div.innerHTML = inp.value.replace(/\n/g, '<br>');
+                const style = window.getComputedStyle(inp); div.style.color = style.color; div.style.fontSize = style.fontSize; div.style.fontWeight = style.fontWeight; div.style.letterSpacing = style.letterSpacing; div.style.textAlign = style.textAlign; div.style.minHeight = inp.offsetHeight + 'px';
+                if(style.textAlign === 'right') div.style.justifyContent = 'flex-end'; else if(inp.classList.contains('pair-input')) div.style.justifyContent = 'center';
                 inp.style.display = 'none'; inp.parentNode.insertBefore(div, inp);
             });
         }
-
         function captureRestore() {
-            const wrapper = document.getElementById('capture-area');
-            wrapper.classList.remove('capture-mode');
-            wrapper.querySelectorAll('.static-text-clone').forEach(div => div.remove());
-            wrapper.querySelectorAll('input.char-input, textarea.char-input, input.pair-input, input.ph-date-input').forEach(inp => inp.style.display = '');
+            const wrapper = document.getElementById('capture-area'); wrapper.classList.remove('capture-mode');
+            wrapper.querySelectorAll('.static-text-clone').forEach(d => d.remove());
+            wrapper.querySelectorAll('input.char-input, textarea.char-input, input.pair-input, input.ph-date-input').forEach(i => i.display = '');
+            applyUI(); // 원본 폼 다시 복구
         }
 
-        /* 📸 이미지 렌더링 (PNG) */
+        /* 📸 이미지 렌더링 */
         function exportImage() {
             const wrapper = document.getElementById('capture-area'); const board = document.getElementById('scroll-board');
             const w = wrapper.offsetWidth; const h = board.scrollHeight;
             const backupW = wrapper.style.width; const backupH = wrapper.style.height; const backupOverflow = board.style.overflowY;
-            
             wrapper.style.width = w + 'px'; wrapper.style.height = h + 'px'; board.style.overflowY = 'visible';
-            captureSetup(); 
-
+            captureSetup();
             document.fonts.ready.then(() => {
                 setTimeout(() => {
-                    html2canvas(wrapper, { backgroundColor: "#0a0b0d", scale: 1, useCORS: true, width: w, height: h, windowWidth: w, windowHeight: h, logging: false })
+                    html2canvas(wrapper, { backgroundColor: "#0a0b0d", scale: 1, useCORS: true, width: w, height: h, logging: false })
                     .then(canvas => {
                         const a = document.createElement('a'); a.href = canvas.toDataURL("image/jpeg", 0.9);
-                        a.download = `CHRONICLE_${document.getElementById('pair-title').value || 'ARCHIVE'}.jpg`; a.click();
-                        wrapper.style.width = backupW; wrapper.style.height = backupH; board.style.overflowY = backupOverflow; captureRestore();
-                    }).catch(err => {
-                        alert("렌더링 실패! 용량 초과입니다. 크롬 확장프로그램 [GoFullPage]를 사용해주세요.");
+                        a.download = `CHRONICLE_${appData.pair.title || 'ARCHIVE'}.jpg`; a.click();
                         wrapper.style.width = backupW; wrapper.style.height = backupH; board.style.overflowY = backupOverflow; captureRestore();
                     });
                 }, 500); 
             });
         }
 
-        /* 🌐 전시관 HTML 내보내기 (애니메이션 100% 사수!) */
+        /* 🌐 [테마 박제 엔진 탑재] HTML 전시관 내보내기 */
         function exportHTMLViewer() {
             const wrapper = document.getElementById('capture-area');
-            captureSetup(); // 텍스트 고정
+            captureSetup(); 
 
             const clone = wrapper.cloneNode(true);
-            
-            // [애니메이션 복구의 핵심] capture-mode 클래스를 제거하여 CSS !important 락을 푼다!
-            clone.classList.remove('capture-mode'); 
-            
-            // 편집용 요소 제거
+            clone.classList.remove('capture-mode'); // 전시관은 락 해제
             clone.querySelector('#hud-panel')?.remove();
-            clone.querySelectorAll('.card-controls, .ch-controls, .sticker-controls, .sticker-tip, input[type="file"]').forEach(el => el.remove());
-            
-            // 편집 이벤트를 무력화하되 hover(애니메이션)는 살아있게 냅둠
-            clone.querySelectorAll('*').forEach(el => {
-                el.removeAttribute('onclick'); el.removeAttribute('oninput'); el.removeAttribute('onchange'); el.removeAttribute('onmousedown');
-            });
-            // 뷰어용 스크롤 권한 부여
+            clone.querySelectorAll('.card-controls, .ch-controls, .sticker-controls, .sticker-tip, input[type="file"], .del-btn').forEach(el => el.remove());
+            clone.querySelectorAll('*').forEach(el => { el.removeAttribute('onclick'); el.removeAttribute('oninput'); el.removeAttribute('onchange'); el.removeAttribute('onmousedown'); });
             clone.querySelector('#scroll-board').style.pointerEvents = 'auto';
+
+            // [핵심] 현재 라이브 테마 컬러 추출
+            const activeMain = getComputedStyle(document.documentElement).getPropertyValue('--c-main').trim();
+            const activeSub = getComputedStyle(document.documentElement).getPropertyValue('--c-sub').trim();
+            const activeBg = getComputedStyle(document.documentElement).getPropertyValue('--c-bg').trim();
 
             const exhibitionStyle = `
                 <style>
-                    /* 전시관 전용 커스텀 CSS */
-                    body { overflow: auto; }
-                    /* 스티커는 뷰어에서 드래그 안 되도록 고정 */
-                    .sticker { pointer-events: none !important; }
-                    /* 텍스트 잘림 방지용 static div 무조건 보이게 */
+                    :root { --c-main: ${activeMain}; --c-sub: ${activeSub}; --c-bg: ${activeBg}; --line: ${activeMain}25; }
+                    body { overflow: auto; background: var(--c-bg); }
+                    .sticker { pointer-events: none !important; border:none !important; }
                     .static-text-clone { display: flex !important; }
+                    /* 호버 부활 */
+                    .story-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 10; border-color: var(--c-main); }
+                    .story-card:hover .card-img-memo { transform: rotate(0deg) scale(2) translate(-10px, 10px) !important; z-index: 20; filter: grayscale(0%); border-top-color: var(--c-main); }
                 </style>
             `;
 
-            const htmlHeader = `<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><title>${appData.pair.title || 'OC ARCHIVE'}</title><link rel="preload" as="style" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css"><style>${document.getElementById('core-css').innerHTML}</style>${exhibitionStyle}</head><body>`;
-            const htmlFooter = `</body></html>`;
-            const finalHTML = htmlHeader + clone.outerHTML + htmlFooter;
+            const htmlHeader = `<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><title>${appData.pair.title || 'ARCHIVE'}</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css"><style>${document.getElementById('core-css').innerHTML}</style>${exhibitionStyle}</head><body>`;
+            const finalHTML = htmlHeader + clone.outerHTML + `</body></html>`;
             
             const blob = new Blob([finalHTML], {type: "text/html;charset=utf-8"});
             const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
             a.download = `VIEWER_${appData.pair.title || 'ARCHIVE'}.html`; a.click();
 
-            captureRestore(); // 원본 복구
-            alert("전시관 HTML 내보내기 성공! 이제 네트리파이에 올리면 애니메이션이 완벽하게 작동합니다!");
+            captureRestore();
+            alert("테마 컬러가 완벽하게 박제된 전시관 HTML이 생성되었습니다!");
         }
 
+        function resetAllData() { if(confirm("모든 데이터를 초기화하시겠습니까? 백업되지 않은 데이터는 복구 불가합니다.")) { localStorage.removeItem('oc_archive_v17'); location.reload(); } }
         function exportData() { saveData(); const b = new Blob([JSON.stringify(appData)], {type: 'text/plain'}); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `ARCHIVE_DATA.txt`; a.click(); }
-        function importData(e) { const f = e.target.files[0]; if(!f) return; const r = new FileReader(); r.onload = ev => { const parsed = JSON.parse(ev.target.result); appData = { ...appData, ...parsed }; applyUI(); saveData(); alert("복원 완료!"); }; r.readAsText(f); }
+        function importData(e) { const f = e.target.files[0]; if(!f) return; const r = new FileReader(); r.onload = ev => { appData = JSON.parse(ev.target.result); applyUI(); saveData(); alert("데이터 로드 완료!"); }; r.readAsText(f); }
     </script>
 </body>
 </html>
