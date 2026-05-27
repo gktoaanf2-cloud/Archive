@@ -1,954 +1,427 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OC CHRONICLE SYSTEM // v1.0</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --bg: #030509;
+            --panel: rgba(13, 17, 26, 0.75);
+            --accent: #8ea1ff;
+            --accent-rgb: 142, 161, 255;
+            --sub-accent: #63ffe9;
+            --text: #edf2ff;
+            --muted: rgba(237, 242, 255, 0.45);
+            --line: rgba(142, 161, 255, 0.15);
+            --card-bg: rgba(20, 25, 38, 0.85);
+            font-family: 'Pretendard', -apple-system, sans-serif;
+        }
 
-<meta charset="UTF-8" />
+        * { box-sizing: border-box; outline: none; }
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            background: var(--bg); color: var(--text); overflow: hidden;
+        }
 
-<meta
-  name="viewport"
-  content="width=device-width, initial-scale=1.0"
-/>
+        /* --- Interactive Background Layer --- */
+        #viewport {
+            position: fixed; inset: 0; z-index: -1;
+            overflow: hidden; perspective: 1000px;
+        }
+        #bg-canvas {
+            position: absolute; inset: -50%;
+            width: 200%; height: 200%;
+            background-size: cover; background-position: center;
+            transform-origin: center;
+            transition: filter 0.3s ease;
+        }
+        .bg-overlay {
+            position: fixed; inset: 0;
+            background: radial-gradient(circle at center, transparent, var(--bg) 90%);
+            z-index: -1; pointer-events: none;
+        }
+        .bg-grid {
+            position: fixed; inset: 0;
+            background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1; opacity: 0.2; pointer-events: none;
+        }
 
-<title>PAIR ARCHIVE</title>
+        /* --- Layout --- */
+        #app-container {
+            display: grid;
+            grid-template-columns: 320px 1fr 350px;
+            height: 100vh; position: relative; z-index: 10;
+        }
 
-<link
-  rel="stylesheet"
-  href="style.css"
-/>
+        /* --- Profile Column --- */
+        .side-panel {
+            background: rgba(3, 5, 9, 0.8);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--line);
+            padding: 30px; display: flex; flex-direction: column; gap: 20px;
+            overflow-y: auto;
+        }
+        .side-panel::-webkit-scrollbar { width: 4px; }
+        .side-panel::-webkit-scrollbar-thumb { background: var(--accent); }
 
-<script src="https://cdn.jsdelivr.net/npm/dom-to-image-more@3.3.0/dist/dom-to-image-more.min.js"></script>
+        .system-label {
+            font-size: 10px; letter-spacing: 0.2em; color: var(--accent);
+            text-transform: uppercase; margin-bottom: 5px; opacity: 0.8;
+        }
 
+        .char-card {
+            background: var(--card-bg); border: 1px solid var(--line);
+            border-radius: 12px; padding: 15px; position: relative;
+        }
+        .char-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, var(--accent), transparent);
+        }
+
+        .image-upload-zone {
+            width: 100%; aspect-ratio: 4/5; background: rgba(0,0,0,0.3);
+            border: 1px dashed var(--line); border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; overflow: hidden; margin-bottom: 10px;
+        }
+        .image-upload-zone img { width: 100%; height: 100%; object-fit: cover; }
+
+        input, textarea {
+            width: 100%; background: transparent; border: 1px solid transparent;
+            color: var(--text); font-family: inherit; transition: 0.2s;
+        }
+        input:focus, textarea:focus { border-bottom: 1px solid var(--accent); }
+        .name-input { font-size: 18px; font-weight: 800; margin-bottom: 5px; }
+        .bio-input { font-size: 13px; line-height: 1.6; color: var(--muted); height: 100px; resize: none; }
+
+        /* --- Center Timeline Board --- */
+        #artboard {
+            overflow-y: auto; overflow-x: hidden; scroll-behavior: smooth;
+            padding: 100px 0; position: relative;
+        }
+        .timeline-axis {
+            position: absolute; left: 50%; top: 0; bottom: 0;
+            width: 1px; background: linear-gradient(to bottom, transparent, var(--accent), transparent);
+            transform: translateX(-50%); opacity: 0.5;
+        }
+        .timeline-content {
+            max-width: 900px; margin: 0 auto; position: relative;
+            display: flex; flex-direction: column; gap: 60px;
+        }
+
+        .timeline-card {
+            width: 420px; background: var(--card-bg);
+            border: 1px solid var(--line); border-radius: 16px;
+            padding: 25px; position: relative;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+        }
+        .timeline-card:nth-child(odd) { align-self: flex-start; }
+        .timeline-card:nth-child(even) { align-self: flex-end; }
+        
+        .timeline-card::after {
+            content: ''; position: absolute; top: 30px;
+            width: 20px; height: 1px; background: var(--accent);
+        }
+        .timeline-card:nth-child(odd)::after { right: -20px; }
+        .timeline-card:nth-child(even)::after { left: -20px; }
+
+        .card-date { font-size: 12px; font-weight: 700; color: var(--accent); margin-bottom: 8px; font-variant-numeric: tabular-nums; }
+        .card-title { font-size: 22px; font-weight: 900; margin-bottom: 15px; letter-spacing: -0.02em; }
+        .card-image { width: 100%; border-radius: 8px; margin-bottom: 15px; border: 1px solid var(--line); }
+        .card-desc { font-size: 14px; line-height: 1.8; color: var(--muted); white-space: pre-wrap; }
+
+        /* --- Floating Editor & Tools --- */
+        .tool-panel {
+            background: rgba(3, 5, 9, 0.8); backdrop-filter: blur(20px);
+            border-left: 1px solid var(--line); padding: 30px;
+            display: flex; flex-direction: column; gap: 25px;
+        }
+
+        button {
+            background: transparent; border: 1px solid var(--accent); color: var(--accent);
+            padding: 12px; border-radius: 8px; cursor: pointer; font-weight: 700;
+            font-size: 12px; letter-spacing: 0.1em; transition: 0.3s;
+        }
+        button:hover { background: var(--accent); color: var(--bg); box-shadow: 0 0 20px rgba(var(--accent-rgb), 0.4); }
+        button.danger { border-color: #ff5e5e; color: #ff5e5e; }
+        button.danger:hover { background: #ff5e5e; color: #fff; }
+
+        .editor-box {
+            background: rgba(255,255,255,0.03); border-radius: 12px; padding: 20px;
+            display: flex; flex-direction: column; gap: 15px; border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* --- Scrollbar --- */
+        #artboard::-webkit-scrollbar { width: 0px; } /* 아트보드는 스크롤바 숨김 */
+
+        /* --- Animation --- */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .timeline-card { animation: fadeIn 0.6s ease forwards; }
+
+    </style>
 </head>
-
 <body>
 
-<!-- BG -->
-
-<div
-  class="bg"
-  id="bg"
->
-
-  <div
-    class="bg-image"
-    id="bgImage"
-  ></div>
-
-  <div class="bg-noise"></div>
-
-  <div class="bg-grid"></div>
-
-</div>
-
-<!-- HEADER -->
-
-<header class="header">
-
-  <div class="header-left">
-
-    <input
-      id="pairName"
-      class="pair-name-input"
-      placeholder="PAIR NAME"
-    />
-
-    <input
-      id="pairKeyword"
-      class="pair-keyword-input"
-      placeholder="relationship keyword"
-    />
-
-  </div>
-
-  <div class="header-right">
-
-    <button
-      class="header-btn"
-      onclick="createStoryCard()"
-    >
-      NEW EVENT
-    </button>
-
-    <button
-      class="header-btn"
-      onclick="exportPNG()"
-    >
-      EXPORT
-    </button>
-
-  </div>
-
-</header>
-
-<!-- EXPORT BOARD -->
-
-<div
-  class="board"
-  id="exportBoard"
->
-
-  <!-- LEFT PROFILE -->
-
-  <aside class="profile-column">
-
-    <div class="profile-panel">
-
-      <div
-        class="profile-image"
-        id="profileA"
-      ></div>
-
-      <input
-        type="file"
-        accept="image/*"
-        onchange="uploadCharacter(event, 'A')"
-      />
-
-      <input
-        id="charAName"
-        class="profile-name"
-        placeholder="Character A"
-      />
-
-      <textarea
-        id="charABio"
-        class="profile-bio"
-        placeholder="Character introduction"
-      ></textarea>
-
+    <div id="viewport">
+        <div id="bg-canvas"></div>
+        <div class="bg-overlay"></div>
+        <div class="bg-grid"></div>
     </div>
 
-  </aside>
+    <div id="app-container">
+        <aside class="side-panel">
+            <div class="system-label">Synchronization Status</div>
+            <input type="text" id="pair-name" class="name-input" placeholder="페어 코드네임" style="font-size: 24px; color: var(--accent);">
+            
+            <div class="system-label" style="margin-top:20px;">Character 01</div>
+            <div class="char-card">
+                <div class="image-upload-zone" onclick="triggerImgUpload('c1-img')">
+                    <img id="c1-preview" src="" style="display:none;">
+                    <span id="c1-placeholder">IMAGE UPLOAD</span>
+                </div>
+                <input type="file" id="c1-img" hidden onchange="handleProfileImg(this, 'c1-preview', 'c1-placeholder')">
+                <input type="text" class="name-input" placeholder="NAME">
+                <textarea class="bio-input" placeholder="DATA FRAGMENT..."></textarea>
+            </div>
 
-  <!-- CENTER -->
+            <div class="system-label" style="margin-top:10px;">Character 02</div>
+            <div class="char-card">
+                <div class="image-upload-zone" onclick="triggerImgUpload('c2-img')">
+                    <img id="c2-preview" src="" style="display:none;">
+                    <span id="c2-placeholder">IMAGE UPLOAD</span>
+                </div>
+                <input type="file" id="c2-img" hidden onchange="handleProfileImg(this, 'c2-preview', 'c2-placeholder')">
+                <input type="text" class="name-input" placeholder="NAME">
+                <textarea class="bio-input" placeholder="DATA FRAGMENT..."></textarea>
+            </div>
 
-  <main class="story-board-wrap">
+            <div class="system-label" style="margin-top:20px;">System Controls</div>
+            <button onclick="exportImage()">IMAGE EXPORT (PNG)</button>
+            <button onclick="exportTxt()">DATA BACKUP (TXT)</button>
+            <button onclick="triggerTxtImport()">IMPORT DATA</button>
+            <input type="file" id="import-file" hidden onchange="importTxt(event)" accept=".txt">
+        </aside>
 
-    <!-- TITLE -->
+        <main id="artboard">
+            <div class="timeline-axis"></div>
+            <div class="timeline-content" id="timeline-list">
+                </div>
+        </main>
 
-    <div class="board-header">
+        <aside class="tool-panel">
+            <div class="system-label">Event Recorder</div>
+            <div class="editor-box">
+                <input type="text" id="ev-date" placeholder="DATE (e.g. 2024.05.27)" class="name-input" style="font-size: 14px;">
+                <input type="text" id="ev-title" placeholder="EVENT TITLE" class="name-input">
+                <div class="image-upload-zone" style="aspect-ratio: 16/9;" onclick="triggerImgUpload('ev-img')">
+                    <img id="ev-preview" src="" style="display:none;">
+                    <span id="ev-placeholder">EVENT VISUAL</span>
+                </div>
+                <input type="file" id="ev-img" hidden onchange="handleProfileImg(this, 'ev-preview', 'ev-placeholder')">
+                <textarea id="ev-content" class="bio-input" placeholder="DESCRIBE THE MOMENT..." style="height: 150px;"></textarea>
+                <button onclick="addTimelineItem()">+ ADD TO CHRONICLE</button>
+            </div>
 
-      <div
-        class="board-title"
-        id="boardTitle"
-      >
-        Pair Name
-      </div>
-
-      <div
-        class="board-keyword"
-        id="boardKeyword"
-      >
-        Relationship
-      </div>
-
+            <div class="system-label">Visual Adjustments</div>
+            <div class="editor-box">
+                <div style="font-size:11px; margin-bottom:5px;">BG UPLOAD</div>
+                <input type="file" onchange="setBgImage(event)" style="font-size:10px;">
+                <div style="font-size:11px; margin-top:15px; margin-bottom:5px;">BLUR LEVEL</div>
+                <input type="range" min="0" max="20" value="0" oninput="updateBgEffects(this.value)">
+                <div style="font-size:10px; color:var(--muted); margin-top:10px; line-height:1.4;">
+                    * Wheel: Zoom<br>
+                    * Drag: Move<br>
+                    * Shift + Wheel: Rotate
+                </div>
+            </div>
+            <button class="danger" onclick="clearData()">SYSTEM RESET</button>
+        </aside>
     </div>
 
-    <!-- STORY BOARD -->
-
-    <div
-      class="story-board"
-      id="storyBoard"
-    ></div>
-
-  </main>
-
-  <!-- RIGHT PROFILE -->
-
-  <aside class="profile-column">
-
-    <div class="profile-panel">
-
-      <div
-        class="profile-image"
-        id="profileB"
-      ></div>
-
-      <input
-        type="file"
-        accept="image/*"
-        onchange="uploadCharacter(event, 'B')"
-      />
-
-      <input
-        id="charBName"
-        class="profile-name"
-        placeholder="Character B"
-      />
-
-      <textarea
-        id="charBBio"
-        class="profile-bio"
-        placeholder="Character introduction"
-      ></textarea>
-
-    </div>
-
-  </aside>
-
-</div>
-
-<!-- FLOATING EDITOR -->
-
-<div
-  class="editor"
-  id="editor"
->
-
-  <div class="editor-header">
-
-    <div class="editor-label">
-      STORY EVENT
-    </div>
-
-    <button
-      class="close-btn"
-      onclick="closeEditor()"
-    >
-      ×
-    </button>
-
-  </div>
-
-  <input
-    id="eventDate"
-    placeholder="DATE"
-  />
-
-  <input
-    id="eventTitle"
-    placeholder="TITLE"
-  />
-
-  <textarea
-    id="eventContent"
-    placeholder="Narrative"
-  ></textarea>
-
-  <div class="editor-sub">
-
-    <div class="range-label">
-      RELATION
-    </div>
-
-    <input
-      type="range"
-      min="0"
-      max="100"
-      value="50"
-      id="eventRelation"
-    />
-
-  </div>
-
-  <input
-    type="file"
-    accept="image/*"
-    id="eventImage"
-  />
-
-  <button
-    class="complete-btn"
-    onclick="saveCard()"
-  >
-    COMPLETE
-  </button>
-
-</div>
-
-<!-- SETTINGS -->
-
-<div class="settings">
-
-  <div class="settings-title">
-    VISUAL
-  </div>
-
-  <div class="color-row">
-
-    <input
-      type="color"
-      value="#8ea1ff"
-      onchange="setAccent(this.value)"
-    />
-
-    <input
-      type="color"
-      value="#63ffe9"
-      onchange="setAccent2(this.value)"
-    />
-
-    <input
-      type="color"
-      value="#11141d"
-      onchange="setPanel(this.value)"
-    />
-
-  </div>
-
-  <input
-    type="file"
-    accept="image/*"
-    onchange="changeBG(event)"
-  />
-
-  <div class="slider-label">
-    BLUR
-  </div>
-
-  <input
-    type="range"
-    min="0"
-    max="40"
-    value="0"
-    oninput="setBlur(this.value)"
-  />
-
-  <div class="slider-label">
-    SCALE
-  </div>
-
-  <input
-    type="range"
-    min="1"
-    max="2"
-    step="0.01"
-    value="1"
-    oninput="setScale(this.value)"
-  />
-
-  <div class="slider-label">
-    ROTATE
-  </div>
-
-  <input
-    type="range"
-    min="-180"
-    max="180"
-    value="0"
-    oninput="setRotate(this.value)"
-  />
-
-  <div class="slider-label">
-    X
-  </div>
-
-  <input
-    type="range"
-    min="-600"
-    max="600"
-    value="0"
-    oninput="setPosX(this.value)"
-  />
-
-  <div class="slider-label">
-    Y
-  </div>
-
-  <input
-    type="range"
-    min="-600"
-    max="600"
-    value="0"
-    oninput="setPosY(this.value)"
-  />
-
-</div>
-
-<script>
-
-let editingIndex = null
-
-let tempImage = ''
-
-let state = JSON.parse(
-  localStorage.getItem(
-    'pairArchiveState'
-  )
-) || {
-
-  pairName: '',
-
-  pairKeyword: '',
-
-  charAName: '',
-  charABio: '',
-  charAImage: '',
-
-  charBName: '',
-  charBBio: '',
-  charBImage: '',
-
-  cards: [],
-
-  bg: '',
-
-  blur: 0,
-
-  scale: 1,
-
-  rotate: 0,
-
-  posX: 0,
-
-  posY: 0,
-}
-
-const storyBoard =
-  document.getElementById(
-    'storyBoard'
-  )
-
-const bgImage =
-  document.getElementById(
-    'bgImage'
-  )
-
-function save() {
-
-  localStorage.setItem(
-    'pairArchiveState',
-    JSON.stringify(state)
-  )
-}
-
-function applyBG() {
-
-  bgImage.style.backgroundImage =
-    state.bg
-      ? `url(${state.bg})`
-      : 'none'
-
-  bgImage.style.filter =
-    `blur(${state.blur}px)`
-
-  bgImage.style.transform = `
-    translate(${state.posX}px, ${state.posY}px)
-    scale(${state.scale + (state.blur * 0.01)})
-    rotate(${state.rotate}deg)
-  `
-}
-
-function render() {
-
-  pairName.value =
-    state.pairName
-
-  pairKeyword.value =
-    state.pairKeyword
-
-  boardTitle.innerText =
-    state.pairName || 'Pair Name'
-
-  boardKeyword.innerText =
-    state.pairKeyword || 'Relationship'
-
-  charAName.value =
-    state.charAName
-
-  charABio.value =
-    state.charABio
-
-  charBName.value =
-    state.charBName
-
-  charBBio.value =
-    state.charBBio
-
-  profileA.style.backgroundImage =
-    state.charAImage
-      ? `url(${state.charAImage})`
-      : 'none'
-
-  profileB.style.backgroundImage =
-    state.charBImage
-      ? `url(${state.charBImage})`
-      : 'none'
-
-  storyBoard.innerHTML = ''
-
-  state.cards.forEach(
-    (card, index) => {
-
-      const el =
-        document.createElement('div')
-
-      el.className =
-        'story-card'
-
-      el.style.left =
-        card.x + 'px'
-
-      el.style.top =
-        card.y + 'px'
-
-      el.style.borderColor =
-        getRelationColor(
-          card.relation
-        )
-
-      el.innerHTML = `
-
-        <div class="story-date">
-          ${card.date || 'DATE'}
-        </div>
-
-        <div class="story-title">
-          ${card.title || 'TITLE'}
-        </div>
-
-        ${
-          card.image
-          ? `
-            <img
-              src="${card.image}"
-              class="story-image"
-            >
-          `
-          : ''
+    <script>
+        // --- Background Interaction Logic ---
+        let bgCanvas = document.getElementById('bg-canvas');
+        let scale = 1, posX = 0, posY = 0, rotate = 0, blurVal = 0;
+        let isDragging = false, startX, startY;
+
+        function updateTransform() {
+            bgCanvas.style.transform = `translate(${posX}px, ${posY}px) scale(${scale}) rotate(${rotate}deg)`;
         }
 
-        <div class="story-text">
-          ${
-            card.content
-              ? card.content.substring(0, 110)
-              : 'Narrative'
-          }
-        </div>
-      `
-
-      el.onclick = () => {
-
-        openEdit(index)
-      }
-
-      enableDrag(
-        el,
-        index
-      )
-
-      storyBoard.appendChild(el)
-    }
-  )
-
-  applyBG()
-
-  save()
-}
-
-function getRelationColor(value) {
-
-  if (value < 30) {
-
-    return 'rgba(255,255,255,0.08)'
-  }
-
-  if (value < 70) {
-
-    return 'var(--accent)'
-  }
-
-  return 'var(--accent2)'
-}
-
-function createStoryCard() {
-
-  editingIndex = null
-
-  editor.classList.add(
-    'editor-open'
-  )
-
-  eventDate.value = ''
-
-  eventTitle.value = ''
-
-  eventContent.value = ''
-
-  eventRelation.value = 50
-
-  tempImage = ''
-}
-
-function openEdit(index) {
-
-  editingIndex = index
-
-  const card =
-    state.cards[index]
-
-  editor.classList.add(
-    'editor-open'
-  )
-
-  eventDate.value =
-    card.date || ''
-
-  eventTitle.value =
-    card.title || ''
-
-  eventContent.value =
-    card.content || ''
-
-  eventRelation.value =
-    card.relation || 50
-
-  tempImage =
-    card.image || ''
-}
-
-function closeEditor() {
-
-  editor.classList.remove(
-    'editor-open'
-  )
-}
-
-eventImage.onchange = e => {
-
-  const file =
-    e.target.files[0]
-
-  if (!file) return
-
-  const reader =
-    new FileReader()
-
-  reader.onload = () => {
-
-    tempImage =
-      reader.result
-  }
-
-  reader.readAsDataURL(file)
-}
-
-function saveCard() {
-
-  const payload = {
-
-    date:
-      eventDate.value,
-
-    title:
-      eventTitle.value,
-
-    content:
-      eventContent.value,
-
-    relation:
-      eventRelation.value,
-
-    image:
-      tempImage,
-
-    x:
-      60 + (state.cards.length * 30),
-
-    y:
-      60 + (state.cards.length * 30),
-  }
-
-  if (
-    editingIndex === null
-  ) {
-
-    state.cards.push(
-      payload
-    )
-
-  } else {
-
-    payload.x =
-      state.cards[editingIndex].x
-
-    payload.y =
-      state.cards[editingIndex].y
-
-    state.cards[editingIndex] =
-      payload
-  }
-
-  render()
-
-  closeEditor()
-}
-
-function enableDrag(
-  element,
-  index
-) {
-
-  let offsetX = 0
-  let offsetY = 0
-  let dragging = false
-
-  element.addEventListener(
-    'mousedown',
-    e => {
-
-      dragging = true
-
-      offsetX =
-        e.clientX -
-        state.cards[index].x
-
-      offsetY =
-        e.clientY -
-        state.cards[index].y
-    }
-  )
-
-  window.addEventListener(
-    'mousemove',
-    e => {
-
-      if (!dragging) return
-
-      state.cards[index].x =
-        e.clientX - offsetX
-
-      state.cards[index].y =
-        e.clientY - offsetY
-
-      element.style.left =
-        state.cards[index].x + 'px'
-
-      element.style.top =
-        state.cards[index].y + 'px'
-    }
-  )
-
-  window.addEventListener(
-    'mouseup',
-    () => {
-
-      dragging = false
-
-      save()
-    }
-  )
-}
-
-function uploadCharacter(
-  event,
-  target
-) {
-
-  const file =
-    event.target.files[0]
-
-  if (!file) return
-
-  const reader =
-    new FileReader()
-
-  reader.onload = () => {
-
-    if (target === 'A') {
-
-      state.charAImage =
-        reader.result
-
-    } else {
-
-      state.charBImage =
-        reader.result
-    }
-
-    render()
-  }
-
-  reader.readAsDataURL(file)
-}
-
-function setAccent(color) {
-
-  document.documentElement
-    .style
-    .setProperty(
-      '--accent',
-      color
-    )
-}
-
-function setAccent2(color) {
-
-  document.documentElement
-    .style
-    .setProperty(
-      '--accent2',
-      color
-    )
-}
-
-function setPanel(color) {
-
-  document.documentElement
-    .style
-    .setProperty(
-      '--panel',
-      color
-    )
-}
-
-function changeBG(event) {
-
-  const file =
-    event.target.files[0]
-
-  if (!file) return
-
-  const reader =
-    new FileReader()
-
-  reader.onload = () => {
-
-    state.bg =
-      reader.result
-
-    render()
-  }
-
-  reader.readAsDataURL(file)
-}
-
-function setBlur(value) {
-
-  state.blur = value
-
-  applyBG()
-
-  save()
-}
-
-function setScale(value) {
-
-  state.scale = value
-
-  applyBG()
-
-  save()
-}
-
-function setRotate(value) {
-
-  state.rotate = value
-
-  applyBG()
-
-  save()
-}
-
-function setPosX(value) {
-
-  state.posX = value
-
-  applyBG()
-
-  save()
-}
-
-function setPosY(value) {
-
-  state.posY = value
-
-  applyBG()
-
-  save()
-}
-
-async function exportPNG() {
-
-  const board =
-    document.getElementById(
-      'exportBoard'
-    )
-
-  try {
-
-    const dataUrl =
-      await domtoimage.toPng(
-        board,
-        {
-          quality: 1,
-          bgcolor: '#07090f',
-          cacheBust: true,
+        window.addEventListener('mousedown', (e) => {
+            if(e.target.closest('.side-panel') || e.target.closest('.tool-panel') || e.target.closest('.timeline-card')) return;
+            isDragging = true; startX = e.clientX - posX; startY = e.clientY - posY;
+        });
+        window.addEventListener('mousemove', (e) => {
+            if(!isDragging) return;
+            posX = e.clientX - startX; posY = e.clientY - startY;
+            updateTransform();
+        });
+        window.addEventListener('mouseup', () => isDragging = false);
+        window.addEventListener('wheel', (e) => {
+            if(e.target.closest('.side-panel') || e.target.closest('.tool-panel') || e.target.closest('#artboard')) return;
+            e.preventDefault();
+            if(e.shiftKey) rotate += e.deltaY * 0.1;
+            else scale -= e.deltaY * 0.001;
+            updateTransform();
+        }, {passive: false});
+
+        function setBgImage(e) {
+            const file = e.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = (ev) => bgCanvas.style.backgroundImage = `url(${ev.target.result})`;
+                reader.readAsDataURL(file);
+            }
         }
-      )
+        function updateBgEffects(val) {
+            bgCanvas.style.filter = `blur(${val}px) brightness(0.7)`;
+        }
 
-    const link =
-      document.createElement('a')
+        // --- Logic: Timeline & Data ---
+        function triggerImgUpload(id) { document.getElementById(id).click(); }
 
-    link.download =
-      `${state.pairName || 'pair'}.png`
+        function handleProfileImg(input, previewId, placeholderId) {
+            const file = input.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    document.getElementById(previewId).src = e.target.result;
+                    document.getElementById(previewId).style.display = 'block';
+                    document.getElementById(placeholderId).style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
 
-    link.href =
-      dataUrl
+        function addTimelineItem() {
+            const date = document.getElementById('ev-date').value;
+            const title = document.getElementById('ev-title').value;
+            const content = document.getElementById('ev-content').value;
+            const imgSrc = document.getElementById('ev-preview').src;
+            const hasImg = document.getElementById('ev-preview').style.display !== 'none';
 
-    link.click()
+            if(!title) { alert("서사 제목은 필수입니다."); return; }
 
-  } catch(err) {
+            const list = document.getElementById('timeline-list');
+            const card = document.createElement('div');
+            card.className = 'timeline-card';
+            card.innerHTML = `
+                <div class="card-date">${date || 'UNDATED'}</div>
+                <div class="card-title">${title}</div>
+                ${hasImg ? `<img src="${imgSrc}" class="card-image">` : ''}
+                <div class="card-desc">${content}</div>
+                <button onclick="this.parentElement.remove(); autoSave();" style="margin-top:15px; border-color:#ff5e5e; color:#ff5e5e; padding:5px 10px; font-size:10px;">DELETE</button>
+            `;
+            list.appendChild(card);
+            autoSave();
+            
+            // 리셋 에디터
+            document.getElementById('ev-title').value = '';
+            document.getElementById('ev-content').value = '';
+            document.getElementById('ev-preview').style.display = 'none';
+            document.getElementById('ev-placeholder').style.display = 'block';
+        }
 
-    console.error(err)
+        // --- Persistence & Export ---
+        function autoSave() {
+            const data = {
+                pairName: document.getElementById('pair-name').value,
+                profiles: Array.from(document.querySelectorAll('.side-panel .char-card')).map(c => ({
+                    name: c.querySelector('.name-input').value,
+                    bio: c.querySelector('.bio-input').value,
+                    img: c.querySelector('img').src,
+                    imgVisible: c.querySelector('img').style.display
+                })),
+                timeline: Array.from(document.querySelectorAll('.timeline-card')).map(c => ({
+                    date: c.querySelector('.card-date').innerText,
+                    title: c.querySelector('.card-title').innerText,
+                    desc: c.querySelector('.card-desc').innerText,
+                    img: c.querySelector('.card-image') ? c.querySelector('.card-image').src : null
+                }))
+            };
+            localStorage.setItem('oc_chronicle_v1', JSON.stringify(data));
+        }
 
-    alert(
-      'PNG export failed'
-    )
-  }
-}
+        function loadData() {
+            const raw = localStorage.getItem('oc_chronicle_v1');
+            if(!raw) return;
+            const data = JSON.parse(raw);
+            document.getElementById('pair-name').value = data.pairName;
+            
+            const profCards = document.querySelectorAll('.side-panel .char-card');
+            data.profiles.forEach((p, i) => {
+                profCards[i].querySelector('.name-input').value = p.name;
+                profCards[i].querySelector('.bio-input').value = p.bio;
+                if(p.imgVisible === 'block') {
+                    profCards[i].querySelector('img').src = p.img;
+                    profCards[i].querySelector('img').style.display = 'block';
+                    profCards[i].querySelector('span').style.display = 'none';
+                }
+            });
 
-pairName.oninput = e => {
+            const list = document.getElementById('timeline-list');
+            list.innerHTML = '';
+            data.timeline.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'timeline-card';
+                card.innerHTML = `
+                    <div class="card-date">${item.date}</div>
+                    <div class="card-title">${item.title}</div>
+                    ${item.img ? `<img src="${item.img}" class="card-image">` : ''}
+                    <div class="card-desc">${item.desc}</div>
+                    <button onclick="this.parentElement.remove(); autoSave();" style="margin-top:15px; border-color:#ff5e5e; color:#ff5e5e; padding:5px 10px; font-size:10px;">DELETE</button>
+                `;
+                list.appendChild(card);
+            });
+        }
 
-  state.pairName =
-    e.target.value
+        function exportTxt() {
+            const raw = localStorage.getItem('oc_chronicle_v1');
+            const blob = new Blob([raw], {type: 'text/plain'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `CHRONICLE_${document.getElementById('pair-name').value || 'DATA'}.txt`;
+            a.click();
+        }
 
-  render()
-}
+        function triggerTxtImport() { document.getElementById('import-file').click(); }
+        function importTxt(e) {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                localStorage.setItem('oc_chronicle_v1', ev.target.result);
+                loadData();
+                alert("SYSTEM: DATA RECOVERY COMPLETE.");
+            };
+            reader.readAsText(file);
+        }
 
-pairKeyword.oninput = e => {
+        function exportImage() {
+            const art = document.body;
+            html2canvas(art, { backgroundColor: '#030509', useCORS: true, scale: 2 }).then(canvas => {
+                const a = document.createElement('a');
+                a.href = canvas.toDataURL("image/png");
+                a.download = `ARTBOARD_${document.getElementById('pair-name').value}.png`;
+                a.click();
+            });
+        }
 
-  state.pairKeyword =
-    e.target.value
+        function clearData() {
+            if(confirm("시스템의 모든 데이터를 소거하시겠습니까? 백업되지 않은 데이터는 복구할 수 없습니다.")) {
+                localStorage.removeItem('oc_chronicle_v1');
+                location.reload();
+            }
+        }
 
-  render()
-}
+        document.addEventListener('input', autoSave);
+        window.onload = loadData;
 
-charAName.oninput = e => {
-
-  state.charAName =
-    e.target.value
-
-  save()
-}
-
-charABio.oninput = e => {
-
-  state.charABio =
-    e.target.value
-
-  save()
-}
-
-charBName.oninput = e => {
-
-  state.charBName =
-    e.target.value
-
-  save()
-}
-
-charBBio.oninput = e => {
-
-  state.charBBio =
-    e.target.value
-
-  save()
-}
-
-render()
-
-</script>
-
+    </script>
 </body>
 </html>
