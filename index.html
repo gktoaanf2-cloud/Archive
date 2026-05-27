@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OC CHRONICLE - APEX ULTIMATE</title>
+    <title>OC CHRONICLE - LIMIT BREAKER</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
@@ -21,12 +21,10 @@
 
         body, html { width: 100%; height: 100%; background: var(--c-bg); color: var(--text-pri); overflow: hidden; }
 
-        /* 래퍼 및 배경 */
         .app-wrapper { display: flex; width: 100%; height: 100vh; position: relative; background-color: var(--c-bg); overflow: hidden; }
         .bg-layer { position: absolute; inset: 0; width: 100%; height: 100%; background-size: cover; background-position: center; opacity: 0.3; z-index: 0; pointer-events: none; transition: filter 0.3s ease; }
         .bg-grid { position: absolute; inset: 0; width: 100%; height: 100%; background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 30px 30px; opacity: 0.5; z-index: 1; pointer-events: none; transition: 0.3s; }
         
-        /* 캐릭터 기둥 */
         .char-pillar { width: 320px; height: 100%; flex-shrink: 0; position: relative; z-index: 10; border-right: 1px solid var(--line); cursor: pointer; background: #000; }
         .char-pillar.right { border-right: none; border-left: 1px solid var(--line); }
         .pillar-img { position: absolute; inset: 0; width: 100%; height: 100%; background-size: cover; background-position: center; filter: grayscale(40%); transition: 0.5s; z-index: 1; }
@@ -34,13 +32,11 @@
         .char-overlay { position: absolute; bottom: 0; left: 0; width: 100%; padding: 150px 30px 40px; background: linear-gradient(to top, rgba(10,11,13,1) 0%, rgba(10,11,13,0.7) 40%, transparent 100%); display: flex; flex-direction: column; gap: 8px; z-index: 2; pointer-events: auto; }
         .char-input { background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-pri); font-family: inherit; transition: 0.3s; padding-bottom: 5px; }
         .char-input:focus { border-bottom-color: var(--c-main); }
-        .char-name { font-size: 24px; font-weight: 900; letter-spacing: 0.15em; color: var(--c-main); }
+        .char-name { font-size: 24px; font-weight: 900; letter-spacing: 0.15em; color: var(--c-main); text-transform: uppercase;}
         .char-bio { font-size: 11px; line-height: 1.8; color: var(--text-mut); resize: none; height: 90px; }
 
-        /* 중앙 보드 */
         .center-board { flex: 1; height: 100%; position: relative; z-index: 5; display: flex; flex-direction: column; background: radial-gradient(circle at center, transparent 0%, rgba(10,11,13,0.8) 100%); overflow-y: auto; overflow-x: hidden; }
         
-        /* 상단 HUD (컨트롤 바) */
         .hud-panel { position: sticky; top: 0; width: 100%; z-index: 100; padding: 20px 40px; background: linear-gradient(to bottom, rgba(10,11,13,0.95) 0%, transparent 100%); }
         .hud-top { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); padding-bottom: 15px; }
         .sys-title { font-size: 12px; font-weight: 900; letter-spacing: 0.4em; color: var(--text-mut); }
@@ -56,11 +52,7 @@
         input[type="color"] { width: 16px; height: 16px; border: none; cursor: pointer; background: transparent; padding:0; }
         input[type="color"]::-webkit-color-swatch { border: 1px solid var(--line); border-radius: 2px; }
 
-        /* [신규 기능] 페어 헤더 (거대하고 미학적인 타이틀 구역) */
-        .pair-header {
-            width: 100%; padding: 80px 40px 40px; display: flex; flex-direction: column; align-items: center; text-align: center;
-            border-bottom: 1px solid var(--line); position: relative; z-index: 10;
-        }
+        .pair-header { width: 100%; padding: 80px 40px 40px; display: flex; flex-direction: column; align-items: center; text-align: center; border-bottom: 1px solid var(--line); position: relative; z-index: 10; }
         .pair-input { background: transparent; border: none; text-align: center; font-family: inherit; color: var(--c-main); transition: 0.3s; width: 100%; }
         .pair-input:focus { border-bottom: 1px solid var(--c-main); background: rgba(255,255,255,0.02); }
         .pair-input::placeholder { color: var(--text-mut); opacity: 0.5; }
@@ -73,17 +65,16 @@
         .ph-date-input::-webkit-calendar-picker-indicator { filter: invert(1); opacity: 0.5; cursor: pointer; }
         .ph-dday-text { font-size: 16px; font-weight: 800; color: var(--c-sub); letter-spacing: 0.1em; }
 
-        /* 타임라인 레이아웃 */
         .timeline-container { padding: 40px 60px 100px; display: flex; flex-direction: column; flex: 1; }
         .timeline-row { display: flex; align-items: flex-start; gap: 40px; padding: 40px 0; position: relative; width: 100%; }
         .timeline-row:nth-child(even) { flex-direction: row-reverse; }
         .timeline-row::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: var(--line); z-index: 0; }
 
-        /* 서사 카드 디자인 (크기 독립화) */
         .story-card {
             width: calc(33.333% - 26px); background: var(--panel);
             border: 1px solid var(--line); border-top: 1px solid var(--c-main);
             padding: 30px 25px; position: relative; z-index: 2; transition: 0.3s ease; height: auto; 
+            backdrop-filter: blur(10px); /* 캡처 시 제거할 클래스 */
         }
         .story-card::before { content: ''; position: absolute; top: -5px; left: 50%; transform: translateX(-50%) rotate(45deg); width: 8px; height: 8px; background: var(--c-bg); border: 1px solid var(--c-main); }
         .story-card:hover { border-color: var(--c-main); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
@@ -92,7 +83,6 @@
         .card-date { font-size: 9px; font-weight: 700; color: var(--c-sub); letter-spacing: 0.2em; margin-top: 5px; margin-bottom: 12px; }
         .card-title { font-size: 16px; font-weight: 800; line-height: 1.4; margin-bottom: 15px; color: var(--text-pri); }
         
-        /* 이미지 크기 축소 */
         .card-img-box { width: 100%; max-height: 90px; margin-bottom: 15px; border: 1px solid var(--line); background-size: cover; background-position: center; border-radius: 4px; filter: grayscale(15%); transition: 0.3s; }
         .story-card:hover .card-img-box { filter: grayscale(0%); max-height: 120px; }
         
@@ -100,35 +90,32 @@
         .del-btn { position: absolute; top: 15px; right: 15px; background: none; border: none; color: #ff5555; font-size: 9px; cursor: pointer; opacity: 0; letter-spacing: 0.1em; }
         .story-card:hover .del-btn { opacity: 1; }
 
-        /* [신규 기능] 챕터 디자인 개편 (사각형 박스 삭제, 거대 마름모와 텍스트의 융합) */
+        /* [수정] 챕터 디자인 개편 (마름모 1/3 사이즈로 축소 및 위치 조정) */
         .chapter-divider {
             width: 100%; display: flex; align-items: center; justify-content: center;
-            margin: 100px 0; position: relative; z-index: 5; height: 160px;
+            margin: 80px 0; position: relative; z-index: 5; height: 120px;
         }
-        /* 중앙 관통 라인 */
-        .chapter-divider::before { content: ''; position: absolute; top: -80px; bottom: -80px; width: 1px; background: linear-gradient(to bottom, transparent, var(--c-sub), transparent); z-index: 0; }
+        .chapter-divider::before { content: ''; position: absolute; top: -60px; bottom: -60px; width: 1px; background: linear-gradient(to bottom, transparent, var(--c-sub), transparent); z-index: 0; }
         
-        /* 거대한 와이어프레임 마름모 */
+        /* 마름모를 60px(기존의 1/3 크기)로 대폭 축소 */
         .chapter-rhombus-bg {
-            position: absolute; width: 180px; height: 180px;
+            position: absolute; width: 60px; height: 60px;
             border: 1px solid var(--line); transform: rotate(45deg);
-            background: var(--c-bg); /* 뒤에 있는 세로선을 가림 */
+            background: var(--c-bg); 
             display: flex; align-items: center; justify-content: center; z-index: 1;
-            box-shadow: inset 0 0 40px rgba(0,0,0,0.8);
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
         }
-        .chapter-rhombus-bg::after { content: ''; position: absolute; width: 160px; height: 160px; border: 1px solid rgba(209,189,160,0.05); }
+        .chapter-rhombus-bg::after { content: ''; position: absolute; width: 45px; height: 45px; border: 1px solid rgba(209,189,160,0.1); }
 
-        /* 텍스트 콘텐츠 (박스 없이 마름모 위에 직접 올라감) */
         .chapter-text-content {
             position: relative; z-index: 2; text-align: center; display: flex; flex-direction: column; align-items: center;
         }
-        .chapter-num-display { font-size: 11px; font-weight: 800; letter-spacing: 0.5em; color: var(--c-main); margin-bottom: 8px; text-transform: uppercase; }
-        .chapter-title-display { font-size: 26px; font-weight: 900; color: #fff; margin-bottom: 5px; letter-spacing: 0.1em; text-shadow: 0 0 10px rgba(255,255,255,0.2); }
+        .chapter-num-display { font-size: 11px; font-weight: 800; letter-spacing: 0.5em; color: var(--c-main); margin-bottom: 4px; text-transform: uppercase; }
+        .chapter-title-display { font-size: 22px; font-weight: 900; color: #fff; margin-bottom: 3px; letter-spacing: 0.1em; text-shadow: 0 0 10px rgba(0,0,0,0.8); }
         .chapter-sub-display { font-size: 10px; color: var(--c-sub); letter-spacing: 0.2em; margin-bottom: 5px; }
         .chapter-del { font-size: 9px; color: #ff5555; cursor: pointer; background: none; border: none; letter-spacing: 0.1em; opacity: 0.3; transition: 0.2s; }
         .chapter-text-content:hover .chapter-del { opacity: 1; }
 
-        /* 모달창 */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 999; display: none; justify-content: center; align-items: center; }
         .editor-box { width: 380px; background: #0a0b0d; border: 1px solid var(--line); border-top: 2px solid var(--c-main); padding: 30px; display: flex; flex-direction: column; gap: 15px; }
         .editor-tabs { display: flex; gap: 15px; border-bottom: 1px solid var(--line); padding-bottom: 10px; margin-bottom: 10px; }
@@ -139,12 +126,16 @@
         #form-story, #form-chapter { display: flex; flex-direction: column; gap: 12px; }
         #form-chapter { display: none; }
 
+        /* 캡처 시 과부하를 막기 위해 일시적으로 적용될 클래스 */
+        .capture-mode .story-card { backdrop-filter: none !important; }
+        .capture-mode .pillar-img { filter: grayscale(0%) !important; }
+        .capture-mode .card-img-box { filter: grayscale(0%) !important; }
+
     </style>
 </head>
 <body>
 
     <div class="app-wrapper" id="capture-area">
-        
         <div class="bg-layer" id="bg-canvas"></div>
         <div class="bg-grid" id="bg-grid"></div>
 
@@ -158,7 +149,6 @@
         </aside>
 
         <main class="center-board" id="scroll-board">
-            
             <div class="hud-panel" data-html2canvas-ignore="true">
                 <div class="hud-top">
                     <div class="sys-title">SYSTEM_READY</div>
@@ -271,7 +261,7 @@
         }
 
         window.onload = () => {
-            const saved = localStorage.getItem('oc_archive_v7');
+            const saved = localStorage.getItem('oc_archive_v8');
             if(saved) { 
                 const parsed = JSON.parse(saved);
                 appData = { ...appData, ...parsed }; 
@@ -312,10 +302,9 @@
             appData.c2.name = document.getElementById('c2-name').value; appData.c2.bio = document.getElementById('c2-bio').value;
             appData.theme.main = document.getElementById('theme-main').value; appData.theme.sub = document.getElementById('theme-sub').value;
             appData.bg.opacity = document.getElementById('bg-opacity').value; appData.bg.blur = document.getElementById('bg-blur').value;
-            try { localStorage.setItem('oc_archive_v7', JSON.stringify(appData)); } catch(e) {}
+            try { localStorage.setItem('oc_archive_v8', JSON.stringify(appData)); } catch(e) {}
         }
 
-        /* 디데이 계산 로직 */
         function calcDday() {
             const dateStr = document.getElementById('pair-date').value;
             const res = document.getElementById('dday-result');
@@ -331,7 +320,6 @@
             else res.innerText = `D-DAY`;
         }
 
-        /* 세팅 컨트롤 */
         function updateColors() {
             const m = document.getElementById('theme-main').value; const s = document.getElementById('theme-sub').value;
             document.documentElement.style.setProperty('--c-main', m); document.documentElement.style.setProperty('--c-sub', s);
@@ -418,7 +406,6 @@
                     flushRow();
                     const chNumFormat = appData.settings.numStyle === 'arabic' ? `CHAPTER ${chapterCounter.toString().padStart(2, '0')}` : `CHAPTER ${toRoman(chapterCounter)}`;
                     
-                    // [핵심 변경점] 사각형 박스를 없애고, 거대한 와이어프레임 마름모 위에 텍스트를 바로 배치
                     box.innerHTML += `
                         <div class="chapter-divider">
                             <div class="chapter-rhombus-bg"></div>
@@ -441,7 +428,7 @@
             const sb = document.getElementById('scroll-board'); sb.scrollTo({ top: sb.scrollHeight, behavior: 'smooth' });
         }
 
-        /* 렌더링 실패 및 크래시 완전 해결 (안정 스케일 적용) */
+        /* [최종 수정] 메모리 폭파 100% 억제 엔진 */
         function exportImage() {
             const wrapper = document.getElementById('capture-area');
             const board = document.getElementById('scroll-board');
@@ -451,16 +438,23 @@
 
             wrapper.style.width = w + 'px'; wrapper.style.height = h + 'px'; board.style.overflowY = 'visible';
 
+            // 캡처 전, 메모리를 갉아먹는 블러(backdrop-filter)와 그레이스케일(filter)을 전부 꺼버림
+            wrapper.classList.add('capture-mode');
+
             setTimeout(() => {
-                // scale을 1로 강제 고정하여 메모리 폭발(렌더링 실패)을 100% 방지.
+                // scale: 1 강제 고정으로 거대한 캔버스 렌더링 한계점 방어
                 html2canvas(wrapper, { backgroundColor: "#0a0b0d", scale: 1, useCORS: true, width: w, height: h, windowWidth: w, windowHeight: h, logging: false })
                 .then(canvas => {
                     const a = document.createElement('a'); a.href = canvas.toDataURL("image/jpeg", 0.9);
-                    a.download = `CHRONICLE_ARCHIVE.jpg`; a.click();
+                    a.download = `CHRONICLE_${document.getElementById('pair-title').value || 'ARCHIVE'}.jpg`; a.click();
+                    
+                    // 캡처 완료 후 복구
                     wrapper.style.width = backupW; wrapper.style.height = backupH; board.style.overflowY = backupOverflow;
+                    wrapper.classList.remove('capture-mode');
                 }).catch(err => {
-                    alert("렌더링 실패. 데이터가 한계치를 초과했습니다. TXT 백업을 이용해주세요.");
+                    alert("정말 엄청난 분량의 서사군요! 브라우저의 이미지 저장 한계를 초과했습니다.\n[크롬 확장프로그램인 'GoFullPage'를 설치하여 캡처하시는 것을 강력히 권장합니다!]");
                     wrapper.style.width = backupW; wrapper.style.height = backupH; board.style.overflowY = backupOverflow;
+                    wrapper.classList.remove('capture-mode');
                 });
             }, 300);
         }
