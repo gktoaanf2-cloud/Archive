@@ -1,104 +1,270 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Pair Archive</title>
+<meta charset="UTF-8" />
 
-  <link rel="stylesheet" href="style.css" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+/>
+
+<title>Pair Archive System</title>
+
+<link
+  rel="stylesheet"
+  href="style.css"
+/>
+
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
 </head>
 
 <body>
 
+<!-- BG -->
+
 <div class="bg">
-  <div class="bg-image" id="bgImage"></div>
+
+  <div
+    class="bg-image"
+    id="bgImage"
+  ></div>
 
   <div class="grid"></div>
 
-  <div class="glow"></div>
+  <div class="glow glow-a"></div>
+
+  <div class="glow glow-b"></div>
+
 </div>
+
+<!-- APP -->
 
 <div class="app">
 
+  <!-- SIDEBAR -->
+
   <aside class="sidebar">
 
-    <div class="subtitle">
-      Pair
+    <div class="sidebar-scroll">
+
+      <div class="subtitle">
+        PROJECT
+      </div>
+
+      <!-- PROJECT -->
+
+      <div class="panel">
+
+        <input
+          id="projectName"
+          placeholder="프로젝트 이름"
+        />
+
+        <button
+          class="main-btn full"
+          onclick="saveProject()"
+        >
+          프로젝트 저장
+        </button>
+
+        <select
+          id="projectSelect"
+          onchange="loadProject(this.value)"
+        >
+        </select>
+
+      </div>
+
+      <!-- PAIR -->
+
+      <div class="panel">
+
+        <div class="subtitle">
+          PAIR
+        </div>
+
+        <input
+          id="pairName"
+          placeholder="페어명"
+        />
+
+        <input
+          id="pairTag"
+          placeholder="관계 키워드"
+        />
+
+      </div>
+
+      <!-- CHARACTER A -->
+
+      <div class="panel character-card">
+
+        <div class="character-top">
+
+          <div
+            class="profile-preview"
+            id="profileA"
+          ></div>
+
+          <div>
+
+            <div class="character-title">
+              Character A
+            </div>
+
+            <input
+              type="file"
+              accept="image/*"
+              onchange="uploadCharacter(event, 'A')"
+            />
+
+          </div>
+
+        </div>
+
+        <input
+          id="charAName"
+          placeholder="캐릭터 이름"
+        />
+
+        <textarea
+          id="charABio"
+          placeholder="캐릭터 소개"
+        ></textarea>
+
+      </div>
+
+      <!-- CHARACTER B -->
+
+      <div class="panel character-card">
+
+        <div class="character-top">
+
+          <div
+            class="profile-preview"
+            id="profileB"
+          ></div>
+
+          <div>
+
+            <div class="character-title">
+              Character B
+            </div>
+
+            <input
+              type="file"
+              accept="image/*"
+              onchange="uploadCharacter(event, 'B')"
+            />
+
+          </div>
+
+        </div>
+
+        <input
+          id="charBName"
+          placeholder="캐릭터 이름"
+        />
+
+        <textarea
+          id="charBBio"
+          placeholder="캐릭터 소개"
+        ></textarea>
+
+      </div>
+
+      <!-- EXPORT -->
+
+      <div class="panel">
+
+        <button
+          class="main-btn full"
+          onclick="exportTXT()"
+        >
+          TXT 저장
+        </button>
+
+        <button
+          class="main-btn full"
+          onclick="exportPNG()"
+        >
+          PNG 저장
+        </button>
+
+        <input
+          type="file"
+          accept=".txt"
+          onchange="importTXT(event)"
+        />
+
+      </div>
+
     </div>
-
-    <input
-      id="pairName"
-      placeholder="페어명"
-    />
-
-    <div class="panel character-card">
-
-      <h3>Character A</h3>
-
-      <input
-        id="charAName"
-        placeholder="캐릭터 이름"
-      />
-
-      <textarea
-        id="charABio"
-        placeholder="캐릭터 소개"
-      ></textarea>
-
-    </div>
-
-    <div class="panel character-card">
-
-      <h3>Character B</h3>
-
-      <input
-        id="charBName"
-        placeholder="캐릭터 이름"
-      />
-
-      <textarea
-        id="charBBio"
-        placeholder="캐릭터 소개"
-      ></textarea>
-
-    </div>
-
-    <button
-      class="main-btn"
-      onclick="exportTXT()"
-    >
-      TXT 저장
-    </button>
-
-    <br><br>
-
-    <input
-      type="file"
-      accept=".txt"
-      onchange="importTXT(event)"
-    />
 
   </aside>
 
-  <main class="main">
+  <!-- MAIN -->
 
-    <div class="subtitle">
-      Archive
+  <main
+    class="main"
+    id="captureTarget"
+  >
+
+    <div class="hero">
+
+      <div>
+
+        <div class="subtitle">
+          ARCHIVE
+        </div>
+
+        <h1 class="title">
+          Timeline
+        </h1>
+
+      </div>
+
+      <div class="hero-buttons">
+
+        <button
+          class="main-btn"
+          onclick="addChapter()"
+        >
+          + 챕터
+        </button>
+
+        <button
+          class="main-btn"
+          onclick="addTimeline()"
+        >
+          + 에피소드
+        </button>
+
+      </div>
+
     </div>
 
-    <h1 class="title">
-      Timeline
-    </h1>
+    <!-- REL GRAPH -->
 
-    <br>
+    <div class="panel relation-panel">
 
-    <button
-      class="main-btn"
-      onclick="addTimeline()"
-    >
-      + 에피소드 추가
-    </button>
+      <div class="subtitle">
+        RELATION GRAPH
+      </div>
+
+      <canvas
+        id="relationCanvas"
+        width="900"
+        height="220"
+      ></canvas>
+
+    </div>
+
+    <!-- TIMELINE -->
 
     <div
       class="timeline"
@@ -107,68 +273,106 @@
 
   </main>
 
+  <!-- SETTINGS -->
+
   <aside class="settings">
 
     <div class="subtitle">
-      Settings
+      SETTINGS
     </div>
 
-    <div class="setting-label">
-      메인 컬러
+    <!-- COLOR -->
+
+    <div class="panel">
+
+      <div class="setting-label">
+        메인 컬러
+      </div>
+
+      <input
+        type="color"
+        value="#91a2ff"
+        onchange="setAccent(this.value)"
+      />
+
     </div>
 
-    <input
-      type="color"
-      value="#91a2ff"
-      onchange="setAccent(this.value)"
-    />
+    <!-- BG -->
 
-    <div class="setting-label">
-      배경 이미지
+    <div class="panel">
+
+      <div class="setting-label">
+        배경 이미지
+      </div>
+
+      <input
+        type="file"
+        accept="image/*"
+        onchange="changeBG(event)"
+      />
+
+      <div class="setting-label">
+        블러
+      </div>
+
+      <input
+        type="range"
+        min="0"
+        max="40"
+        value="0"
+        oninput="setBlur(this.value)"
+      />
+
+      <div class="setting-label">
+        확대
+      </div>
+
+      <input
+        type="range"
+        min="1"
+        max="2"
+        step="0.01"
+        value="1"
+        oninput="setScale(this.value)"
+      />
+
+      <div class="setting-label">
+        회전
+      </div>
+
+      <input
+        type="range"
+        min="-180"
+        max="180"
+        value="0"
+        oninput="setRotate(this.value)"
+      />
+
+      <div class="setting-label">
+        X 이동
+      </div>
+
+      <input
+        type="range"
+        min="-500"
+        max="500"
+        value="0"
+        oninput="setPosX(this.value)"
+      />
+
+      <div class="setting-label">
+        Y 이동
+      </div>
+
+      <input
+        type="range"
+        min="-500"
+        max="500"
+        value="0"
+        oninput="setPosY(this.value)"
+      />
+
     </div>
-
-    <input
-      type="file"
-      accept="image/*"
-      onchange="changeBG(event)"
-    />
-
-    <div class="setting-label">
-      배경 블러
-    </div>
-
-    <input
-      type="range"
-      min="0"
-      max="40"
-      value="0"
-      oninput="setBlur(this.value)"
-    />
-
-    <div class="setting-label">
-      배경 확대
-    </div>
-
-    <input
-      type="range"
-      min="1"
-      max="2"
-      step="0.01"
-      value="1"
-      oninput="setScale(this.value)"
-    />
-
-    <div class="setting-label">
-      배경 회전
-    </div>
-
-    <input
-      type="range"
-      min="-180"
-      max="180"
-      value="0"
-      oninput="setRotate(this.value)"
-    />
 
   </aside>
 
@@ -180,13 +384,19 @@ let state = JSON.parse(
   localStorage.getItem('pairArchiveData')
 ) || {
 
+  projectName: '',
+
   pairName: '',
+
+  pairTag: '',
 
   charAName: '',
   charABio: '',
+  charAImage: '',
 
   charBName: '',
   charBBio: '',
+  charBImage: '',
 
   timelines: [],
 
@@ -197,6 +407,10 @@ let state = JSON.parse(
   scale: 1,
 
   rotate: 0,
+
+  posX: 0,
+
+  posY: 0,
 }
 
 const timelineEl =
@@ -211,6 +425,78 @@ function save() {
     'pairArchiveData',
     JSON.stringify(state)
   )
+
+  renderProjectList()
+}
+
+function renderProjectList() {
+
+  const select =
+    document.getElementById('projectSelect')
+
+  select.innerHTML = ''
+
+  const projects =
+    JSON.parse(
+      localStorage.getItem('pairProjects')
+    ) || []
+
+  projects.forEach(project => {
+
+    const option =
+      document.createElement('option')
+
+    option.value =
+      project.projectName
+
+    option.innerText =
+      project.projectName
+
+    select.appendChild(option)
+  })
+}
+
+function saveProject() {
+
+  const projects =
+    JSON.parse(
+      localStorage.getItem('pairProjects')
+    ) || []
+
+  const filtered =
+    projects.filter(
+      p =>
+      p.projectName !==
+      state.projectName
+    )
+
+  filtered.push(state)
+
+  localStorage.setItem(
+    'pairProjects',
+    JSON.stringify(filtered)
+  )
+
+  renderProjectList()
+}
+
+function loadProject(name) {
+
+  const projects =
+    JSON.parse(
+      localStorage.getItem('pairProjects')
+    ) || []
+
+  const found =
+    projects.find(
+      p => p.projectName === name
+    )
+
+  if (!found) return
+
+  state = found
+
+  render()
 }
 
 function applyBG() {
@@ -223,27 +509,45 @@ function applyBG() {
   bgImage.style.filter =
     `blur(${state.blur}px)`
 
-  bgImage.style.transform =
-    `scale(${state.scale + (state.blur * 0.01)})
-     rotate(${state.rotate}deg)`
+  bgImage.style.transform = `
+    translate(${state.posX}px, ${state.posY}px)
+    scale(${state.scale + (state.blur * 0.01)})
+    rotate(${state.rotate}deg)
+  `
 }
 
 function render() {
 
-  document.getElementById('pairName').value =
+  projectName.value =
+    state.projectName
+
+  pairName.value =
     state.pairName
 
-  document.getElementById('charAName').value =
+  pairTag.value =
+    state.pairTag
+
+  charAName.value =
     state.charAName
 
-  document.getElementById('charABio').value =
+  charABio.value =
     state.charABio
 
-  document.getElementById('charBName').value =
+  charBName.value =
     state.charBName
 
-  document.getElementById('charBBio').value =
+  charBBio.value =
     state.charBBio
+
+  profileA.style.backgroundImage =
+    state.charAImage
+      ? `url(${state.charAImage})`
+      : 'none'
+
+  profileB.style.backgroundImage =
+    state.charBImage
+      ? `url(${state.charBImage})`
+      : 'none'
 
   timelineEl.innerHTML = ''
 
@@ -253,49 +557,79 @@ function render() {
       document.createElement('div')
 
     div.className =
-      'panel timeline-item'
+      item.type === 'chapter'
+      ? 'chapter-card'
+      : 'panel timeline-item'
 
-    div.innerHTML = `
+    if (item.type === 'chapter') {
 
-      <div class="subtitle">
-        EPISODE ${index + 1}
-      </div>
+      div.innerHTML = `
+        <input
+          class="chapter-input"
+          placeholder="챕터 이름"
+          value="${item.title || ''}"
+          onchange="updateTimeline(${index}, 'title', this.value)"
+        >
+      `
 
-      <input
-        placeholder="날짜"
-        value="${item.date || ''}"
-        onchange="updateTimeline(${index}, 'date', this.value)"
-      >
+    } else {
 
-      <input
-        placeholder="에피소드 제목"
-        value="${item.title || ''}"
-        onchange="updateTimeline(${index}, 'title', this.value)"
-      >
+      div.innerHTML = `
 
-      <textarea
-        placeholder="서사를 입력하세요"
-        onchange="updateTimeline(${index}, 'content', this.value)"
-      >${item.content || ''}</textarea>
+        <div class="episode-number">
+          EPISODE ${index + 1}
+        </div>
 
-      <input
-        type="file"
-        accept="image/*"
-        onchange="timelineImage(event, ${index})"
-      >
+        <input
+          placeholder="날짜"
+          value="${item.date || ''}"
+          onchange="updateTimeline(${index}, 'date', this.value)"
+        >
 
-      ${
-        item.image
-        ? `<img src="${item.image}" class="image-preview">`
-        : ''
-      }
+        <input
+          placeholder="에피소드 제목"
+          value="${item.title || ''}"
+          onchange="updateTimeline(${index}, 'title', this.value)"
+        >
 
-    `
+        <textarea
+          placeholder="서사를 입력하세요"
+          onchange="updateTimeline(${index}, 'content', this.value)"
+        >${item.content || ''}</textarea>
+
+        <input
+          type="range"
+          min="0"
+          max="100"
+          value="${item.relation || 50}"
+          onchange="updateTimeline(${index}, 'relation', this.value)"
+        >
+
+        <input
+          type="file"
+          accept="image/*"
+          onchange="timelineImage(event, ${index})"
+        >
+
+        ${
+          item.image
+          ? `
+            <img
+              src="${item.image}"
+              class="image-preview"
+            >
+          `
+          : ''
+        }
+      `
+    }
 
     timelineEl.appendChild(div)
   })
 
   applyBG()
+
+  renderGraph()
 
   save()
 }
@@ -304,6 +638,8 @@ function addTimeline() {
 
   state.timelines.push({
 
+    type: 'episode',
+
     date: '',
 
     title: '',
@@ -311,6 +647,20 @@ function addTimeline() {
     content: '',
 
     image: '',
+
+    relation: 50,
+  })
+
+  render()
+}
+
+function addChapter() {
+
+  state.timelines.push({
+
+    type: 'chapter',
+
+    title: '',
   })
 
   render()
@@ -321,7 +671,38 @@ function updateTimeline(index, key, value) {
   state.timelines[index][key] =
     value
 
+  renderGraph()
+
   save()
+}
+
+function uploadCharacter(event, target) {
+
+  const file =
+    event.target.files[0]
+
+  if (!file) return
+
+  const reader =
+    new FileReader()
+
+  reader.onload = () => {
+
+    if (target === 'A') {
+
+      state.charAImage =
+        reader.result
+
+    } else {
+
+      state.charBImage =
+        reader.result
+    }
+
+    render()
+  }
+
+  reader.readAsDataURL(file)
 }
 
 function timelineImage(event, index) {
@@ -347,7 +728,8 @@ function timelineImage(event, index) {
 
 function setAccent(color) {
 
-  document.documentElement.style
+  document.documentElement
+    .style
     .setProperty('--accent', color)
 }
 
@@ -366,9 +748,7 @@ function changeBG(event) {
     state.bg =
       reader.result
 
-    applyBG()
-
-    save()
+    render()
   }
 
   reader.readAsDataURL(file)
@@ -401,6 +781,24 @@ function setRotate(value) {
   save()
 }
 
+function setPosX(value) {
+
+  state.posX = value
+
+  applyBG()
+
+  save()
+}
+
+function setPosY(value) {
+
+  state.posY = value
+
+  applyBG()
+
+  save()
+}
+
 function exportTXT() {
 
   const text =
@@ -409,7 +807,9 @@ function exportTXT() {
   const blob =
     new Blob(
       [text],
-      { type: 'text/plain' }
+      {
+        type: 'text/plain'
+      }
     )
 
   const a =
@@ -419,7 +819,7 @@ function exportTXT() {
     URL.createObjectURL(blob)
 
   a.download =
-    `${state.pairName || 'pair-archive'}.txt`
+    `${state.projectName || 'pair'}.txt`
 
   a.click()
 }
@@ -445,45 +845,144 @@ function importTXT(event) {
   reader.readAsText(file)
 }
 
+async function exportPNG() {
+
+  const target =
+    document.getElementById('captureTarget')
+
+  const canvas =
+    await html2canvas(target)
+
+  const link =
+    document.createElement('a')
+
+  link.download =
+    `${state.projectName || 'pair'}.png`
+
+  link.href =
+    canvas.toDataURL()
+
+  link.click()
+}
+
+function renderGraph() {
+
+  const canvas =
+    document.getElementById('relationCanvas')
+
+  const ctx =
+    canvas.getContext('2d')
+
+  ctx.clearRect(
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  )
+
+  ctx.beginPath()
+
+  ctx.strokeStyle =
+    '#91a2ff'
+
+  ctx.lineWidth = 4
+
+  const episodes =
+    state.timelines.filter(
+      t => t.type === 'episode'
+    )
+
+  episodes.forEach((item, index) => {
+
+    const x =
+      60 + index * 120
+
+    const y =
+      180 - item.relation
+
+    if (index === 0) {
+
+      ctx.moveTo(x, y)
+
+    } else {
+
+      ctx.lineTo(x, y)
+    }
+
+    ctx.fillStyle =
+      '#ffffff'
+
+    ctx.beginPath()
+
+    ctx.arc(x, y, 6, 0, Math.PI * 2)
+
+    ctx.fill()
+  })
+
+  ctx.stroke()
+}
+
+projectName.oninput = e => {
+  state.projectName = e.target.value
+  save()
+}
+
 pairName.oninput = e => {
+  state.pairName = e.target.value
+  save()
+}
 
-  state.pairName =
-    e.target.value
-
+pairTag.oninput = e => {
+  state.pairTag = e.target.value
   save()
 }
 
 charAName.oninput = e => {
-
-  state.charAName =
-    e.target.value
-
+  state.charAName = e.target.value
   save()
 }
 
 charABio.oninput = e => {
-
-  state.charABio =
-    e.target.value
-
+  state.charABio = e.target.value
   save()
 }
 
 charBName.oninput = e => {
-
-  state.charBName =
-    e.target.value
-
+  state.charBName = e.target.value
   save()
 }
 
 charBBio.oninput = e => {
-
-  state.charBBio =
-    e.target.value
-
+  state.charBBio = e.target.value
   save()
 }
+
+new Sortable(
+  timelineEl,
+  {
+    animation: 200,
+
+    onEnd: function(evt) {
+
+      const moved =
+        state.timelines.splice(
+          evt.oldIndex,
+          1
+        )[0]
+
+      state.timelines.splice(
+        evt.newIndex,
+        0,
+        moved
+      )
+
+      save()
+      renderGraph()
+    }
+  }
+)
+
+renderProjectList()
 
 render()
 
