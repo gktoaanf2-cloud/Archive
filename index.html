@@ -9,7 +9,7 @@
   content="width=device-width, initial-scale=1.0"
 />
 
-<title>Pair Archive</title>
+<title>PAIR ARCHIVE</title>
 
 <link
   rel="stylesheet"
@@ -34,159 +34,171 @@
     id="bgImage"
   ></div>
 
+  <div class="bg-noise"></div>
+
   <div class="bg-grid"></div>
 
 </div>
 
-<!-- TOPBAR -->
+<!-- HEADER -->
 
-<header class="topbar">
+<header class="header">
 
-  <div class="top-left">
+  <div class="header-left">
 
     <input
       id="pairName"
-      class="pair-input"
+      class="pair-name-input"
       placeholder="PAIR NAME"
     />
 
     <input
-      id="pairTag"
-      class="tag-input"
+      id="pairKeyword"
+      class="pair-keyword-input"
       placeholder="relationship keyword"
     />
 
   </div>
 
-  <div class="top-right">
+  <div class="header-right">
 
     <button
-      class="top-btn"
-      onclick="openEditor()"
+      class="header-btn"
+      onclick="createStoryCard()"
     >
       NEW EVENT
     </button>
 
     <button
-      class="top-btn"
+      class="header-btn"
       onclick="exportPNG()"
     >
-      EXPORT PNG
+      EXPORT
     </button>
 
   </div>
 
 </header>
 
-<!-- BOARD -->
+<!-- EXPORT BOARD -->
 
 <div
   class="board"
   id="exportBoard"
 >
 
-  <!-- LEFT -->
+  <!-- LEFT PROFILE -->
 
-  <aside class="character-panel">
+  <aside class="profile-column">
 
-    <div
-      class="profile-image"
-      id="profileA"
-    ></div>
+    <div class="profile-panel">
 
-    <input
-      type="file"
-      accept="image/*"
-      onchange="uploadCharacter(event, 'A')"
-    />
+      <div
+        class="profile-image"
+        id="profileA"
+      ></div>
 
-    <input
-      id="charAName"
-      class="character-name"
-      placeholder="Character A"
-    />
+      <input
+        type="file"
+        accept="image/*"
+        onchange="uploadCharacter(event, 'A')"
+      />
 
-    <textarea
-      id="charABio"
-      class="character-bio"
-      placeholder="Character introduction"
-    ></textarea>
+      <input
+        id="charAName"
+        class="profile-name"
+        placeholder="Character A"
+      />
+
+      <textarea
+        id="charABio"
+        class="profile-bio"
+        placeholder="Character introduction"
+      ></textarea>
+
+    </div>
 
   </aside>
 
   <!-- CENTER -->
 
-  <main class="story-section">
+  <main class="story-board-wrap">
 
-    <div class="story-header">
+    <!-- TITLE -->
+
+    <div class="board-header">
 
       <div
-        class="pair-render"
-        id="pairRender"
+        class="board-title"
+        id="boardTitle"
       >
         Pair Name
       </div>
 
       <div
-        class="tag-render"
-        id="tagRender"
+        class="board-keyword"
+        id="boardKeyword"
       >
         Relationship
       </div>
 
     </div>
 
-    <!-- MAP -->
+    <!-- STORY BOARD -->
 
     <div
-      class="story-map"
-      id="storyMap"
+      class="story-board"
+      id="storyBoard"
     ></div>
 
   </main>
 
-  <!-- RIGHT -->
+  <!-- RIGHT PROFILE -->
 
-  <aside class="character-panel">
+  <aside class="profile-column">
 
-    <div
-      class="profile-image"
-      id="profileB"
-    ></div>
+    <div class="profile-panel">
 
-    <input
-      type="file"
-      accept="image/*"
-      onchange="uploadCharacter(event, 'B')"
-    />
+      <div
+        class="profile-image"
+        id="profileB"
+      ></div>
 
-    <input
-      id="charBName"
-      class="character-name"
-      placeholder="Character B"
-    />
+      <input
+        type="file"
+        accept="image/*"
+        onchange="uploadCharacter(event, 'B')"
+      />
 
-    <textarea
-      id="charBBio"
-      class="character-bio"
-      placeholder="Character introduction"
-    ></textarea>
+      <input
+        id="charBName"
+        class="profile-name"
+        placeholder="Character B"
+      />
+
+      <textarea
+        id="charBBio"
+        class="profile-bio"
+        placeholder="Character introduction"
+      ></textarea>
+
+    </div>
 
   </aside>
 
 </div>
 
-<!-- EDITOR -->
+<!-- FLOATING EDITOR -->
 
 <div
   class="editor"
   id="editor"
 >
 
-  <div class="editor-top">
+  <div class="editor-header">
 
-    <div class="editor-title">
-      EVENT EDITOR
+    <div class="editor-label">
+      STORY EVENT
     </div>
 
     <button
@@ -213,12 +225,21 @@
     placeholder="Narrative"
   ></textarea>
 
-  <input
-    type="range"
-    min="0"
-    max="100"
-    id="eventRelation"
-  />
+  <div class="editor-sub">
+
+    <div class="range-label">
+      RELATION
+    </div>
+
+    <input
+      type="range"
+      min="0"
+      max="100"
+      value="50"
+      id="eventRelation"
+    />
+
+  </div>
 
   <input
     type="file"
@@ -228,7 +249,7 @@
 
   <button
     class="complete-btn"
-    onclick="saveEvent()"
+    onclick="saveCard()"
   >
     COMPLETE
   </button>
@@ -240,14 +261,14 @@
 <div class="settings">
 
   <div class="settings-title">
-    THEME
+    VISUAL
   </div>
 
-  <div class="color-grid">
+  <div class="color-row">
 
     <input
       type="color"
-      value="#91a2ff"
+      value="#8ea1ff"
       onchange="setAccent(this.value)"
     />
 
@@ -259,7 +280,7 @@
 
     <input
       type="color"
-      value="#141824"
+      value="#11141d"
       onchange="setPanel(this.value)"
     />
 
@@ -314,8 +335,8 @@
 
   <input
     type="range"
-    min="-500"
-    max="500"
+    min="-600"
+    max="600"
     value="0"
     oninput="setPosX(this.value)"
   />
@@ -326,8 +347,8 @@
 
   <input
     type="range"
-    min="-500"
-    max="500"
+    min="-600"
+    max="600"
     value="0"
     oninput="setPosY(this.value)"
   />
@@ -342,13 +363,13 @@ let tempImage = ''
 
 let state = JSON.parse(
   localStorage.getItem(
-    'pairArchiveData'
+    'pairArchiveState'
   )
 ) || {
 
   pairName: '',
 
-  pairTag: '',
+  pairKeyword: '',
 
   charAName: '',
   charABio: '',
@@ -373,9 +394,9 @@ let state = JSON.parse(
   posY: 0,
 }
 
-const storyMap =
+const storyBoard =
   document.getElementById(
-    'storyMap'
+    'storyBoard'
   )
 
 const bgImage =
@@ -386,7 +407,7 @@ const bgImage =
 function save() {
 
   localStorage.setItem(
-    'pairArchiveData',
+    'pairArchiveState',
     JSON.stringify(state)
   )
 }
@@ -413,14 +434,14 @@ function render() {
   pairName.value =
     state.pairName
 
-  pairTag.value =
-    state.pairTag
+  pairKeyword.value =
+    state.pairKeyword
 
-  pairRender.innerText =
+  boardTitle.innerText =
     state.pairName || 'Pair Name'
 
-  tagRender.innerText =
-    state.pairTag || 'Relationship'
+  boardKeyword.innerText =
+    state.pairKeyword || 'Relationship'
 
   charAName.value =
     state.charAName
@@ -444,7 +465,7 @@ function render() {
       ? `url(${state.charBImage})`
       : 'none'
 
-  storyMap.innerHTML = ''
+  storyBoard.innerHTML = ''
 
   state.cards.forEach(
     (card, index) => {
@@ -455,13 +476,24 @@ function render() {
       el.className =
         'story-card'
 
+      el.style.left =
+        card.x + 'px'
+
+      el.style.top =
+        card.y + 'px'
+
+      el.style.borderColor =
+        getRelationColor(
+          card.relation
+        )
+
       el.innerHTML = `
 
-        <div class="card-date">
+        <div class="story-date">
           ${card.date || 'DATE'}
         </div>
 
-        <div class="card-title">
+        <div class="story-title">
           ${card.title || 'TITLE'}
         </div>
 
@@ -470,16 +502,16 @@ function render() {
           ? `
             <img
               src="${card.image}"
-              class="card-image"
+              class="story-image"
             >
           `
           : ''
         }
 
-        <div class="card-content">
+        <div class="story-text">
           ${
             card.content
-              ? card.content.substring(0, 120)
+              ? card.content.substring(0, 110)
               : 'Narrative'
           }
         </div>
@@ -490,7 +522,12 @@ function render() {
         openEdit(index)
       }
 
-      storyMap.appendChild(el)
+      enableDrag(
+        el,
+        index
+      )
+
+      storyBoard.appendChild(el)
     }
   )
 
@@ -499,7 +536,22 @@ function render() {
   save()
 }
 
-function openEditor() {
+function getRelationColor(value) {
+
+  if (value < 30) {
+
+    return 'rgba(255,255,255,0.08)'
+  }
+
+  if (value < 70) {
+
+    return 'var(--accent)'
+  }
+
+  return 'var(--accent2)'
+}
+
+function createStoryCard() {
 
   editingIndex = null
 
@@ -520,10 +572,10 @@ function openEditor() {
 
 function openEdit(index) {
 
+  editingIndex = index
+
   const card =
     state.cards[index]
-
-  editingIndex = index
 
   editor.classList.add(
     'editor-open'
@@ -571,7 +623,7 @@ eventImage.onchange = e => {
   reader.readAsDataURL(file)
 }
 
-function saveEvent() {
+function saveCard() {
 
   const payload = {
 
@@ -589,15 +641,29 @@ function saveEvent() {
 
     image:
       tempImage,
+
+    x:
+      60 + (state.cards.length * 30),
+
+    y:
+      60 + (state.cards.length * 30),
   }
 
   if (
     editingIndex === null
   ) {
 
-    state.cards.push(payload)
+    state.cards.push(
+      payload
+    )
 
   } else {
+
+    payload.x =
+      state.cards[editingIndex].x
+
+    payload.y =
+      state.cards[editingIndex].y
 
     state.cards[editingIndex] =
       payload
@@ -606,6 +672,62 @@ function saveEvent() {
   render()
 
   closeEditor()
+}
+
+function enableDrag(
+  element,
+  index
+) {
+
+  let offsetX = 0
+  let offsetY = 0
+  let dragging = false
+
+  element.addEventListener(
+    'mousedown',
+    e => {
+
+      dragging = true
+
+      offsetX =
+        e.clientX -
+        state.cards[index].x
+
+      offsetY =
+        e.clientY -
+        state.cards[index].y
+    }
+  )
+
+  window.addEventListener(
+    'mousemove',
+    e => {
+
+      if (!dragging) return
+
+      state.cards[index].x =
+        e.clientX - offsetX
+
+      state.cards[index].y =
+        e.clientY - offsetY
+
+      element.style.left =
+        state.cards[index].x + 'px'
+
+      element.style.top =
+        state.cards[index].y + 'px'
+    }
+  )
+
+  window.addEventListener(
+    'mouseup',
+    () => {
+
+      dragging = false
+
+      save()
+    }
+  )
 }
 
 function uploadCharacter(
@@ -784,9 +906,9 @@ pairName.oninput = e => {
   render()
 }
 
-pairTag.oninput = e => {
+pairKeyword.oninput = e => {
 
-  state.pairTag =
+  state.pairKeyword =
     e.target.value
 
   render()
