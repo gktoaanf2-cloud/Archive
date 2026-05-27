@@ -26,16 +26,19 @@
 
 <!-- BG -->
 
-<div class="bg">
+<div
+  class="bg-layer"
+  id="bgLayer"
+>
 
   <div
     class="bg-image"
     id="bgImage"
   ></div>
 
-  <div class="bg-noise"></div>
+  <div class="bg-grid"></div>
 
-  <div class="bg-line"></div>
+  <div class="bg-noise"></div>
 
 </div>
 
@@ -43,177 +46,195 @@
 
 <div class="app">
 
-  <!-- TOP BAR -->
+  <!-- HEADER -->
 
-  <div class="topbar">
+  <header class="header">
 
-    <div class="top-left">
+    <div class="header-left">
 
       <input
         id="pairName"
-        class="pair-input"
+        class="pair-name-input"
         placeholder="PAIR NAME"
       />
 
       <input
         id="pairTag"
-        class="tag-input"
+        class="pair-tag-input"
         placeholder="relationship keyword"
       />
 
     </div>
 
-    <div class="top-right">
+    <div class="header-right">
 
       <button
-        class="minimal-btn"
+        class="ghost-btn"
+        onclick="addCard()"
+      >
+        ADD CARD
+      </button>
+
+      <button
+        class="ghost-btn"
         onclick="addChapter()"
       >
-        CHAPTER
+        ADD CHAPTER
       </button>
 
       <button
-        class="minimal-btn"
-        onclick="addTimeline()"
-      >
-        EPISODE
-      </button>
-
-      <button
-        class="minimal-btn"
+        class="ghost-btn"
         onclick="exportPNG()"
       >
         PNG
       </button>
 
-      <button
-        class="minimal-btn"
-        onclick="saveProject()"
-      >
-        SAVE
-      </button>
-
     </div>
 
-  </div>
+  </header>
 
-  <!-- BOARD -->
+  <!-- EXPORT BOARD -->
 
   <div
-    class="board"
+    class="export-board"
     id="exportBoard"
   >
 
-    <!-- CHARACTER A -->
+    <!-- LEFT CHARACTER -->
 
-    <aside class="character-side">
+    <aside class="character-panel">
 
-      <div class="character-panel">
+      <div
+        class="character-image"
+        id="profileA"
+      ></div>
 
-        <div
-          class="profile-image"
-          id="profileA"
-        ></div>
+      <input
+        type="file"
+        accept="image/*"
+        onchange="uploadCharacter(event, 'A')"
+      />
 
-        <input
-          type="file"
-          accept="image/*"
-          onchange="uploadCharacter(event, 'A')"
-        />
+      <input
+        id="charAName"
+        class="character-name"
+        placeholder="Character A"
+      />
 
-        <input
-          id="charAName"
-          class="character-name"
-          placeholder="Character A"
-        />
-
-        <textarea
-          id="charABio"
-          class="character-bio"
-          placeholder="Character introduction"
-        ></textarea>
-
-      </div>
+      <textarea
+        id="charABio"
+        class="character-bio"
+        placeholder="Character introduction"
+      ></textarea>
 
     </aside>
 
-    <!-- TIMELINE -->
+    <!-- CENTER -->
 
-    <main class="timeline-section">
+    <main class="story-map-wrap">
 
-      <div class="timeline-header">
+      <div class="story-map-header">
 
-        <div>
+        <div
+          class="pair-render"
+          id="pairRender"
+        >
+          Pair Name
+        </div>
 
-          <div
-            class="render-pair"
-            id="pairRender"
-          >
-            Pair Name
-          </div>
-
-          <div
-            class="render-tag"
-            id="tagRender"
-          >
-            Relationship
-          </div>
-
+        <div
+          class="tag-render"
+          id="tagRender"
+        >
+          Relationship
         </div>
 
       </div>
 
-      <!-- RELATION -->
-
-      <div class="relation-box">
-
-        <canvas
-          id="relationCanvas"
-          width="900"
-          height="140"
-        ></canvas>
-
-      </div>
-
-      <!-- TIMELINE -->
+      <!-- STORY MAP -->
 
       <div
-        class="timeline"
-        id="timeline"
+        class="story-map"
+        id="storyMap"
       ></div>
 
-    </main>
+      <!-- EDIT PANEL -->
 
-    <!-- CHARACTER B -->
+      <div class="edit-panel">
 
-    <aside class="character-side">
+        <div class="edit-top">
 
-      <div class="character-panel">
+          <div class="edit-title">
+            CARD EDITOR
+          </div>
 
-        <div
-          class="profile-image"
-          id="profileB"
-        ></div>
+          <div
+            class="selected-indicator"
+            id="selectedIndicator"
+          >
+            no card selected
+          </div>
+
+        </div>
+
+        <input
+          id="editDate"
+          placeholder="DATE"
+        />
+
+        <input
+          id="editTitle"
+          placeholder="TITLE"
+        />
+
+        <textarea
+          id="editContent"
+          placeholder="Narrative"
+        ></textarea>
+
+        <input
+          type="range"
+          id="editRelation"
+          min="0"
+          max="100"
+        />
 
         <input
           type="file"
           accept="image/*"
-          onchange="uploadCharacter(event, 'B')"
+          id="editImage"
         />
-
-        <input
-          id="charBName"
-          class="character-name"
-          placeholder="Character B"
-        />
-
-        <textarea
-          id="charBBio"
-          class="character-bio"
-          placeholder="Character introduction"
-        ></textarea>
 
       </div>
+
+    </main>
+
+    <!-- RIGHT CHARACTER -->
+
+    <aside class="character-panel">
+
+      <div
+        class="character-image"
+        id="profileB"
+      ></div>
+
+      <input
+        type="file"
+        accept="image/*"
+        onchange="uploadCharacter(event, 'B')"
+      />
+
+      <input
+        id="charBName"
+        class="character-name"
+        placeholder="Character B"
+      />
+
+      <textarea
+        id="charBBio"
+        class="character-bio"
+        placeholder="Character introduction"
+      ></textarea>
 
     </aside>
 
@@ -221,9 +242,13 @@
 
   <!-- SETTINGS -->
 
-  <div class="floating-settings">
+  <div class="floating-panel">
 
-    <div class="setting-group">
+    <div class="floating-title">
+      THEME
+    </div>
+
+    <div class="color-row">
 
       <input
         type="color"
@@ -239,7 +264,7 @@
 
       <input
         type="color"
-        value="#141824"
+        value="#161c2b"
         onchange="setPanel(this.value)"
       />
 
@@ -251,11 +276,74 @@
       onchange="changeBG(event)"
     />
 
+    <div class="slider-label">
+      BLUR
+    </div>
+
+    <input
+      type="range"
+      min="0"
+      max="40"
+      value="0"
+      oninput="setBlur(this.value)"
+    />
+
+    <div class="slider-label">
+      SCALE
+    </div>
+
+    <input
+      type="range"
+      min="1"
+      max="2"
+      step="0.01"
+      value="1"
+      oninput="setScale(this.value)"
+    />
+
+    <div class="slider-label">
+      ROTATE
+    </div>
+
+    <input
+      type="range"
+      min="-180"
+      max="180"
+      value="0"
+      oninput="setRotate(this.value)"
+    />
+
+    <div class="slider-label">
+      X
+    </div>
+
+    <input
+      type="range"
+      min="-500"
+      max="500"
+      value="0"
+      oninput="setPosX(this.value)"
+    />
+
+    <div class="slider-label">
+      Y
+    </div>
+
+    <input
+      type="range"
+      min="-500"
+      max="500"
+      value="0"
+      oninput="setPosY(this.value)"
+    />
+
   </div>
 
 </div>
 
 <script>
+
+let selectedCard = null
 
 let state = JSON.parse(
   localStorage.getItem('pairArchiveData')
@@ -273,13 +361,23 @@ let state = JSON.parse(
   charBBio: '',
   charBImage: '',
 
-  timelines: [],
+  cards: [],
 
   bg: '',
+
+  blur: 0,
+
+  scale: 1,
+
+  rotate: 0,
+
+  posX: 0,
+
+  posY: 0,
 }
 
-const timelineEl =
-  document.getElementById('timeline')
+const storyMap =
+  document.getElementById('storyMap')
 
 const bgImage =
   document.getElementById('bgImage')
@@ -290,6 +388,23 @@ function save() {
     'pairArchiveData',
     JSON.stringify(state)
   )
+}
+
+function applyBG() {
+
+  bgImage.style.backgroundImage =
+    state.bg
+      ? `url(${state.bg})`
+      : 'none'
+
+  bgImage.style.filter =
+    `blur(${state.blur}px)`
+
+  bgImage.style.transform = `
+    translate(${state.posX}px, ${state.posY}px)
+    scale(${state.scale + (state.blur * 0.01)})
+    rotate(${state.rotate}deg)
+  `
 }
 
 function render() {
@@ -328,133 +443,92 @@ function render() {
       ? `url(${state.charBImage})`
       : 'none'
 
-  bgImage.style.backgroundImage =
-    state.bg
-      ? `url(${state.bg})`
-      : 'none'
+  storyMap.innerHTML = ''
 
-  timelineEl.innerHTML = ''
+  state.cards.forEach((card, index) => {
 
-  state.timelines.forEach((item, index) => {
-
-    const row =
+    const el =
       document.createElement('div')
 
-    if (item.type === 'chapter') {
+    el.className =
+      card.type === 'chapter'
+      ? 'chapter-card'
+      : 'story-card'
 
-      row.className =
-        'chapter'
+    if (selectedCard === index) {
 
-      row.innerHTML = `
+      el.classList.add(
+        'selected-card'
+      )
+    }
 
-        <input
-          class="chapter-input"
-          placeholder="CHAPTER"
-          value="${item.title || ''}"
-          onchange="updateTimeline(${index}, 'title', this.value)"
-        >
+    if (card.type === 'chapter') {
+
+      el.innerHTML = `
+        <div class="chapter-name">
+          ${card.title || 'CHAPTER'}
+        </div>
       `
 
     } else {
 
-      row.className =
-        'timeline-row'
+      el.innerHTML = `
 
-      row.innerHTML = `
-
-        <div class="timeline-left">
-
-          <div class="timeline-dot"></div>
-
-          <div class="timeline-date">
-            ${item.date || 'DATE'}
-          </div>
-
+        <div class="story-date">
+          ${card.date || 'DATE'}
         </div>
 
-        <div class="timeline-card">
+        <div class="story-title">
+          ${card.title || 'TITLE'}
+        </div>
 
-          <input
-            class="timeline-title"
-            placeholder="Episode title"
-            value="${item.title || ''}"
-            onchange="updateTimeline(${index}, 'title', this.value)"
-          >
-
-          <textarea
-            class="story-area"
-            placeholder="Narrative"
-            oninput="autoResize(this)"
-            onchange="updateTimeline(${index}, 'content', this.value)"
-          >${item.content || ''}</textarea>
-
+        <div class="story-preview">
           ${
-            item.image
-            ? `
-              <img
-                src="${item.image}"
-                class="episode-image"
-              >
-            `
-            : ''
+            card.content
+            ? card.content.substring(0, 80)
+            : 'Narrative'
           }
-
-          <div class="timeline-bottom">
-
-            <input
-              class="date-input"
-              placeholder="DATE"
-              value="${item.date || ''}"
-              onchange="updateTimeline(${index}, 'date', this.value)"
-            >
-
-            <input
-              type="range"
-              min="0"
-              max="100"
-              value="${item.relation || 50}"
-              onchange="updateTimeline(${index}, 'relation', this.value)"
-            >
-
-            <input
-              type="file"
-              accept="image/*"
-              onchange="timelineImage(event, ${index})"
-            >
-
-          </div>
-
         </div>
+
+        ${
+          card.image
+          ? `
+            <img
+              src="${card.image}"
+              class="story-thumb"
+            >
+          `
+          : ''
+        }
       `
     }
 
-    timelineEl.appendChild(row)
+    el.onclick = () => {
+
+      selectCard(index)
+    }
+
+    storyMap.appendChild(el)
   })
+
+  applyBG()
 
   renderGraph()
 
   save()
 }
 
-function autoResize(el) {
+function addCard() {
 
-  el.style.height = 'auto'
+  state.cards.push({
 
-  el.style.height =
-    el.scrollHeight + 'px'
-}
+    type: 'story',
 
-function addTimeline() {
-
-  state.timelines.push({
-
-    type: 'episode',
+    date: '',
 
     title: '',
 
     content: '',
-
-    date: '',
 
     relation: 50,
 
@@ -466,7 +540,7 @@ function addTimeline() {
 
 function addChapter() {
 
-  state.timelines.push({
+  state.cards.push({
 
     type: 'chapter',
 
@@ -476,14 +550,90 @@ function addChapter() {
   render()
 }
 
-function updateTimeline(index, key, value) {
+function selectCard(index) {
 
-  state.timelines[index][key] =
-    value
+  selectedCard = index
 
-  renderGraph()
+  const card =
+    state.cards[index]
 
-  save()
+  selectedIndicator.innerText =
+    card.title || 'untitled'
+
+  editDate.value =
+    card.date || ''
+
+  editTitle.value =
+    card.title || ''
+
+  editContent.value =
+    card.content || ''
+
+  editRelation.value =
+    card.relation || 50
+
+  render()
+}
+
+function updateSelectedCard() {
+
+  if (
+    selectedCard === null
+  ) return
+
+  const card =
+    state.cards[selectedCard]
+
+  card.date =
+    editDate.value
+
+  card.title =
+    editTitle.value
+
+  card.content =
+    editContent.value
+
+  card.relation =
+    editRelation.value
+
+  render()
+}
+
+editDate.oninput =
+updateSelectedCard
+
+editTitle.oninput =
+updateSelectedCard
+
+editContent.oninput =
+updateSelectedCard
+
+editRelation.oninput =
+updateSelectedCard
+
+editImage.onchange = e => {
+
+  if (
+    selectedCard === null
+  ) return
+
+  const file =
+    e.target.files[0]
+
+  if (!file) return
+
+  const reader =
+    new FileReader()
+
+  reader.onload = () => {
+
+    state.cards[selectedCard].image =
+      reader.result
+
+    render()
+  }
+
+  reader.readAsDataURL(file)
 }
 
 function uploadCharacter(event, target) {
@@ -515,46 +665,34 @@ function uploadCharacter(event, target) {
   reader.readAsDataURL(file)
 }
 
-function timelineImage(event, index) {
-
-  const file =
-    event.target.files[0]
-
-  if (!file) return
-
-  const reader =
-    new FileReader()
-
-  reader.onload = () => {
-
-    state.timelines[index].image =
-      reader.result
-
-    render()
-  }
-
-  reader.readAsDataURL(file)
-}
-
 function setAccent(color) {
 
   document.documentElement
     .style
-    .setProperty('--accent', color)
+    .setProperty(
+      '--accent',
+      color
+    )
 }
 
 function setAccent2(color) {
 
   document.documentElement
     .style
-    .setProperty('--accent2', color)
+    .setProperty(
+      '--accent2',
+      color
+    )
 }
 
 function setPanel(color) {
 
   document.documentElement
     .style
-    .setProperty('--panel', color)
+    .setProperty(
+      '--panel',
+      color
+    )
 }
 
 function changeBG(event) {
@@ -578,6 +716,51 @@ function changeBG(event) {
   reader.readAsDataURL(file)
 }
 
+function setBlur(value) {
+
+  state.blur = value
+
+  applyBG()
+
+  save()
+}
+
+function setScale(value) {
+
+  state.scale = value
+
+  applyBG()
+
+  save()
+}
+
+function setRotate(value) {
+
+  state.rotate = value
+
+  applyBG()
+
+  save()
+}
+
+function setPosX(value) {
+
+  state.posX = value
+
+  applyBG()
+
+  save()
+}
+
+function setPosY(value) {
+
+  state.posY = value
+
+  applyBG()
+
+  save()
+}
+
 async function exportPNG() {
 
   const board =
@@ -585,14 +768,49 @@ async function exportPNG() {
       'exportBoard'
     )
 
+  const wrapper =
+    document.createElement('div')
+
+  wrapper.style.position =
+    'fixed'
+
+  wrapper.style.left =
+    '-99999px'
+
+  wrapper.style.top =
+    '0'
+
+  wrapper.style.width =
+    board.offsetWidth + 'px'
+
+  wrapper.style.height =
+    board.offsetHeight + 'px'
+
+  wrapper.style.background =
+    '#070b14'
+
+  const bgClone =
+    bgLayer.cloneNode(true)
+
+  const boardClone =
+    board.cloneNode(true)
+
+  wrapper.appendChild(bgClone)
+
+  wrapper.appendChild(boardClone)
+
+  document.body.appendChild(
+    wrapper
+  )
+
   try {
 
     const dataUrl =
       await domtoimage.toPng(
-        board,
+        wrapper,
         {
           quality: 1,
-          bgcolor: 'transparent'
+          cacheBust: true,
         }
       )
 
@@ -607,89 +825,21 @@ async function exportPNG() {
 
     link.click()
 
-  } catch (err) {
+  } catch(err) {
 
     alert(
-      'PNG export failed.'
+      'PNG export failed'
     )
 
     console.error(err)
   }
-}
 
-function renderGraph() {
-
-  const canvas =
-    document.getElementById(
-      'relationCanvas'
-    )
-
-  const ctx =
-    canvas.getContext('2d')
-
-  ctx.clearRect(
-    0,
-    0,
-    canvas.width,
-    canvas.height
+  document.body.removeChild(
+    wrapper
   )
-
-  const episodes =
-    state.timelines.filter(
-      t => t.type === 'episode'
-    )
-
-  ctx.strokeStyle =
-    '#91a2ff'
-
-  ctx.lineWidth = 2
-
-  ctx.beginPath()
-
-  episodes.forEach((item, index) => {
-
-    const x =
-      60 + index * 110
-
-    const y =
-      120 - item.relation
-
-    if (index === 0) {
-
-      ctx.moveTo(x, y)
-
-    } else {
-
-      ctx.lineTo(x, y)
-    }
-  })
-
-  ctx.stroke()
-
-  episodes.forEach((item, index) => {
-
-    const x =
-      60 + index * 110
-
-    const y =
-      120 - item.relation
-
-    ctx.beginPath()
-
-    ctx.fillStyle =
-      '#ffffff'
-
-    ctx.arc(
-      x,
-      y,
-      4,
-      0,
-      Math.PI * 2
-    )
-
-    ctx.fill()
-  })
 }
+
+function renderGraph() {}
 
 pairName.oninput = e => {
 
@@ -739,35 +889,26 @@ charBBio.oninput = e => {
   save()
 }
 
-function saveProject() {
-
-  save()
-
-  alert('saved')
-}
-
 new Sortable(
-  timelineEl,
+  storyMap,
   {
     animation: 160,
 
     onEnd: function(evt) {
 
       const moved =
-        state.timelines.splice(
+        state.cards.splice(
           evt.oldIndex,
           1
         )[0]
 
-      state.timelines.splice(
+      state.cards.splice(
         evt.newIndex,
         0,
         moved
       )
 
-      renderGraph()
-
-      save()
+      render()
     }
   }
 )
