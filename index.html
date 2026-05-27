@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OC CHRONICLE - V2.1 STABLE</title>
+    <title>OC CHRONICLE - V19 OPTIMIZED</title>
     <link rel="preload" as="style" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
@@ -133,7 +133,7 @@
         .sticker-tip { display:none; position:absolute; bottom:-20px; left:50%; transform:translateX(-50%); font-size:9px; color:var(--c-main); white-space:nowrap; }
         .sticker.active .sticker-tip { display:block; }
 
-        /* 캡처/전시관 모달 숨김 */
+        /* 모달 및 상태 숨김 (전시관/캡처용) */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 999; display: none; justify-content: center; align-items: center; }
         .editor-box { width: 400px; background: #0a0b0d; border: 1px solid var(--line); border-top: 2px solid var(--c-main); padding: 30px; display: flex; flex-direction: column; gap: 15px; }
         .editor-tabs { display: flex; gap: 15px; border-bottom: 1px solid var(--line); padding-bottom: 10px; margin-bottom: 10px; }
@@ -141,6 +141,8 @@
         .tab-btn.active { color: var(--c-main); }
         .editor-input { background: transparent; border: 1px solid var(--line); color: var(--text-pri); padding: 12px; font-family: inherit; font-size: 11px; letter-spacing: 0.05em; transition: 0.2s; }
         .editor-input:focus { border-color: var(--c-main); }
+        #form-story, #form-chapter { display: flex; flex-direction: column; gap: 12px; }
+        #form-chapter { display: none; }
         
         .capture-mode .story-card { backdrop-filter: none !important; }
         .capture-mode .pillar-img { filter: grayscale(0%) !important; }
@@ -167,9 +169,10 @@
         </aside>
 
         <main class="center-board" id="scroll-board">
+            <!-- HUD -->
             <div class="hud-panel" id="hud-panel" data-html2canvas-ignore="true">
                 <div class="hud-top">
-                    <div class="sys-title">CHRONICLE_V2.1</div>
+                    <div class="sys-title">CHRONICLE_V19</div>
                     <div style="display:flex; gap: 10px;">
                         <button class="btn btn-sub" onclick="openGuide()">📖 배포 가이드</button>
                         <button class="btn btn-sub" onclick="document.getElementById('settings-bar').classList.toggle('active')">⚙️ SETTING</button>
@@ -226,6 +229,7 @@
         </aside>
     </div>
 
+    <!-- 에디터 모달 -->
     <div class="modal-overlay" id="editor-modal" data-html2canvas-ignore="true">
         <div class="editor-box">
             <div class="editor-tabs">
@@ -252,6 +256,7 @@
         </div>
     </div>
 
+    <!-- 가이드 모달 -->
     <div class="modal-overlay" id="guide-modal" data-html2canvas-ignore="true">
         <div class="editor-box" style="width: 450px;">
             <div style="font-size:16px; font-weight:bold; color:var(--c-main); border-bottom:1px solid var(--line); padding-bottom:10px; margin-bottom:10px;">
@@ -260,20 +265,19 @@
             </div>
             <div style="font-size:12px; line-height:1.8; color:var(--text-pri);">
                 <span style="color:var(--c-sub);">1.</span> 우측 상단의 <b>[HTML 전시관 내보내기]</b> 버튼을 클릭합니다.<br>
-                <span style="color:var(--c-sub);">2.</span> 다운로드된 HTML 파일은 애니메이션이 포함된 감상 전용 파일입니다.<br>
+                <span style="color:var(--c-sub);">2.</span> 다운로드된 HTML 파일은 감상 전용 파일입니다.<br>
                 <span style="color:var(--c-sub);">3.</span> <b>[app.netlify.com/drop]</b> 에 접속하여 파일을 드래그합니다.<br>
-                <span style="color:var(--c-sub);">4.</span> 생성된 링크를 모두에게 공개하세요!
+                <span style="color:var(--c-sub);">4.</span> 생성된 링크를 모두에게 전달하세요!
             </div>
         </div>
     </div>
 
     <script>
-        // [V2.1 절대 방어형 데이터 선언]
         let defaultData = { pair:{title:'',sub:'',date:''}, c1:{img:'',name:'',bio:''}, c2:{img:'',name:'',bio:''}, theme:{main:'#d1bda0',sub:'#6d827c'}, bg:{img:'',blur:0,opacity:3}, settings:{grid:true,numStyle:'arabic'}, timeline:[], stickers:[] };
         let appData = JSON.parse(JSON.stringify(defaultData)); 
         let tempImg = ''; let editingId = null;
+        let saveTimeout; // [핵심] 먹통 방지용 디바운스 타이머 변수
 
-        /* 방어형 데이터 병합 엔진 (구버전 호환용) */
         function mergeData(parsed) {
             appData.pair = { ...defaultData.pair, ...(parsed.pair || {}) };
             appData.c1 = { ...defaultData.c1, ...(parsed.c1 || {}) };
@@ -303,10 +307,8 @@
         }
 
         window.onload = () => {
-            const saved = localStorage.getItem('oc_archive_v18'); 
-            if(saved) { 
-                try { mergeData(JSON.parse(saved)); } catch(e){} 
-            }
+            const saved = localStorage.getItem('oc_archive_v19'); 
+            if(saved) { try { mergeData(JSON.parse(saved)); } catch(e){} }
             applyUI(); 
             document.getElementById('scroll-board').addEventListener('mousedown', (e) => {
                 if(!e.target.closest('.sticker')) document.querySelectorAll('.sticker').forEach(s => s.classList.remove('active'));
@@ -320,18 +322,38 @@
             document.getElementById('c2-name').value = appData.c2.name || ''; document.getElementById('c2-bio').value = appData.c2.bio || '';
             if(appData.c2.img) document.getElementById('char2-img').style.backgroundImage = `url(${appData.c2.img})`;
             document.getElementById('theme-main').value = appData.theme.main; document.getElementById('theme-sub').value = appData.theme.sub;
-            updateColors();
+            
+            // 색상과 배경 바로 반영 (저장은 안 함)
+            const m = document.getElementById('theme-main').value; const s = document.getElementById('theme-sub').value;
+            document.documentElement.style.setProperty('--c-main', m); document.documentElement.style.setProperty('--c-sub', s);
+            document.documentElement.style.setProperty('--line', m + '25');
+            
             if(appData.bg.img) document.getElementById('bg-canvas').style.backgroundImage = `url(${appData.bg.img})`;
             document.getElementById('bg-opacity').value = appData.bg.opacity; document.getElementById('bg-blur').value = appData.bg.blur;
-            updateBgStyle(); applySettingsUI(); renderTimeline(); renderStickers();
+            document.getElementById('bg-canvas').style.opacity = appData.bg.opacity / 10;
+            document.getElementById('bg-canvas').style.filter = `blur(${appData.bg.blur}px)`;
+            
+            applySettingsUI(); renderTimeline(); renderStickers();
         }
 
-        function saveData() {
+        /* [V19 핵심 최적화: 디바운스 저장 엔진] 먹통 현상 완벽 방어 */
+        function saveData(immediate = false) {
             appData.pair = { title: document.getElementById('pair-title').value, sub: document.getElementById('pair-sub').value, date: document.getElementById('pair-date').value };
             appData.c1.name = document.getElementById('c1-name').value; appData.c1.bio = document.getElementById('c1-bio').value;
             appData.c2.name = document.getElementById('c2-name').value; appData.c2.bio = document.getElementById('c2-bio').value;
             appData.theme.main = document.getElementById('theme-main').value; appData.theme.sub = document.getElementById('theme-sub').value;
-            localStorage.setItem('oc_archive_v18', JSON.stringify(appData));
+            appData.bg.opacity = document.getElementById('bg-opacity').value; appData.bg.blur = document.getElementById('bg-blur').value;
+            
+            const performSave = () => {
+                try { localStorage.setItem('oc_archive_v19', JSON.stringify(appData)); } catch(e) { console.error("로컬 스토리지 저장 실패(용량 초과 가능성)", e); }
+            };
+
+            clearTimeout(saveTimeout);
+            if(immediate) {
+                performSave();
+            } else {
+                saveTimeout = setTimeout(performSave, 500); // 0.5초 동안 입력이 없으면 비로소 저장
+            }
         }
 
         function calcDday() {
@@ -350,11 +372,12 @@
         function updateBgStyle() {
             appData.bg.opacity = document.getElementById('bg-opacity').value; appData.bg.blur = document.getElementById('bg-blur').value;
             document.getElementById('bg-canvas').style.opacity = appData.bg.opacity / 10;
-            document.getElementById('bg-canvas').style.filter = `blur(${appData.bg.blur}px)`; saveData();
+            document.getElementById('bg-canvas').style.filter = `blur(${appData.bg.blur}px)`; saveData(); 
+            /* 이제 디바운스가 걸려있어 슬라이더를 마구 움직여도 멈추지 않습니다! */
         }
 
-        function handleBgUpload(e) { if(e.target.files[0]) compressImage(e.target.files[0], d => { appData.bg.img = d; document.getElementById('bg-canvas').style.backgroundImage = `url(${d})`; saveData(); }); }
-        function handleImgUpload(e, id, key) { if(e.target.files[0]) compressImage(e.target.files[0], d => { appData[key].img = d; document.getElementById(id).style.backgroundImage = `url(${d})`; saveData(); }); }
+        function handleBgUpload(e) { if(e.target.files[0]) compressImage(e.target.files[0], d => { appData.bg.img = d; document.getElementById('bg-canvas').style.backgroundImage = `url(${d})`; saveData(true); }); }
+        function handleImgUpload(e, id, key) { if(e.target.files[0]) compressImage(e.target.files[0], d => { appData[key].img = d; document.getElementById(id).style.backgroundImage = `url(${d})`; saveData(true); }); }
 
         function toggleGrid() { appData.settings.grid = !appData.settings.grid; applySettingsUI(); saveData(); }
         function toggleNumStyle() { appData.settings.numStyle = appData.settings.numStyle === 'arabic' ? 'roman' : 'arabic'; applySettingsUI(); renderTimeline(); saveData(); }
@@ -370,7 +393,7 @@
         
         function resetAllData() {
             if(confirm("경고: 모든 데이터가 영구적으로 삭제됩니다!\n정말 초기화하시겠습니까?")) {
-                localStorage.removeItem('oc_archive_v18'); location.reload();
+                localStorage.removeItem('oc_archive_v19'); location.reload();
             }
         }
 
@@ -398,9 +421,9 @@
                 if(editingId) { const i = appData.timeline.find(x => x.id === editingId); i.title = title; i.sub = document.getElementById('chSub').value; }
                 else appData.timeline.push({ type:'chapter', id:Date.now(), title:title, sub:document.getElementById('chSub').value });
             }
-            closeModal(); saveData(); renderTimeline();
+            closeModal(); saveData(true); renderTimeline();
         }
-        function deleteItem(id) { appData.timeline = appData.timeline.filter(i => i.id !== id); saveData(); renderTimeline(); }
+        function deleteItem(id) { appData.timeline = appData.timeline.filter(i => i.id !== id); saveData(true); renderTimeline(); }
 
         function renderTimeline() {
             const box = document.getElementById('timeline-box'); box.innerHTML = '';
@@ -431,7 +454,7 @@
         }
 
         let highestZ = 50; let draggingSticker = null; let sStartX, sStartY;
-        function addSticker(e) { if(e.target.files[0]) compressImage(e.target.files[0], d => { appData.stickers.push({ id:Date.now(), img:d, x:400, y:300, w:150, h:150, r:0, z:++highestZ }); saveData(); renderStickers(); }); }
+        function addSticker(e) { if(e.target.files[0]) compressImage(e.target.files[0], d => { appData.stickers.push({ id:Date.now(), img:d, x:400, y:300, w:150, h:150, r:0, z:++highestZ }); saveData(true); renderStickers(); }); }
         function renderStickers() {
             const layer = document.getElementById('sticker-layer'); layer.innerHTML = '';
             appData.stickers.forEach(s => {
@@ -444,8 +467,8 @@
         }
         window.addEventListener('mousemove', e => { if(draggingSticker) { draggingSticker.x = e.clientX - sStartX; draggingSticker.y = e.clientY - sStartY; renderStickers(); } });
         window.addEventListener('mouseup', () => { if(draggingSticker){ draggingSticker = null; saveData(); }});
-        function changeStickerZ(id, dir) { const s = appData.stickers.find(i => i.id === id); if(s) { s.z += (dir * 2); renderStickers(); saveData(); } }
-        function deleteSticker(id) { appData.stickers = appData.stickers.filter(s => s.id !== id); saveData(); renderStickers(); }
+        function changeStickerZ(id, dir) { const s = appData.stickers.find(i => i.id === id); if(s) { s.z += (dir * 2); renderStickers(); saveData(true); } }
+        function deleteSticker(id) { appData.stickers = appData.stickers.filter(s => s.id !== id); saveData(true); renderStickers(); }
 
         function captureSetup() {
             const wrapper = document.getElementById('capture-area'); wrapper.classList.add('capture-mode');
@@ -465,6 +488,7 @@
         }
 
         function exportImage() {
+            saveData(true); // 렌더링 전 강제 저장
             const wrapper = document.getElementById('capture-area'); const board = document.getElementById('scroll-board');
             const w = wrapper.offsetWidth; const h = board.scrollHeight; const backupW = wrapper.style.width; const backupH = wrapper.style.height; const backupOverflow = board.style.overflowY;
             wrapper.style.width = w + 'px'; wrapper.style.height = h + 'px'; board.style.overflowY = 'visible'; captureSetup();
@@ -475,6 +499,7 @@
         }
 
         function exportHTMLViewer() {
+            saveData(true); // 내보내기 전 강제 저장
             const wrapper = document.getElementById('capture-area'); captureSetup(); 
             const clone = wrapper.cloneNode(true);
             clone.classList.remove('capture-mode'); 
@@ -503,28 +528,27 @@
             const blob = new Blob([finalHTML], {type: "text/html;charset=utf-8"});
             const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
             a.download = `VIEWER_${appData.pair.title || 'ARCHIVE'}.html`; a.click();
-            captureRestore(); alert("완벽한 전시관 HTML이 생성되었습니다!");
+            captureRestore(); alert("전시관 HTML이 생성되었습니다!");
         }
 
-        /* [V2.1 치명적 에러 픽스: 로딩 데이터 병합 엔진] */
         function importData(e) { 
             const f = e.target.files[0]; if(!f) return; 
             const r = new FileReader(); 
             r.onload = ev => { 
                 try {
                     const parsed = JSON.parse(ev.target.result);
-                    mergeData(parsed); // 구버전 데이터 완벽 호환 병합
+                    mergeData(parsed); 
                     applyUI(); 
-                    saveData(); 
+                    saveData(true); 
                     alert("데이터 로드 완료!"); 
                 } catch(err) {
                     alert("파일이 손상되었거나 형식이 맞지 않습니다.");
                 }
-                e.target.value = ''; // 연속 로드 버그 방지
+                e.target.value = ''; 
             }; 
             r.readAsText(f); 
         }
-        function exportData() { saveData(); const b = new Blob([JSON.stringify(appData)], {type: 'text/plain'}); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `ARCHIVE_DATA.txt`; a.click(); }
+        function exportData() { saveData(true); const b = new Blob([JSON.stringify(appData)], {type: 'text/plain'}); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `ARCHIVE_DATA.txt`; a.click(); }
     </script>
 </body>
 </html>
