@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OC CHRONICLE - V2 DIARY</title>
+    <title>OC CHRONICLE - PERFECT EXHIBITION</title>
     <link rel="preload" as="style" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-    <style>
+    <style id="core-css">
         :root {
             --c-main: #d1bda0; --c-sub: #6d827c; --c-bg: #0a0b0d; 
             --panel: rgba(12, 14, 17, 0.85); --text-pri: #f0f0f0; --text-mut: rgba(255, 255, 255, 0.4);
@@ -31,14 +31,15 @@
         .pillar-img { position: absolute; inset: 0; width: 100%; height: 100%; background-size: cover; background-position: center; filter: grayscale(40%); transition: 0.5s; z-index: 1; }
         .char-pillar:hover .pillar-img { filter: grayscale(0%); }
         .char-overlay { position: absolute; bottom: 0; left: 0; width: 100%; padding: 150px 30px 40px; background: linear-gradient(to top, rgba(10,11,13,1) 0%, rgba(10,11,13,0.7) 40%, transparent 100%); display: flex; flex-direction: column; gap: 8px; z-index: 2; pointer-events: auto; }
-        .char-input { background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-pri); font-family: inherit; transition: 0.3s; padding-bottom: 5px; }
+        
+        /* 텍스트 폼 스타일 (렌더링 복제본에도 적용됨) */
+        .char-input { background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-pri); font-family: inherit; transition: 0.3s; padding-bottom: 5px; width: 100%; }
         .char-input:focus { border-bottom-color: var(--c-main); }
         .char-name { font-size: 24px; font-weight: 900; letter-spacing: 0.15em; color: var(--c-main); text-transform: uppercase; }
         .char-bio { font-size: 11px; line-height: 1.8; color: var(--text-mut); resize: none; height: 90px; }
 
         .center-board { flex: 1; height: 100%; position: relative; z-index: 5; display: flex; flex-direction: column; background: radial-gradient(circle at center, transparent 0%, rgba(10,11,13,0.8) 100%); overflow-y: auto; overflow-x: hidden; }
         
-        /* HUD UI */
         .hud-panel { position: sticky; top: 0; width: 100%; z-index: 100; padding: 20px 40px; background: linear-gradient(to bottom, rgba(10,11,13,0.95) 0%, transparent 100%); }
         .hud-top { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); padding-bottom: 15px; }
         .sys-title { font-size: 12px; font-weight: 900; letter-spacing: 0.4em; color: var(--text-mut); }
@@ -54,7 +55,7 @@
         input[type="color"] { width: 16px; height: 16px; border: none; cursor: pointer; background: transparent; padding:0; }
         input[type="color"]::-webkit-color-swatch { border: 1px solid var(--line); border-radius: 2px; }
 
-        /* 페어 헤더 & 디데이 (시작일 텍스트 삭제) */
+        /* 페어 헤더 & 디데이 */
         .pair-header { width: 100%; padding: 80px 40px 40px; display: flex; flex-direction: column; align-items: center; text-align: center; border-bottom: 1px solid var(--line); position: relative; z-index: 10; }
         .pair-input { background: transparent; border: none; text-align: center; font-family: inherit; color: var(--c-main); transition: 0.3s; width: 100%; }
         .pair-input:focus { border-bottom: 1px solid var(--c-main); background: rgba(255,255,255,0.02); }
@@ -96,7 +97,7 @@
         .story-card:hover .card-img-memo { transform: rotate(0deg) scale(2) translate(-10px, 10px); z-index: 20; filter: grayscale(0%); border-top-color: var(--c-main); }
         .card-desc { font-size: 12px; line-height: 1.9; color: var(--text-mut); white-space: pre-wrap; word-break: keep-all; }
         
-        /* 카드 컨트롤러 (수정/삭제) */
+        /* 카드 컨트롤러 */
         .card-controls { position: absolute; bottom: 15px; right: 15px; display: flex; gap: 8px; opacity: 0; transition: 0.2s; }
         .story-card:hover .card-controls { opacity: 0.5; }
         .card-controls button { background: none; border: none; font-size: 9px; cursor: pointer; letter-spacing: 0.1em; transition: 0.2s; }
@@ -104,44 +105,34 @@
         .btn-edit { color: var(--c-main); }
         .btn-del { color: #ff5555; }
 
-        /* 챕터 분기점 (미니멀 디자인) */
+        /* 챕터 분기점 (미니멀 디자인 유지) */
         .chapter-divider { width: 100%; display: flex; align-items: center; justify-content: center; margin: 60px 0; position: relative; z-index: 5; }
         .chapter-divider::before { content: ''; position: absolute; top: -30px; bottom: -30px; width: 1px; background: var(--c-sub); opacity: 0.3; z-index: 0; }
         
-        .chapter-text-content { position: relative; z-index: 2; text-align: center; display: flex; flex-direction: column; align-items: center; background: var(--c-bg); padding: 15px 40px; border: 1px solid var(--line); border-top: 2px solid var(--c-main); box-shadow: 0 10px 30px rgba(0,0,0,0.8); min-width: 220px; transition: 0.3s; }
+        .chapter-text-content { position: relative; z-index: 2; text-align: center; display: flex; flex-direction: column; align-items: center; background: var(--c-bg); padding: 20px 45px; border: 1px solid var(--line); border-top: 2px solid var(--c-main); box-shadow: 0 10px 30px rgba(0,0,0,0.8); min-width: 220px; transition: 0.3s; }
         .chapter-text-content:hover { border-color: var(--c-main); }
         
         .ch-label { font-size: 10px; font-weight: 800; letter-spacing: 0.4em; color: var(--text-mut); margin-bottom: 5px; text-transform: uppercase; }
-        .ch-number { font-size: 24px; font-weight: 900; letter-spacing: 0.1em; color: var(--c-main); margin-bottom: 8px; font-family: 'Times New Roman', serif; }
-        .ch-title { font-size: 18px; font-weight: 900; color: #fff; margin-bottom: 2px; letter-spacing: 0.05em; }
-        .ch-sub { font-size: 10px; color: var(--c-sub); letter-spacing: 0.2em; }
+        .ch-number { font-size: 24px; font-weight: 900; letter-spacing: 0.1em; color: var(--c-main); margin-bottom: 12px; font-family: 'Times New Roman', serif; }
+        .ch-title { font-size: 18px; font-weight: 900; color: #fff; margin-bottom: 5px; letter-spacing: 0.05em; }
+        .ch-sub { font-size: 11px; color: var(--c-sub); letter-spacing: 0.2em; }
 
-        .ch-controls { position: absolute; right: 10px; top: 10px; display: flex; gap: 5px; opacity: 0; transition: 0.2s; }
+        .ch-controls { position: absolute; right: 10px; top: 10px; display: flex; gap: 8px; opacity: 0; transition: 0.2s; }
         .chapter-text-content:hover .ch-controls { opacity: 0.5; }
         .ch-controls button { background: none; border: none; font-size: 10px; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .ch-controls button:hover { opacity: 1 !important; }
 
-        /* [신규 기믹] 다꾸 스티커 시스템 */
-        .sticker {
-            position: absolute; cursor: move; z-index: 50; 
-            background-size: contain; background-repeat: no-repeat; background-position: center;
-            border: 1px solid transparent; transition: border 0.2s;
-            /* 캡처 시 방해 안 되게 기본 상태는 깔끔하게 */
-        }
+        /* 다꾸 스티커 시스템 */
+        .sticker { position: absolute; cursor: move; z-index: 50; background-size: contain; background-repeat: no-repeat; background-position: center; border: 1px solid transparent; transition: border 0.2s; }
         .sticker.active { border: 1px dashed var(--c-main); background-color: rgba(255,255,255,0.05); }
-        .sticker-controls {
-            position: absolute; top: -30px; left: 50%; transform: translateX(-50%);
-            display: none; background: rgba(0,0,0,0.8); border: 1px solid var(--c-main);
-            padding: 4px 8px; border-radius: 4px; gap: 8px; font-size: 10px; white-space: nowrap; pointer-events: auto;
-        }
+        .sticker-controls { position: absolute; top: -30px; left: 50%; transform: translateX(-50%); display: none; background: rgba(0,0,0,0.8); border: 1px solid var(--c-main); padding: 4px 8px; border-radius: 4px; gap: 8px; font-size: 10px; white-space: nowrap; pointer-events: auto; }
         .sticker.active .sticker-controls { display: flex; }
         .sticker-controls button { background: none; border: none; color: white; cursor: pointer; font-size: 12px; }
         .sticker-controls button:hover { color: var(--c-main); }
-        
         .sticker-tip { display:none; position:absolute; bottom:-20px; left:50%; transform:translateX(-50%); font-size:9px; color:var(--c-main); white-space:nowrap; }
         .sticker.active .sticker-tip { display:block; }
 
-        /* 모달 (에디터 & 가이드) */
+        /* 모달 및 상태 숨김 (전시관/캡처용) */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 999; display: none; justify-content: center; align-items: center; }
         .editor-box { width: 400px; background: #0a0b0d; border: 1px solid var(--line); border-top: 2px solid var(--c-main); padding: 30px; display: flex; flex-direction: column; gap: 15px; }
         .editor-tabs { display: flex; gap: 15px; border-bottom: 1px solid var(--line); padding-bottom: 10px; margin-bottom: 10px; }
@@ -152,13 +143,14 @@
         #form-story, #form-chapter { display: flex; flex-direction: column; gap: 12px; }
         #form-chapter { display: none; }
         
-        /* 캡처 안전 모드 */
         .capture-mode .story-card { backdrop-filter: none !important; }
         .capture-mode .pillar-img { filter: grayscale(0%) !important; }
         .capture-mode .card-img-memo { transform: rotate(0deg) scale(1) translate(0,0) !important; filter: grayscale(0%) !important; border-top-color: var(--c-main) !important;}
         .capture-mode .sticker { border-color: transparent !important; background-color: transparent !important; }
         .capture-mode .sticker-controls, .capture-mode .sticker-tip { display: none !important; }
 
+        /* [텍스트 렌더링 방어용 정적 블록 클래스] */
+        .static-text-clone { white-space: pre-wrap; word-break: break-word; overflow: hidden; display: flex; }
     </style>
 </head>
 <body>
@@ -177,7 +169,7 @@
         </aside>
 
         <main class="center-board" id="scroll-board">
-            <div class="hud-panel" data-html2canvas-ignore="true">
+            <div class="hud-panel" id="hud-panel" data-html2canvas-ignore="true">
                 <div class="hud-top">
                     <div class="sys-title">CHRONICLE_V2</div>
                     <div style="display:flex; gap: 10px;">
@@ -189,7 +181,8 @@
                         <div style="width:1px; background:var(--line); margin: 0 5px;"></div>
                         <button class="btn" onclick="openModal('chapter')">+ 챕터 분기</button>
                         <button class="btn" onclick="openModal('story')">+ 서사 기록</button>
-                        <button class="btn" style="background:var(--text-pri); color:#000; border:none;" onclick="exportImage()">📸 렌더링</button>
+                        <button class="btn" style="background:var(--c-sub); color:#fff; border:none;" onclick="exportHTMLViewer()">🌐 HTML 전시관 내보내기</button>
+                        <button class="btn" style="background:var(--text-pri); color:#000; border:none;" onclick="exportImage()">📸 이미지 렌더링</button>
                     </div>
                 </div>
                 
@@ -220,8 +213,7 @@
                 </div>
             </header>
 
-            <div class="timeline-container" id="timeline-box">
-                </div>
+            <div class="timeline-container" id="timeline-box"></div>
             
             <div id="sticker-layer"></div>
         </main>
@@ -273,11 +265,11 @@
             </div>
             <div style="font-size:12px; line-height:1.8; color:var(--text-pri);">
                 다른 사람에게 완성된 이 페이지를 '링크'로 보여주고 싶다면?<br><br>
-                <span style="color:var(--c-sub);">1.</span> 우측 상단의 <b>[TXT 백업]</b>을 눌러 데이터를 먼저 안전하게 저장합니다.<br>
-                <span style="color:var(--c-sub);">2.</span> 화면 빈 곳을 우클릭하고 <b>[다른 이름으로 저장]</b>을 눌러 현재 페이지를 <b>HTML 파일</b>로 다운받습니다.<br>
+                <span style="color:var(--c-sub);">1.</span> 우측 상단의 <b>[HTML 전시관 내보내기]</b> 버튼을 누릅니다.<br>
+                <span style="color:var(--c-sub);">2.</span> 다운로드된 HTML 파일은 타인이 수정할 수 없는 관람 전용 회지입니다.<br>
                 <span style="color:var(--c-sub);">3.</span> 인터넷 창을 열고 <b>[ app.netlify.com/drop ]</b> 에 접속합니다.<br>
-                <span style="color:var(--c-sub);">4.</span> 다운받은 HTML 파일을 사이트 중앙의 커다란 원 안으로 드래그합니다.<br>
-                <span style="color:var(--c-sub);">5.</span> 3초 뒤 초록색 링크가 생성됩니다. 그 링크를 공유하세요!<br>
+                <span style="color:var(--c-sub);">4.</span> 다운받은 HTML 파일을 중앙 원 안으로 드래그 앤 드롭합니다.<br>
+                <span style="color:var(--c-sub);">5.</span> 3초 뒤 초록색 링크가 생성됩니다. 그 링크를 앤오님께 공유하세요!<br>
             </div>
         </div>
     </div>
@@ -291,12 +283,11 @@
             bg: { img: '', blur: 0, opacity: 3 },
             settings: { grid: true, numStyle: 'arabic' },
             timeline: [],
-            stickers: [] // V2: 스티커 데이터 배열 추가
+            stickers: []
         };
         let tempImg = '';
-        let editingId = null; // V2: 수정 모드 판별용 ID
+        let editingId = null; 
 
-        /* 압축 엔진 */
         function compressImage(file, callback) {
             const reader = new FileReader();
             reader.onload = (e) => {
@@ -315,7 +306,7 @@
         }
 
         window.onload = () => {
-            const saved = localStorage.getItem('oc_archive_v14');
+            const saved = localStorage.getItem('oc_archive_v15');
             if(saved) { 
                 const parsed = JSON.parse(saved);
                 appData = { ...appData, ...parsed }; 
@@ -323,7 +314,6 @@
                 if(!appData.stickers) appData.stickers = [];
                 applyUI(); 
             }
-            // 스티커 바탕 클릭 시 선택 해제
             document.getElementById('scroll-board').addEventListener('mousedown', (e) => {
                 if(!e.target.closest('.sticker')) {
                     document.querySelectorAll('.sticker').forEach(s => s.classList.remove('active'));
@@ -351,7 +341,7 @@
             appData.c2.name = document.getElementById('c2-name').value; appData.c2.bio = document.getElementById('c2-bio').value;
             appData.theme.main = document.getElementById('theme-main').value; appData.theme.sub = document.getElementById('theme-sub').value;
             appData.bg.opacity = document.getElementById('bg-opacity').value; appData.bg.blur = document.getElementById('bg-blur').value;
-            try { localStorage.setItem('oc_archive_v14', JSON.stringify(appData)); } catch(e) {}
+            try { localStorage.setItem('oc_archive_v15', JSON.stringify(appData)); } catch(e) {}
         }
 
         function calcDday() {
@@ -380,8 +370,7 @@
         function openGuide() { document.getElementById('guide-modal').style.display = 'flex'; }
         
         function openModal(type) { 
-            editingId = null; // 새 항목 작성
-            document.getElementById('editor-modal').style.display = 'flex'; 
+            editingId = null; document.getElementById('editor-modal').style.display = 'flex'; 
             document.getElementById('evDate').value = ''; document.getElementById('evTitle').value = ''; document.getElementById('evContent').value = ''; document.getElementById('evPreview').style.display = 'none'; tempImg = '';
             document.getElementById('chTitle').value = ''; document.getElementById('chSub').value = '';
             switchTab(type); 
@@ -390,26 +379,15 @@
         function switchTab(type) { document.getElementById('tab-story').classList.toggle('active', type === 'story'); document.getElementById('tab-chapter').classList.toggle('active', type === 'chapter'); document.getElementById('form-story').style.display = type === 'story' ? 'flex' : 'none'; document.getElementById('form-chapter').style.display = type === 'chapter' ? 'flex' : 'none'; }
         function setTempImg(e) { if(e.target.files[0]) { compressImage(e.target.files[0], (compressedData) => { tempImg = compressedData; const preview = document.getElementById('evPreview'); preview.style.backgroundImage = `url(${tempImg})`; preview.style.display = 'block'; }); } }
 
-        /* [V2 기능] 수정 모드 연동 */
         function editItem(id) {
-            const item = appData.timeline.find(i => i.id === id);
-            if(!item) return;
-            editingId = id;
-            document.getElementById('editor-modal').style.display = 'flex';
+            const item = appData.timeline.find(i => i.id === id); if(!item) return;
+            editingId = id; document.getElementById('editor-modal').style.display = 'flex';
             if(item.type === 'story') {
                 switchTab('story');
-                document.getElementById('evDate').value = item.date;
-                document.getElementById('evTitle').value = item.title;
-                document.getElementById('evContent').value = item.content;
-                tempImg = item.img || '';
-                const preview = document.getElementById('evPreview');
-                if(tempImg) { preview.style.backgroundImage = `url(${tempImg})`; preview.style.display = 'block'; }
-                else { preview.style.display = 'none'; }
-            } else {
-                switchTab('chapter');
-                document.getElementById('chTitle').value = item.title;
-                document.getElementById('chSub').value = item.sub;
-            }
+                document.getElementById('evDate').value = item.date; document.getElementById('evTitle').value = item.title; document.getElementById('evContent').value = item.content;
+                tempImg = item.img || ''; const preview = document.getElementById('evPreview');
+                if(tempImg) { preview.style.backgroundImage = `url(${tempImg})`; preview.style.display = 'block'; } else { preview.style.display = 'none'; }
+            } else { switchTab('chapter'); document.getElementById('chTitle').value = item.title; document.getElementById('chSub').value = item.sub; }
         }
 
         function addItem(type) {
@@ -418,17 +396,11 @@
                 if(editingId) {
                     const item = appData.timeline.find(i => i.id === editingId);
                     item.date = document.getElementById('evDate').value; item.title = title; item.content = document.getElementById('evContent').value; item.img = tempImg;
-                } else {
-                    appData.timeline.push({ type: 'story', id: Date.now(), date: document.getElementById('evDate').value, title: title, content: document.getElementById('evContent').value, img: tempImg });
-                }
+                } else { appData.timeline.push({ type: 'story', id: Date.now(), date: document.getElementById('evDate').value, title: title, content: document.getElementById('evContent').value, img: tempImg }); }
             } else {
                 const chTitle = document.getElementById('chTitle').value; if(!chTitle) return alert("타이틀 필수.");
-                if(editingId) {
-                    const item = appData.timeline.find(i => i.id === editingId);
-                    item.title = chTitle; item.sub = document.getElementById('chSub').value;
-                } else {
-                    appData.timeline.push({ type: 'chapter', id: Date.now(), title: chTitle, sub: document.getElementById('chSub').value });
-                }
+                if(editingId) { const item = appData.timeline.find(i => i.id === editingId); item.title = chTitle; item.sub = document.getElementById('chSub').value; } 
+                else { appData.timeline.push({ type: 'chapter', id: Date.now(), title: chTitle, sub: document.getElementById('chSub').value }); }
             }
             closeModal(); saveData(); renderTimeline();
         }
@@ -440,12 +412,9 @@
 
             function flushRows() {
                 for(let i=0; i<currentRows.length; i++) {
-                    const rowItems = currentRows[i];
-                    const isReverse = (i % 2 !== 0); 
-                    const isLastRow = (i === currentRows.length - 1);
+                    const rowItems = currentRows[i]; const isReverse = (i % 2 !== 0); const isLastRow = (i === currentRows.length - 1);
                     const rowClass = isReverse ? 'timeline-row row-reverse' : 'timeline-row row-normal';
                     const curveClass = !isLastRow ? ' has-curve' : '';
-
                     let rowHtml = `<div class="${rowClass}${curveClass}">`;
 
                     rowItems.forEach(item => {
@@ -466,8 +435,7 @@
                         `;
                         storyCounter++;
                     });
-                    rowHtml += `</div>`;
-                    box.innerHTML += rowHtml;
+                    rowHtml += `</div>`; box.innerHTML += rowHtml;
                 }
                 currentRows = []; 
             }
@@ -477,7 +445,6 @@
                 if (item.type === 'chapter') {
                     if (tempRow.length > 0) { currentRows.push(tempRow); tempRow = []; }
                     flushRows(); 
-
                     const chNumFormat = appData.settings.numStyle === 'arabic' ? chapterCounter.toString().padStart(2, '0') : toRoman(chapterCounter);
                     box.innerHTML += `
                         <div class="chapter-divider">
@@ -503,42 +470,24 @@
             flushRows(); 
         }
 
-        /* ================= [V2 핵심: 다꾸 스티커 엔진] ================= */
-        let highestZ = 50;
-        let draggingSticker = null;
-        let sStartX, sStartY;
+        /* 다꾸 스티커 엔진 */
+        let highestZ = 50; let draggingSticker = null; let sStartX, sStartY;
 
         function addSticker(e) {
             if(e.target.files[0]) {
                 compressImage(e.target.files[0], (compressedData) => {
-                    // 화면 중앙 근처에 배치
                     const board = document.getElementById('scroll-board');
-                    const newSticker = {
-                        id: Date.now(), img: compressedData,
-                        x: board.scrollLeft + 400, y: board.scrollTop + 300,
-                        w: 150, h: 150, r: 0, z: ++highestZ
-                    };
-                    appData.stickers.push(newSticker);
-                    saveData(); renderStickers();
+                    const newSticker = { id: Date.now(), img: compressedData, x: board.scrollLeft + 400, y: board.scrollTop + 300, w: 150, h: 150, r: 0, z: ++highestZ };
+                    appData.stickers.push(newSticker); saveData(); renderStickers();
                 });
             }
         }
-
         function renderStickers() {
-            const layer = document.getElementById('sticker-layer');
-            layer.innerHTML = '';
+            const layer = document.getElementById('sticker-layer'); layer.innerHTML = '';
             appData.stickers.forEach(s => {
                 if(s.z > highestZ) highestZ = s.z;
-                
-                const el = document.createElement('div');
-                el.className = 'sticker';
-                el.style.backgroundImage = `url(${s.img})`;
-                el.style.width = s.w + 'px'; el.style.height = s.h + 'px';
-                el.style.left = s.x + 'px'; el.style.top = s.y + 'px';
-                el.style.transform = `rotate(${s.r}deg)`;
-                el.style.zIndex = s.z;
-                
-                // 컨트롤 바 UI
+                const el = document.createElement('div'); el.className = 'sticker';
+                el.style.backgroundImage = `url(${s.img})`; el.style.width = s.w + 'px'; el.style.height = s.h + 'px'; el.style.left = s.x + 'px'; el.style.top = s.y + 'px'; el.style.transform = `rotate(${s.r}deg)`; el.style.zIndex = s.z;
                 el.innerHTML = `
                     <div class="sticker-controls" data-html2canvas-ignore="true">
                         <button onclick="changeStickerZ(${s.id}, 1)">▲ 위로</button>
@@ -547,63 +496,66 @@
                     </div>
                     <div class="sticker-tip" data-html2canvas-ignore="true">드래그(이동) / 휠(크기) / Shift+휠(회전)</div>
                 `;
-
-                // 이벤트 리스너
                 el.addEventListener('mousedown', (e) => {
-                    if(e.target.closest('.sticker-controls')) return; // 컨트롤버튼 클릭시 무시
+                    if(e.target.closest('.sticker-controls')) return;
                     document.querySelectorAll('.sticker').forEach(st => st.classList.remove('active'));
-                    el.classList.add('active');
-                    s.z = ++highestZ; el.style.zIndex = s.z; // 클릭시 맨 위로
-                    
-                    draggingSticker = s;
-                    sStartX = e.clientX - s.x; sStartY = e.clientY - s.y;
+                    el.classList.add('active'); s.z = ++highestZ; el.style.zIndex = s.z; 
+                    draggingSticker = s; sStartX = e.clientX - s.x; sStartY = e.clientY - s.y;
                 });
-
                 el.addEventListener('wheel', (e) => {
-                    if(!el.classList.contains('active')) return;
-                    e.preventDefault();
-                    if(e.shiftKey) { s.r += e.deltaY * 0.1; } // 회전
-                    else { 
-                        let delta = e.deltaY * 0.2;
-                        s.w -= delta; s.h -= delta;
-                        if(s.w < 30) s.w = 30; if(s.h < 30) s.h = 30;
-                    }
-                    el.style.width = s.w + 'px'; el.style.height = s.h + 'px';
-                    el.style.transform = `rotate(${s.r}deg)`;
-                    saveData();
+                    if(!el.classList.contains('active')) return; e.preventDefault();
+                    if(e.shiftKey) { s.r += e.deltaY * 0.1; } else { let delta = e.deltaY * 0.2; s.w -= delta; s.h -= delta; if(s.w < 30) s.w = 30; if(s.h < 30) s.h = 30; }
+                    el.style.width = s.w + 'px'; el.style.height = s.h + 'px'; el.style.transform = `rotate(${s.r}deg)`; saveData();
                 }, {passive: false});
-
                 layer.appendChild(el);
             });
         }
-
-        window.addEventListener('mousemove', (e) => {
-            if(draggingSticker) {
-                draggingSticker.x = e.clientX - sStartX; draggingSticker.y = e.clientY - sStartY;
-                renderStickers(); // 약간 부하가 있을 수 있으나 DOM 하나만 업데이트 하는게 귀찮으므로 재렌더링
-            }
-        });
+        window.addEventListener('mousemove', (e) => { if(draggingSticker) { draggingSticker.x = e.clientX - sStartX; draggingSticker.y = e.clientY - sStartY; renderStickers(); } });
         window.addEventListener('mouseup', () => { if(draggingSticker){ draggingSticker = null; saveData(); }});
+        function changeStickerZ(id, dir) { const s = appData.stickers.find(i => i.id === id); if(s) { s.z += (dir * 2); renderStickers(); saveData(); } }
+        function deleteSticker(id) { appData.stickers = appData.stickers.filter(s => s.id !== id); saveData(); renderStickers(); }
 
-        function changeStickerZ(id, dir) {
-            const s = appData.stickers.find(i => i.id === id);
-            if(s) { s.z += (dir * 2); renderStickers(); saveData(); }
-        }
-        function deleteSticker(id) {
-            appData.stickers = appData.stickers.filter(s => s.id !== id);
-            saveData(); renderStickers();
-        }
-        /* ========================================================== */
+        /* [텍스트 잘림 영구 박멸 & 메모리 최적화 렌더링 엔진] */
+        function captureSetup() {
+            const wrapper = document.getElementById('capture-area');
+            wrapper.classList.add('capture-mode');
+            document.querySelectorAll('.sticker').forEach(s => s.classList.remove('active'));
 
-        /* 폰트 증발 완벽 방어 및 메모리 최적화 렌더링 */
+            // 렌더링 찰나의 순간에만 input, textarea를 정적 div로 변환하여 잘림 현상 원천 봉쇄
+            const inputs = wrapper.querySelectorAll('input.char-input, textarea.char-input, input.pair-input, input.ph-date-input');
+            inputs.forEach(inp => {
+                const div = document.createElement('div');
+                div.className = inp.className + ' static-text-clone';
+                div.innerHTML = inp.value.replace(/\n/g, '<br>');
+                div.style.color = window.getComputedStyle(inp).color;
+                div.style.fontSize = window.getComputedStyle(inp).fontSize;
+                div.style.fontWeight = window.getComputedStyle(inp).fontWeight;
+                div.style.letterSpacing = window.getComputedStyle(inp).letterSpacing;
+                div.style.textAlign = window.getComputedStyle(inp).textAlign;
+                div.style.minHeight = inp.offsetHeight + 'px';
+                
+                if(inp.style.textAlign === 'right') div.style.justifyContent = 'flex-end';
+                else if(inp.classList.contains('pair-input') || inp.classList.contains('ph-date-input')) div.style.justifyContent = 'center';
+                
+                inp.style.display = 'none';
+                inp.parentNode.insertBefore(div, inp);
+            });
+        }
+
+        function captureRestore() {
+            const wrapper = document.getElementById('capture-area');
+            wrapper.classList.remove('capture-mode');
+            wrapper.querySelectorAll('.static-text-clone').forEach(div => div.remove());
+            wrapper.querySelectorAll('input.char-input, textarea.char-input, input.pair-input, input.ph-date-input').forEach(inp => inp.style.display = '');
+        }
+
         function exportImage() {
             const wrapper = document.getElementById('capture-area'); const board = document.getElementById('scroll-board');
             const w = wrapper.offsetWidth; const h = board.scrollHeight;
             const backupW = wrapper.style.width; const backupH = wrapper.style.height; const backupOverflow = board.style.overflowY;
             
             wrapper.style.width = w + 'px'; wrapper.style.height = h + 'px'; board.style.overflowY = 'visible';
-            wrapper.classList.add('capture-mode'); // 캡처 모드 온 (스티커 테두리 등 숨김)
-            document.querySelectorAll('.sticker').forEach(s => s.classList.remove('active'));
+            captureSetup(); // 텍스트 변환 및 캡처 모드 ON
 
             document.fonts.ready.then(() => {
                 setTimeout(() => {
@@ -611,13 +563,50 @@
                     .then(canvas => {
                         const a = document.createElement('a'); a.href = canvas.toDataURL("image/jpeg", 0.9);
                         a.download = `CHRONICLE_${document.getElementById('pair-title').value || 'ARCHIVE'}.jpg`; a.click();
-                        wrapper.style.width = backupW; wrapper.style.height = backupH; board.style.overflowY = backupOverflow; wrapper.classList.remove('capture-mode');
+                        wrapper.style.width = backupW; wrapper.style.height = backupH; board.style.overflowY = backupOverflow; captureRestore();
                     }).catch(err => {
-                        alert("렌더링 실패! C드라이브 용량을 확인하거나, 확장프로그램 [GoFullPage]를 사용해주세요!");
-                        wrapper.style.width = backupW; wrapper.style.height = backupH; board.style.overflowY = backupOverflow; wrapper.classList.remove('capture-mode');
+                        alert("렌더링 실패! 용량 초과입니다. 크롬 확장프로그램 [GoFullPage]를 사용해주세요.");
+                        wrapper.style.width = backupW; wrapper.style.height = backupH; board.style.overflowY = backupOverflow; captureRestore();
                     });
                 }, 500); 
             });
+        }
+
+        /* [V2 절대 비기: 읽기 전용 HTML 전시관 내보내기 엔진] */
+        function exportHTMLViewer() {
+            const wrapper = document.getElementById('capture-area');
+            captureSetup(); // UI 변환
+
+            // 1. 현재 화면의 복제본 생성
+            const clone = wrapper.cloneNode(true);
+            
+            // 2. 전시관에 필요 없는 모든 편집용 UI 제거
+            clone.querySelector('#hud-panel')?.remove();
+            clone.querySelectorAll('.card-controls, .ch-controls, .sticker-controls, .sticker-tip, input[type="file"]').forEach(el => el.remove());
+            
+            // 3. 자바스크립트 이벤트(onclick 등) 모두 제거하여 먹통으로 만듦
+            clone.querySelectorAll('*').forEach(el => {
+                el.removeAttribute('onclick'); el.removeAttribute('oninput'); el.removeAttribute('onchange'); el.removeAttribute('onmousedown');
+                // 마우스 올려도 X버튼이나 컨트롤 안뜨게 막기
+                if(el.classList.contains('chapter-text-content') || el.classList.contains('story-card') || el.classList.contains('sticker')) {
+                    el.style.pointerEvents = 'none'; 
+                }
+            });
+            // 스크롤 허용을 위해 보드만 포인터 이벤트 복구
+            clone.querySelector('#scroll-board').style.pointerEvents = 'auto';
+
+            // 4. 복제본을 독립된 HTML 구조로 패키징
+            const htmlHeader = `<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><title>${appData.pair.title || 'OC ARCHIVE'}</title><link rel="preload" as="style" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css"><style>${document.getElementById('core-css').innerHTML}</style><style>/* 전시관 커스텀 CSS */ body{overflow:auto;} .story-card:hover {transform:none; box-shadow:none; border-color:var(--line);} .card-img-memo {transform:rotate(5deg) !important; filter:grayscale(0%) !important; z-index:5 !important;} </style></head><body>`;
+            const htmlFooter = `</body></html>`;
+            const finalHTML = htmlHeader + clone.outerHTML + htmlFooter;
+            
+            // 5. 다운로드
+            const blob = new Blob([finalHTML], {type: "text/html;charset=utf-8"});
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+            a.download = `VIEWER_${appData.pair.title || 'ARCHIVE'}.html`; a.click();
+
+            captureRestore(); // 원본 복구
+            alert("전시관 HTML 내보내기 성공! 이제 이 파일을 Netlify에 올려 공유하세요!");
         }
 
         function exportData() { saveData(); const b = new Blob([JSON.stringify(appData)], {type: 'text/plain'}); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `ARCHIVE_DATA.txt`; a.click(); }
