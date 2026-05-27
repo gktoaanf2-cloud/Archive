@@ -16,19 +16,17 @@
   href="style.css"
 />
 
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-
 <script src="https://cdn.jsdelivr.net/npm/dom-to-image-more@3.3.0/dist/dom-to-image-more.min.js"></script>
 
 </head>
 
 <body>
 
-<!-- BG -->
+<!-- BACKGROUND -->
 
 <div
-  class="bg-layer"
-  id="bgLayer"
+  class="bg"
+  id="bg"
 >
 
   <div
@@ -38,74 +36,63 @@
 
   <div class="bg-grid"></div>
 
-  <div class="bg-noise"></div>
-
 </div>
 
-<!-- APP -->
+<!-- HEADER -->
 
-<div class="app">
+<header class="topbar">
 
-  <!-- HEADER -->
+  <div class="top-left">
 
-  <header class="header">
+    <input
+      id="pairName"
+      class="pair-input"
+      placeholder="PAIR NAME"
+    />
 
-    <div class="header-left">
+    <input
+      id="pairTag"
+      class="tag-input"
+      placeholder="relationship keyword"
+    />
 
-      <input
-        id="pairName"
-        class="pair-name-input"
-        placeholder="PAIR NAME"
-      />
+  </div>
 
-      <input
-        id="pairTag"
-        class="pair-tag-input"
-        placeholder="relationship keyword"
-      />
+  <div class="top-right">
 
-    </div>
+    <button
+      class="top-btn"
+      onclick="openCreatePanel()"
+    >
+      NEW EVENT
+    </button>
 
-    <div class="header-right">
+    <button
+      class="top-btn"
+      onclick="exportPNG()"
+    >
+      EXPORT PNG
+    </button>
 
-      <button
-        class="ghost-btn"
-        onclick="addCard()"
-      >
-        ADD CARD
-      </button>
+  </div>
 
-      <button
-        class="ghost-btn"
-        onclick="addChapter()"
-      >
-        ADD CHAPTER
-      </button>
+</header>
 
-      <button
-        class="ghost-btn"
-        onclick="exportPNG()"
-      >
-        PNG
-      </button>
+<!-- BOARD -->
 
-    </div>
+<div
+  class="board"
+  id="exportBoard"
+>
 
-  </header>
+  <!-- LEFT -->
 
-  <!-- EXPORT BOARD -->
+  <aside class="character-side">
 
-  <div
-    class="export-board"
-    id="exportBoard"
-  >
-
-    <!-- LEFT CHARACTER -->
-
-    <aside class="character-panel">
+    <div class="character-panel">
 
       <div
-        class="character-image"
+        class="profile-image"
         id="profileA"
       ></div>
 
@@ -127,94 +114,49 @@
         placeholder="Character introduction"
       ></textarea>
 
-    </aside>
+    </div>
 
-    <!-- CENTER -->
+  </aside>
 
-    <main class="story-map-wrap">
+  <!-- CENTER -->
 
-      <div class="story-map-header">
+  <main class="story-wrap">
 
-        <div
-          class="pair-render"
-          id="pairRender"
-        >
-          Pair Name
-        </div>
-
-        <div
-          class="tag-render"
-          id="tagRender"
-        >
-          Relationship
-        </div>
-
-      </div>
-
-      <!-- STORY MAP -->
+    <div class="story-header">
 
       <div
-        class="story-map"
-        id="storyMap"
-      ></div>
-
-      <!-- EDIT PANEL -->
-
-      <div class="edit-panel">
-
-        <div class="edit-top">
-
-          <div class="edit-title">
-            CARD EDITOR
-          </div>
-
-          <div
-            class="selected-indicator"
-            id="selectedIndicator"
-          >
-            no card selected
-          </div>
-
-        </div>
-
-        <input
-          id="editDate"
-          placeholder="DATE"
-        />
-
-        <input
-          id="editTitle"
-          placeholder="TITLE"
-        />
-
-        <textarea
-          id="editContent"
-          placeholder="Narrative"
-        ></textarea>
-
-        <input
-          type="range"
-          id="editRelation"
-          min="0"
-          max="100"
-        />
-
-        <input
-          type="file"
-          accept="image/*"
-          id="editImage"
-        />
-
+        class="pair-render"
+        id="pairRender"
+      >
+        Pair Name
       </div>
 
-    </main>
+      <div
+        class="tag-render"
+        id="tagRender"
+      >
+        Relationship
+      </div>
 
-    <!-- RIGHT CHARACTER -->
+    </div>
 
-    <aside class="character-panel">
+    <!-- STORY MAP -->
+
+    <div
+      class="story-map"
+      id="storyMap"
+    ></div>
+
+  </main>
+
+  <!-- RIGHT -->
+
+  <aside class="character-side">
+
+    <div class="character-panel">
 
       <div
-        class="character-image"
+        class="profile-image"
         id="profileB"
       ></div>
 
@@ -236,117 +178,157 @@
         placeholder="Character introduction"
       ></textarea>
 
-    </aside>
+    </div>
+
+  </aside>
+
+</div>
+
+<!-- CREATE / EDIT PANEL -->
+
+<div
+  class="editor-panel"
+  id="editorPanel"
+>
+
+  <div class="editor-top">
+
+    <div class="editor-title">
+      EVENT EDITOR
+    </div>
+
+    <button
+      class="close-btn"
+      onclick="closeEditor()"
+    >
+      ×
+    </button>
 
   </div>
 
-  <!-- SETTINGS -->
+  <input
+    id="eventDate"
+    placeholder="DATE"
+  />
 
-  <div class="floating-panel">
+  <input
+    id="eventTitle"
+    placeholder="TITLE"
+  />
 
-    <div class="floating-title">
-      THEME
-    </div>
+  <textarea
+    id="eventContent"
+    placeholder="Narrative"
+  ></textarea>
 
-    <div class="color-row">
+  <input
+    type="range"
+    id="eventRelation"
+    min="0"
+    max="100"
+    value="50"
+  />
 
-      <input
-        type="color"
-        value="#91a2ff"
-        onchange="setAccent(this.value)"
-      />
+  <input
+    type="file"
+    accept="image/*"
+    id="eventImage"
+  />
 
-      <input
-        type="color"
-        value="#63ffe9"
-        onchange="setAccent2(this.value)"
-      />
+  <button
+    class="create-btn"
+    onclick="saveEvent()"
+  >
+    COMPLETE
+  </button>
 
-      <input
-        type="color"
-        value="#161c2b"
-        onchange="setPanel(this.value)"
-      />
+</div>
 
-    </div>
+<!-- SETTINGS -->
+
+<div class="settings-panel">
+
+  <div class="settings-title">
+    THEME
+  </div>
+
+  <div class="color-grid">
 
     <input
-      type="file"
-      accept="image/*"
-      onchange="changeBG(event)"
+      type="color"
+      value="#91a2ff"
+      onchange="setAccent(this.value)"
     />
 
-    <div class="slider-label">
-      BLUR
-    </div>
-
     <input
-      type="range"
-      min="0"
-      max="40"
-      value="0"
-      oninput="setBlur(this.value)"
+      type="color"
+      value="#63ffe9"
+      onchange="setAccent2(this.value)"
     />
 
-    <div class="slider-label">
-      SCALE
-    </div>
-
     <input
-      type="range"
-      min="1"
-      max="2"
-      step="0.01"
-      value="1"
-      oninput="setScale(this.value)"
-    />
-
-    <div class="slider-label">
-      ROTATE
-    </div>
-
-    <input
-      type="range"
-      min="-180"
-      max="180"
-      value="0"
-      oninput="setRotate(this.value)"
-    />
-
-    <div class="slider-label">
-      X
-    </div>
-
-    <input
-      type="range"
-      min="-500"
-      max="500"
-      value="0"
-      oninput="setPosX(this.value)"
-    />
-
-    <div class="slider-label">
-      Y
-    </div>
-
-    <input
-      type="range"
-      min="-500"
-      max="500"
-      value="0"
-      oninput="setPosY(this.value)"
+      type="color"
+      value="#141824"
+      onchange="setPanel(this.value)"
     />
 
   </div>
+
+  <input
+    type="file"
+    accept="image/*"
+    onchange="changeBG(event)"
+  />
+
+  <div class="slider-label">
+    BLUR
+  </div>
+
+  <input
+    type="range"
+    min="0"
+    max="40"
+    value="0"
+    oninput="setBlur(this.value)"
+  />
+
+  <div class="slider-label">
+    SCALE
+  </div>
+
+  <input
+    type="range"
+    min="1"
+    max="2"
+    step="0.01"
+    value="1"
+    oninput="setScale(this.value)"
+  />
+
+  <div class="slider-label">
+    ROTATE
+  </div>
+
+  <input
+    type="range"
+    min="-180"
+    max="180"
+    value="0"
+    oninput="setRotate(this.value)"
+  />
 
 </div>
 
 <script>
 
-let selectedCard = null
+let editIndex = null
+
+let tempImage = ''
 
 let state = JSON.parse(
-  localStorage.getItem('pairArchiveData')
+  localStorage.getItem(
+    'pairArchiveData'
+  )
 ) || {
 
   pairName: '',
@@ -370,17 +352,17 @@ let state = JSON.parse(
   scale: 1,
 
   rotate: 0,
-
-  posX: 0,
-
-  posY: 0,
 }
 
 const storyMap =
-  document.getElementById('storyMap')
+  document.getElementById(
+    'storyMap'
+  )
 
 const bgImage =
-  document.getElementById('bgImage')
+  document.getElementById(
+    'bgImage'
+  )
 
 function save() {
 
@@ -401,8 +383,7 @@ function applyBG() {
     `blur(${state.blur}px)`
 
   bgImage.style.transform = `
-    translate(${state.posX}px, ${state.posY}px)
-    scale(${state.scale + (state.blur * 0.01)})
+    scale(${state.scale})
     rotate(${state.rotate}deg)
   `
 }
@@ -445,49 +426,23 @@ function render() {
 
   storyMap.innerHTML = ''
 
-  state.cards.forEach((card, index) => {
+  state.cards.forEach(
+    (card, index) => {
 
-    const el =
-      document.createElement('div')
+      const el =
+        document.createElement('div')
 
-    el.className =
-      card.type === 'chapter'
-      ? 'chapter-card'
-      : 'story-card'
-
-    if (selectedCard === index) {
-
-      el.classList.add(
-        'selected-card'
-      )
-    }
-
-    if (card.type === 'chapter') {
-
-      el.innerHTML = `
-        <div class="chapter-name">
-          ${card.title || 'CHAPTER'}
-        </div>
-      `
-
-    } else {
+      el.className =
+        'story-card'
 
       el.innerHTML = `
 
-        <div class="story-date">
+        <div class="card-date">
           ${card.date || 'DATE'}
         </div>
 
-        <div class="story-title">
+        <div class="card-title">
           ${card.title || 'TITLE'}
-        </div>
-
-        <div class="story-preview">
-          ${
-            card.content
-            ? card.content.substring(0, 80)
-            : 'Narrative'
-          }
         </div>
 
         ${
@@ -495,127 +450,89 @@ function render() {
           ? `
             <img
               src="${card.image}"
-              class="story-thumb"
+              class="card-image"
             >
           `
           : ''
         }
+
+        <div class="card-content">
+          ${
+            card.content
+              ? card.content.substring(0, 90)
+              : 'Narrative'
+          }
+        </div>
       `
+
+      el.onclick = () => {
+
+        openEdit(index)
+      }
+
+      storyMap.appendChild(el)
     }
-
-    el.onclick = () => {
-
-      selectCard(index)
-    }
-
-    storyMap.appendChild(el)
-  })
+  )
 
   applyBG()
-
-  renderGraph()
 
   save()
 }
 
-function addCard() {
+function openCreatePanel() {
 
-  state.cards.push({
+  editIndex = null
 
-    type: 'story',
+  editorPanel.classList.add(
+    'editor-open'
+  )
 
-    date: '',
+  eventDate.value = ''
 
-    title: '',
+  eventTitle.value = ''
 
-    content: '',
+  eventContent.value = ''
 
-    relation: 50,
+  eventRelation.value = 50
 
-    image: '',
-  })
-
-  render()
+  tempImage = ''
 }
 
-function addChapter() {
-
-  state.cards.push({
-
-    type: 'chapter',
-
-    title: '',
-  })
-
-  render()
-}
-
-function selectCard(index) {
-
-  selectedCard = index
+function openEdit(index) {
 
   const card =
     state.cards[index]
 
-  selectedIndicator.innerText =
-    card.title || 'untitled'
+  editIndex = index
 
-  editDate.value =
+  editorPanel.classList.add(
+    'editor-open'
+  )
+
+  eventDate.value =
     card.date || ''
 
-  editTitle.value =
+  eventTitle.value =
     card.title || ''
 
-  editContent.value =
+  eventContent.value =
     card.content || ''
 
-  editRelation.value =
+  eventRelation.value =
     card.relation || 50
 
-  render()
+  tempImage =
+    card.image || ''
 }
 
-function updateSelectedCard() {
+function closeEditor() {
 
-  if (
-    selectedCard === null
-  ) return
-
-  const card =
-    state.cards[selectedCard]
-
-  card.date =
-    editDate.value
-
-  card.title =
-    editTitle.value
-
-  card.content =
-    editContent.value
-
-  card.relation =
-    editRelation.value
-
-  render()
+  editorPanel.classList.remove(
+    'editor-open'
+  )
 }
 
-editDate.oninput =
-updateSelectedCard
-
-editTitle.oninput =
-updateSelectedCard
-
-editContent.oninput =
-updateSelectedCard
-
-editRelation.oninput =
-updateSelectedCard
-
-editImage.onchange = e => {
-
-  if (
-    selectedCard === null
-  ) return
+eventImage.onchange = e => {
 
   const file =
     e.target.files[0]
@@ -627,16 +544,54 @@ editImage.onchange = e => {
 
   reader.onload = () => {
 
-    state.cards[selectedCard].image =
+    tempImage =
       reader.result
-
-    render()
   }
 
   reader.readAsDataURL(file)
 }
 
-function uploadCharacter(event, target) {
+function saveEvent() {
+
+  const payload = {
+
+    date:
+      eventDate.value,
+
+    title:
+      eventTitle.value,
+
+    content:
+      eventContent.value,
+
+    relation:
+      eventRelation.value,
+
+    image:
+      tempImage,
+  }
+
+  if (
+    editIndex === null
+  ) {
+
+    state.cards.push(payload)
+
+  } else {
+
+    state.cards[editIndex] =
+      payload
+  }
+
+  render()
+
+  closeEditor()
+}
+
+function uploadCharacter(
+  event,
+  target
+) {
 
   const file =
     event.target.files[0]
@@ -743,73 +698,21 @@ function setRotate(value) {
   save()
 }
 
-function setPosX(value) {
-
-  state.posX = value
-
-  applyBG()
-
-  save()
-}
-
-function setPosY(value) {
-
-  state.posY = value
-
-  applyBG()
-
-  save()
-}
-
 async function exportPNG() {
 
-  const board =
+  const node =
     document.getElementById(
       'exportBoard'
     )
-
-  const wrapper =
-    document.createElement('div')
-
-  wrapper.style.position =
-    'fixed'
-
-  wrapper.style.left =
-    '-99999px'
-
-  wrapper.style.top =
-    '0'
-
-  wrapper.style.width =
-    board.offsetWidth + 'px'
-
-  wrapper.style.height =
-    board.offsetHeight + 'px'
-
-  wrapper.style.background =
-    '#070b14'
-
-  const bgClone =
-    bgLayer.cloneNode(true)
-
-  const boardClone =
-    board.cloneNode(true)
-
-  wrapper.appendChild(bgClone)
-
-  wrapper.appendChild(boardClone)
-
-  document.body.appendChild(
-    wrapper
-  )
 
   try {
 
     const dataUrl =
       await domtoimage.toPng(
-        wrapper,
+        node,
         {
           quality: 1,
+          bgcolor: '#070b14',
           cacheBust: true,
         }
       )
@@ -827,19 +730,13 @@ async function exportPNG() {
 
   } catch(err) {
 
+    console.error(err)
+
     alert(
       'PNG export failed'
     )
-
-    console.error(err)
   }
-
-  document.body.removeChild(
-    wrapper
-  )
 }
-
-function renderGraph() {}
 
 pairName.oninput = e => {
 
@@ -888,30 +785,6 @@ charBBio.oninput = e => {
 
   save()
 }
-
-new Sortable(
-  storyMap,
-  {
-    animation: 160,
-
-    onEnd: function(evt) {
-
-      const moved =
-        state.cards.splice(
-          evt.oldIndex,
-          1
-        )[0]
-
-      state.cards.splice(
-        evt.newIndex,
-        0,
-        moved
-      )
-
-      render()
-    }
-  }
-)
 
 render()
 
