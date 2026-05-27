@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OC Timeline Archive - SF Edition</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            /* 커스텀 가능한 메인 테마 컬러 (SF 느낌의 네온 베이스) */
+            --main-color: #00f3ff;
+            --sub-color: #ff0055;
+            --bg-color: #050914;
+            --panel-bg: rgba(10, 15, 30, 0.65);
+            --border-glow: 0 0 10px rgba(0, 243, 255, 0.3);
+            --text-color: #e0e6ed;
+            font-family: 'Pretendard', sans-serif;
+        }
+
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow: hidden; /* 커스텀 휠 스크롤을 위해 기본 스크롤 숨김 */
+        }
+
+        /* 배경 컨트롤 영역 */
+        #bg-layer {
+            position: fixed; top: -10%; left: -10%; width: 120%; height: 120%;
+            background-size: cover; background-position: center;
+            z-index: -1; transform-origin: center;
+            transition: filter 0.3s;
+        }
+
+        /* 전체 UI 래퍼 (유리질감) */
+        #ui-wrapper {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; backdrop-filter: blur(0px); /* 기본 블러 해제, JS로 제어 */
+            overflow-y: auto; z-index: 10;
+        }
+
+        /* 왼쪽: 프로필 패널 */
+        .profile-panel {
+            width: 350px; padding: 30px;
+            background: var(--panel-bg);
+            border-right: 1px solid rgba(0, 243, 255, 0.2);
+            box-shadow: var(--border-glow);
+            display: flex; flex-direction: column; gap: 20px;
+        }
+
+        .sf-input {
+            width: 100%; background: transparent;
+            border: none; border-bottom: 2px solid var(--main-color);
+            color: white; font-size: 16px; padding: 10px 0;
+            font-family: 'Pretendard'; transition: 0.3s;
+        }
+        .sf-input:focus { outline: none; border-bottom-color: var(--sub-color); }
+        .pair-title { font-size: 28px; font-weight: 800; text-align: center; color: var(--main-color); text-transform: uppercase; letter-spacing: 2px; }
+
+        .char-box {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px; border-radius: 8px; background: rgba(0,0,0,0.3);
+        }
+
+        /* 오른쪽: 타임라인 패널 */
+        .timeline-panel {
+            flex: 1; padding: 40px; position: relative;
+        }
+        
+        .timeline-container {
+            border-left: 2px solid var(--main-color);
+            padding-left: 30px; position: relative;
+        }
+
+        .timeline-item {
+            position: relative; margin-bottom: 40px;
+            background: var(--panel-bg); border: 1px solid rgba(0, 243, 255, 0.1);
+            padding: 20px; border-radius: 0 15px 15px 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+        .timeline-item:hover { border-color: var(--main-color); box-shadow: var(--border-glow); }
+        .timeline-item::before {
+            content: ''; position: absolute; left: -37px; top: 0;
+            width: 12px; height: 12px; border-radius: 50%;
+            background: var(--main-color); box-shadow: 0 0 10px var(--main-color);
+        }
+
+        textarea.sf-input { height: 80px; resize: vertical; }
+        
+        /* 컨트롤 버튼들 */
+        .controls {
+            position: fixed; top: 20px; right: 20px;
+            display: flex; gap: 10px; z-index: 100;
+        }
+        button {
+            background: rgba(0, 243, 255, 0.1); border: 1px solid var(--main-color);
+            color: var(--main-color); padding: 8px 15px; cursor: pointer;
+            font-family: 'Pretendard'; border-radius: 4px; font-weight: 600;
+            transition: 0.2s;
+        }
+        button:hover { background: var(--main-color); color: #000; }
+
+        /* 세팅 모달 */
+        .settings-panel {
+            position: fixed; bottom: 20px; right: 20px;
+            background: rgba(0,0,0,0.8); border: 1px solid var(--sub-color);
+            padding: 15px; border-radius: 8px; z-index: 100;
+        }
+        .settings-panel input[type="range"] { width: 100px; }
+        .settings-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 5px; font-size: 12px; }
+
+    </style>
+</head>
+<body>
+
+    <div id="bg-layer"></div>
+
+    <div class="controls">
+        <button onclick="addTimelineItem()">+ 에피소드 추가</button>
+        <button onclick="saveToLocal()">임시 저장</button>
+        <button onclick="exportTxt()">TXT 내보내기</button>
+        <input type="file" id="import-file" style="display:none" onchange="importTxt(event)" accept=".txt">
+        <button onclick="document.getElementById('import-file').click()">TXT 불러오기</button>
+        <button onclick="exportImage()">이미지 저장</button>
+    </div>
+
+    <div class="settings-panel">
+        <div class="settings-row">
+            <span>배경 업로드:</span>
+            <input type="file" id="bg-upload" accept="image/*" onchange="setBgImage(event)" style="width: 120px;">
+        </div>
+        <div class="settings-row">
+            <span>메인 테마 컬러:</span>
+            <input type="color" id="color-picker" value="#00f3ff" onchange="changeThemeColor(event)">
+        </div>
+        <div class="settings-row">
+            <span>배경 블러:</span>
+            <input type="range" id="blur-slider" min="0" max="20" value="0" oninput="updateBgEffects()">
+        </div>
+        <div class="settings-row" style="color: #888; font-size: 10px;">
+            ※ 배경 이동: 드래그 / 확대: 휠 / 회전: Shift+휠
+        </div>
+    </div>
+
+    <div id="ui-wrapper">
+        <div class="profile-panel" id="profile-section">
+            <input type="text" id="pair-name" class="sf-input pair-title" placeholder="페어명 입력">
+            
+            <div class="char-box">
+                <input type="text" class="sf-input" placeholder="캐릭터 1 이름" style="font-weight: bold;">
+                <textarea class="sf-input" placeholder="캐릭터 1 프로필 요약..."></textarea>
+            </div>
+            
+            <div class="char-box">
+                <input type="text" class="sf-input" placeholder="캐릭터 2 이름" style="font-weight: bold;">
+                <textarea class="sf-input" placeholder="캐릭터 2 프로필 요약..."></textarea>
+            </div>
+            
+            <div class="char-box">
+                <input type="text" class="sf-input" placeholder="관계성 / 메모" style="font-weight: bold;">
+                <textarea class="sf-input" placeholder="둘의 관계나 서사 요약을 적어주세요."></textarea>
+            </div>
+        </div>
+
+        <div class="timeline-panel">
+            <div class="timeline-container" id="timeline-container">
+                </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. 배경 이미지 제어 (이동, 확대, 회전) ---
+        let bg = document.getElementById('bg-layer');
+        let scale = 1, posX = 0, posY = 0, rotate = 0, blurVal = 0;
+        let isDragging = false, startX, startY;
+
+        function updateBgTransform() {
+            // 블러 가장자리가 안보이게 하기 위해 기본적으로 scale을 조금 더 줌
+            let baseScale = blurVal > 0 ? scale * 1.1 : scale;
+            bg.style.transform = `translate(${posX}px, ${posY}px) scale(${baseScale}) rotate(${rotate}deg)`;
+        }
+
+        document.getElementById('ui-wrapper').addEventListener('mousedown', (e) => {
+            if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'BUTTON') return;
+            isDragging = true; startX = e.clientX - posX; startY = e.clientY - posY;
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if(!isDragging) return;
+            posX = e.clientX - startX; posY = e.clientY - startY;
+            updateBgTransform();
+        });
+
+        window.addEventListener('mouseup', () => isDragging = false);
+
+        document.getElementById('ui-wrapper').addEventListener('wheel', (e) => {
+            if(e.target.closest('.timeline-item') || e.target.closest('.profile-panel')) return; // 텍스트 영역 스크롤 보호
+            e.preventDefault();
+            if(e.shiftKey) { rotate += e.deltaY * 0.1; } // Shift+휠: 회전
+            else { scale -= e.deltaY * 0.001; if(scale < 0.1) scale = 0.1; } // 휠: 확대/축소
+            updateBgTransform();
+        }, {passive: false});
+
+        function updateBgEffects() {
+            blurVal = document.getElementById('blur-slider').value;
+            bg.style.filter = `blur(${blurVal}px) brightness(0.6)`;
+            updateBgTransform();
+        }
+
+        function setBgImage(e) {
+            const file = e.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = (event) => { bg.style.backgroundImage = `url(${event.target.result})`; }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function changeThemeColor(e) {
+            document.documentElement.style.setProperty('--main-color', e.target.value);
+            document.documentElement.style.setProperty('--border-glow', `0 0 10px ${e.target.value}40`);
+        }
+
+        // --- 2. 타임라인 로직 ---
+        function addTimelineItem(date='', title='', content='', imgSrc='') {
+            const container = document.getElementById('timeline-container');
+            const item = document.createElement('div');
+            item.className = 'timeline-item';
+            item.innerHTML = `
+                <input type="text" class="sf-input date-input" placeholder="날짜 (예: 2026.05.27)" value="${date}" style="width: 150px; color: var(--main-color);">
+                <input type="text" class="sf-input title-input" placeholder="에피소드 / 사건 명" value="${title}" style="font-size: 20px; margin-bottom: 10px;">
+                <div style="margin-bottom:10px;">
+                    <input type="file" accept="image/*" onchange="previewImage(event, this)" style="font-size: 12px;">
+                    <img class="tl-img-preview" src="${imgSrc}" style="max-width: 100%; margin-top: 10px; border-radius: 8px; display: ${imgSrc ? 'block' : 'none'};">
+                </div>
+                <textarea class="sf-input content-input" placeholder="서사 내용을 작성해주세요...">${content}</textarea>
+                <button onclick="this.parentElement.remove()" style="position:absolute; right:20px; top:20px; border-color:var(--sub-color); color:var(--sub-color)">삭제</button>
+            `;
+            container.appendChild(item);
+        }
+
+        function previewImage(event, inputElement) {
+            const file = event.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = inputElement.nextElementSibling;
+                    img.src = e.target.result;
+                    img.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // --- 3. 데이터 저장 / 불러오기 (로컬 & TXT) ---
+        function gatherData() {
+            const inputs = document.querySelectorAll('.profile-panel input, .profile-panel textarea');
+            const profileData = Array.from(inputs).map(inp => inp.value);
+            
+            const tlItems = document.querySelectorAll('.timeline-item');
+            const timelineData = Array.from(tlItems).map(item => ({
+                date: item.querySelector('.date-input').value,
+                title: item.querySelector('.title-input').value,
+                content: item.querySelector('.content-input').value,
+                imgSrc: item.querySelector('.tl-img-preview').src
+            }));
+
+            return { profile: profileData, timeline: timelineData };
+        }
+
+        function loadData(data) {
+            const inputs = document.querySelectorAll('.profile-panel input, .profile-panel textarea');
+            if(data.profile) data.profile.forEach((val, i) => { if(inputs[i]) inputs[i].value = val; });
+            
+            document.getElementById('timeline-container').innerHTML = '';
+            if(data.timeline) data.timeline.forEach(item => {
+                // 더미 이미지 경로 방지
+                const src = item.imgSrc.includes('index.html') ? '' : item.imgSrc;
+                addTimelineItem(item.date, item.title, item.content, src);
+            });
+        }
+
+        function saveToLocal() {
+            localStorage.setItem('oc_archive_data', JSON.stringify(gatherData()));
+            alert("브라우저에 임시 저장되었습니다!");
+        }
+
+        function exportTxt() {
+            const data = JSON.stringify(gatherData());
+            const blob = new Blob([data], { type: 'text/plain' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `${document.getElementById('pair-name').value || 'OC_Pair'}_Archive.txt`;
+            a.click();
+        }
+
+        function importTxt(event) {
+            const file = event.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try { loadData(JSON.parse(e.target.result)); alert("불러오기 완료!"); } 
+                    catch(err) { alert("파일 형식이 잘못되었습니다."); }
+                }
+                reader.readAsText(file);
+            }
+        }
+
+        // --- 4. 이미지 내보내기 ---
+        function exportImage() {
+            const wrapper = document.getElementById('ui-wrapper');
+            // 캡처 전 스크롤 조정 등 사전 작업
+            wrapper.style.overflow = 'visible'; 
+            
+            html2canvas(wrapper, {
+                backgroundColor: window.getComputedStyle(document.body).backgroundColor,
+                allowTaint: true, useCORS: true, scale: 2
+            }).then(canvas => {
+                const a = document.createElement('a');
+                a.href = canvas.toDataURL("image/png");
+                a.download = `${document.getElementById('pair-name').value || 'OC_Pair'}_Timeline.png`;
+                a.click();
+                wrapper.style.overflow = 'auto'; // 원상복구
+            });
+        }
+
+        // --- 초기화 ---
+        window.onload = () => {
+            const saved = localStorage.getItem('oc_archive_data');
+            if(saved) loadData(JSON.parse(saved));
+            else addTimelineItem(); // 기본 1개 생성
+            updateBgEffects();
+        }
+    </script>
+</body>
+</html>
