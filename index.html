@@ -3,382 +3,353 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OC ARTBOARD SYSTEM</title>
+    <title>OC CHRONICLE - SERPENTINE</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
         :root {
-            /* 컬러 팔레트 최적화: 심해와 우주의 경계 */
-            --bg: #07090f;
-            --panel: rgba(11, 14, 23, 0.65);
-            --panel2: rgba(22, 27, 38, 0.85);
+            /* 기본 테마 컬러 (JS로 변경 가능) */
             --accent: #8ea1ff;
-            --accent2: #63ffe9;
-            --text: #edf2ff;
-            --muted: rgba(237, 242, 255, 0.5);
-            --line: rgba(142, 161, 255, 0.15);
-            --glow: 0 0 20px rgba(142, 161, 255, 0.2);
-        }
-
-        * { box-sizing: border-box; outline: none; }
-        
-        body, html {
-            width: 100%; height: 100%; margin: 0;
+            --bg: #05070a;
+            --panel: rgba(10, 12, 18, 0.7);
+            --text: #f0f2f5;
+            --muted: rgba(255, 255, 255, 0.4);
+            --line: rgba(255, 255, 255, 0.08);
             font-family: 'Pretendard', sans-serif;
-            background: var(--bg); color: var(--text);
-            overflow: hidden; /* 전체 스크롤 막고 보드 안에서만 스크롤 */
         }
 
-        /* 1. 배경 시스템 (SF 감성 극대화) */
-        .bg { position: fixed; inset: 0; z-index: -20; background: var(--bg); }
-        .bg-image {
-            position: absolute; inset: -10%; background-size: cover; background-position: center;
-            opacity: 0.3; filter: blur(15px); transition: 0.5s ease;
-        }
-        .bg-noise {
-            position: absolute; inset: 0; opacity: 0.04; mix-blend-mode: overlay;
-            background-image: url('data:image/svg+xml;utf8,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)"/%3E%3C/svg%3E');
-        }
-        .bg-grid {
-            position: absolute; inset: 0; opacity: 0.3;
-            background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
-            background-size: 60px 60px;
-            mask-image: radial-gradient(circle at center, white, transparent 80%);
-            -webkit-mask-image: radial-gradient(circle at center, white, transparent 80%);
-        }
+        * { box-sizing: border-box; outline: none; margin: 0; padding: 0; }
+        body, html { width: 100%; height: 100%; background: var(--bg); color: var(--text); overflow: hidden; }
 
-        /* 2. 헤더 (시스템 HUD 느낌) */
-        .header {
-            height: 70px; border-bottom: 1px solid var(--line);
-            background: rgba(7, 9, 15, 0.8); backdrop-filter: blur(12px);
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 30px; position: relative; z-index: 20; box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        /* --- 전체 레이아웃 (양옆 캐릭터 기둥 + 중앙 서사) --- */
+        .app-wrapper { display: flex; width: 100vw; height: 100vh; position: relative; }
+
+        /* 1. 양 사이드 캐릭터 패널 (가로 짧고 세로 꽉 채움) */
+        .char-pillar {
+            width: 280px; height: 100%; position: relative; flex-shrink: 0;
+            background-color: #000; background-size: cover; background-position: center;
+            border-right: 1px solid var(--line); overflow: hidden; transition: 0.5s;
         }
-        .header-left, .header-right { display: flex; align-items: center; gap: 15px; }
+        .char-pillar.right { border-right: none; border-left: 1px solid var(--line); }
+        .char-pillar::before {
+            content: 'CLICK TO UPLOAD CHARACTER'; position: absolute; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 10px; letter-spacing: 0.2em; color: var(--muted); z-index: 1; pointer-events: none;
+        }
+        .char-pillar.has-img::before { display: none; }
         
-        input, textarea, button { font-family: inherit; }
-        input, textarea {
-            border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2);
-            color: white; border-radius: 6px; transition: 0.3s ease; padding: 0 15px;
+        /* 캐릭터 이미지 위를 덮는 그라데이션과 텍스트 영역 */
+        .char-info-overlay {
+            position: absolute; bottom: 0; left: 0; width: 100%; padding: 60px 25px 30px;
+            background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.6) 50%, transparent 100%);
+            z-index: 2; display: flex; flex-direction: column; gap: 10px;
         }
-        input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 10px rgba(142,161,255,0.2); }
+        .char-input {
+            background: transparent; border: none; border-bottom: 1px solid transparent;
+            color: white; font-family: inherit; transition: 0.3s;
+        }
+        .char-input:focus { border-bottom: 1px solid var(--accent); }
+        .char-name { font-size: 24px; font-weight: 900; letter-spacing: -0.02em; }
+        .char-bio { font-size: 12px; line-height: 1.6; color: var(--muted); resize: none; height: 80px; }
+
+        /* 2. 중앙 아트보드 (뱀파이어 타임라인) */
+        .center-board {
+            flex: 1; height: 100%; position: relative; overflow-y: auto; overflow-x: hidden;
+            background: radial-gradient(circle at center, rgba(255,255,255,0.02), transparent 70%);
+        }
+        .center-board::-webkit-scrollbar { width: 0; }
+
+        /* 헤더 / 컨트롤 바 */
+        .top-hud {
+            position: sticky; top: 0; width: 100%; padding: 20px 40px;
+            background: linear-gradient(to bottom, var(--bg) 0%, transparent 100%);
+            display: flex; justify-content: space-between; align-items: center; z-index: 100;
+            backdrop-filter: blur(5px);
+        }
+        .hud-left { display: flex; align-items: center; gap: 20px; }
+        .hud-right { display: flex; align-items: center; gap: 15px; }
         
-        .pair-name-input { width: 250px; height: 40px; font-size: 16px; font-weight: 800; letter-spacing: 0.05em; color: var(--accent2); }
-        .pair-keyword-input { width: 200px; height: 40px; font-size: 13px; letter-spacing: 0.1em; }
+        .system-title { font-size: 18px; font-weight: 900; letter-spacing: 0.2em; color: var(--accent); }
+        .theme-picker {
+            display: flex; align-items: center; gap: 10px; font-size: 11px; letter-spacing: 0.1em; color: var(--muted);
+        }
+        .theme-picker input[type="color"] {
+            -webkit-appearance: none; border: none; width: 20px; height: 20px; border-radius: 50%; cursor: pointer;
+            background: transparent; padding: 0;
+        }
+        .theme-picker input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        .theme-picker input[type="color"]::-webkit-color-swatch { border: 1px solid var(--line); border-radius: 50%; }
+
+        .btn {
+            background: transparent; border: 1px solid var(--line); color: var(--text);
+            padding: 8px 16px; border-radius: 20px; font-size: 11px; font-weight: 700;
+            letter-spacing: 0.1em; cursor: pointer; transition: 0.3s;
+        }
+        .btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(255,255,255,0.02); }
+        .btn-primary { border-color: var(--accent); color: var(--accent); }
+        .btn-primary:hover { background: var(--accent); color: #000; box-shadow: 0 0 15px var(--accent); }
+
+        /* 3. 라운드형(S자) 타임라인 구조 */
+        .timeline-container { padding: 80px 60px; display: flex; flex-direction: column; }
         
-        .header-btn {
-            height: 40px; border: 1px solid var(--accent); background: rgba(142,161,255,0.05);
-            color: var(--accent); border-radius: 6px; padding: 0 20px; cursor: pointer;
-            font-size: 12px; font-weight: 700; letter-spacing: 0.1em; transition: 0.3s ease;
+        .timeline-row {
+            display: flex; gap: 40px; padding: 60px 0; position: relative; width: 100%;
         }
-        .header-btn:hover { background: var(--accent); color: var(--bg); box-shadow: var(--glow); }
-
-        /* 3. 메인 보드 레이아웃 */
-        .board {
-            height: calc(100vh - 70px); display: grid;
-            grid-template-columns: 320px minmax(0, 1fr); gap: 0; /* 분리된 느낌을 없애고 하나로 융합 */
-            padding: 0; position: relative;
-        }
-
-        /* 4. 프로필 패널 (좌측 고정, 유리 질감) */
-        .profile-column {
-            background: var(--panel); border-right: 1px solid var(--line);
-            backdrop-filter: blur(20px); padding: 30px; overflow-y: auto; z-index: 10;
-            display: flex; flex-direction: column; gap: 25px;
-        }
-        .profile-column::-webkit-scrollbar { width: 4px; }
-        .profile-column::-webkit-scrollbar-thumb { background: var(--accent); }
-
-        .profile-panel { display: flex; flex-direction: column; gap: 10px; }
-        .panel-label { font-size: 10px; font-weight: 800; color: var(--accent); letter-spacing: 0.2em; text-transform: uppercase; }
+        /* 짝수 번째 줄은 오른쪽에서 왼쪽으로 전개 */
+        .timeline-row:nth-child(even) { flex-direction: row-reverse; }
         
-        .profile-image {
-            width: 100%; aspect-ratio: 1/1; border-radius: 12px;
-            border: 1px solid var(--line); background: rgba(0,0,0,0.5);
-            background-size: cover; background-position: center;
-            cursor: pointer; position: relative; overflow: hidden;
+        /* 가로 연결선 */
+        .timeline-row::before {
+            content: ''; position: absolute; left: 0; right: 0; top: 50%;
+            height: 1px; background: var(--accent); z-index: 0; opacity: 0.5;
         }
-        .profile-image::after {
-            content: 'CLICK TO UPLOAD'; position: absolute; inset: 0; display: flex;
-            align-items: center; justify-content: center; font-size: 11px;
-            letter-spacing: 0.1em; color: var(--muted); opacity: 1; transition: 0.3s;
-        }
-        .profile-image.has-img::after { opacity: 0; }
         
-        .profile-name { height: 45px; font-size: 18px; font-weight: 800; text-align: center; }
-        .profile-bio { min-height: 120px; padding: 15px; font-size: 13px; line-height: 1.8; resize: none; }
-
-        /* 5. 스토리 타임라인 (수직 스크롤 아트보드) */
-        .story-board-wrap {
-            position: relative; overflow-y: auto; overflow-x: hidden;
-            padding: 60px; scroll-behavior: smooth;
+        /* 라운드 커브 (아래로 꺾이는 선) */
+        .timeline-row:not(:last-child)::after {
+            content: ''; position: absolute; top: 50%; width: 60px; height: 100%;
+            border: 1px solid var(--accent); z-index: 0; opacity: 0.5;
         }
-        .story-board-wrap::-webkit-scrollbar { width: 0; } /* 캡처를 위해 숨김 */
-
-        .story-board {
-            max-width: 1000px; margin: 0 auto; position: relative;
-            display: flex; flex-direction: column; gap: 40px; padding: 40px 0;
+        /* 홀수 줄: 오른쪽 끝에서 아래로 커브 */
+        .timeline-row:nth-child(odd):not(:last-child)::after {
+            right: -30px; border-left: none; border-radius: 0 40px 40px 0;
         }
-        /* 중앙 관통 라인 */
-        .story-board::before {
-            content: ''; position: absolute; left: 50%; top: 0; bottom: 0;
-            width: 2px; background: linear-gradient(to bottom, transparent, var(--accent), transparent);
-            transform: translateX(-50%); opacity: 0.5;
+        /* 짝수 줄: 왼쪽 끝에서 아래로 커브 */
+        .timeline-row:nth-child(even):not(:last-child)::after {
+            left: -30px; border-right: none; border-radius: 40px 0 0 40px;
         }
 
-        /* 6. 서사 카드 (교차 정렬 방식) */
+        /* 4. 세련된 카드 디자인 (Editorial Style) */
         .story-card {
-            width: calc(50% - 40px); background: var(--panel2);
-            border: 1px solid var(--line); border-radius: 16px;
-            padding: 30px; position: relative; backdrop-filter: blur(10px);
-            transition: 0.3s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            width: calc(33.333% - 27px); /* 한 줄에 3개 배치 */
+            background: rgba(5, 7, 10, 0.8);
+            border: 1px solid var(--line); border-top: 2px solid var(--accent);
+            padding: 25px; position: relative; z-index: 2;
+            backdrop-filter: blur(10px); transition: 0.3s ease;
         }
+        .story-card:hover { transform: translateY(-5px); border-color: var(--accent); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         
-        /* 좌우 정렬 및 연결선 */
-        .story-card:nth-child(odd) { align-self: flex-start; }
-        .story-card:nth-child(even) { align-self: flex-end; }
-        
-        .story-card::after {
-            content: ''; position: absolute; top: 40px; width: 40px; height: 2px; background: var(--accent); opacity: 0.5;
-        }
-        .story-card:nth-child(odd)::after { right: -40px; }
-        .story-card:nth-child(even)::after { left: -40px; }
-        
-        /* 타임라인 노드(점) */
+        /* 타임라인 노드 (점) */
         .story-card::before {
-            content: ''; position: absolute; top: 35px; width: 12px; height: 12px;
-            background: var(--bg); border: 2px solid var(--accent2); border-radius: 50%; z-index: 2;
-            box-shadow: 0 0 10px var(--accent2);
+            content: ''; position: absolute; top: -5px; left: 50%; transform: translateX(-50%);
+            width: 8px; height: 8px; background: var(--bg); border: 2px solid var(--accent);
+            border-radius: 50%; box-shadow: 0 0 10px var(--accent);
         }
-        .story-card:nth-child(odd)::before { right: -47px; }
-        .story-card:nth-child(even)::before { left: -47px; }
 
-        .story-card:hover { border-color: var(--accent); transform: translateY(-5px); box-shadow: var(--glow); }
-
-        .story-date { font-size: 12px; font-weight: 700; color: var(--accent2); letter-spacing: 0.1em; margin-bottom: 10px; }
-        .story-title { font-size: 24px; font-weight: 900; line-height: 1.3; margin-bottom: 20px; letter-spacing: -0.03em; }
-        .story-image { width: 100%; border-radius: 8px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); display: none; }
-        .story-text { font-size: 14px; line-height: 1.9; color: var(--muted); white-space: pre-wrap; word-break: keep-all; }
-
-        .delete-btn {
-            position: absolute; top: 20px; right: 20px; background: transparent; border: none;
-            color: #ff4d4d; font-size: 11px; cursor: pointer; opacity: 0.3; transition: 0.2s;
+        .card-date { font-size: 10px; font-weight: 800; color: var(--accent); letter-spacing: 0.15em; margin-bottom: 10px; }
+        .card-title { font-size: 20px; font-weight: 900; line-height: 1.3; margin-bottom: 15px; letter-spacing: -0.02em; }
+        
+        /* 삽입된 이미지 크기 제어 (작고 세련되게) */
+        .card-img {
+            width: 100%; max-height: 140px; object-fit: cover; border-radius: 4px;
+            margin-bottom: 15px; border: 1px solid var(--line); filter: grayscale(20%); transition: 0.3s;
         }
+        .story-card:hover .card-img { filter: grayscale(0%); }
+        
+        .card-desc { font-size: 13px; line-height: 1.8; color: var(--muted); white-space: pre-wrap; }
+        .delete-btn { position: absolute; top: 15px; right: 15px; background: none; border: none; color: #ff4a4a; font-size: 10px; cursor: pointer; opacity: 0; }
         .story-card:hover .delete-btn { opacity: 1; }
 
-        /* 7. 에디터 (우측 하단 플로팅) */
-        .editor {
-            position: fixed; right: 30px; bottom: 30px; width: 400px;
-            background: rgba(7, 9, 15, 0.95); border: 1px solid var(--accent);
-            border-radius: 16px; padding: 25px; backdrop-filter: blur(20px);
-            display: flex; flex-direction: column; gap: 15px; z-index: 100;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8), var(--glow);
-            transform: translateY(120%); transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        /* 5. 에디터 팝업 */
+        .editor-modal {
+            position: fixed; right: 40px; bottom: 40px; width: 360px;
+            background: rgba(10, 12, 18, 0.95); border: 1px solid var(--accent);
+            padding: 30px; border-radius: 12px; backdrop-filter: blur(20px);
+            display: flex; flex-direction: column; gap: 15px; z-index: 1000;
+            transform: translateY(150%); transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .editor.open { transform: translateY(0); }
-
-        .editor-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); padding-bottom: 10px; margin-bottom: 10px; }
-        .editor-label { font-size: 13px; font-weight: 800; color: var(--accent); letter-spacing: 0.1em; }
-        .close-btn { background: transparent; border: none; color: white; font-size: 20px; cursor: pointer; }
-
-        .editor input { height: 45px; }
-        .editor textarea { height: 120px; padding-top: 15px; }
-        .file-upload-btn {
-            border: 1px dashed var(--line); background: rgba(0,0,0,0.2); color: var(--muted);
-            height: 40px; display: flex; align-items: center; justify-content: center;
-            border-radius: 6px; font-size: 12px; cursor: pointer; transition: 0.3s;
+        .editor-modal.active { transform: translateY(0); }
+        .modal-header { display: flex; justify-content: space-between; font-size: 12px; font-weight: 800; color: var(--accent); letter-spacing: 0.1em; border-bottom: 1px solid var(--line); padding-bottom: 10px; }
+        
+        .editor-modal input, .editor-modal textarea {
+            background: rgba(0,0,0,0.3); border: 1px solid var(--line); color: white;
+            padding: 12px; border-radius: 6px; font-family: inherit; font-size: 13px;
         }
-        .file-upload-btn:hover { border-color: var(--accent); color: var(--accent); }
-
-        .complete-btn {
-            height: 50px; border: none; background: linear-gradient(135deg, var(--accent), var(--accent2));
-            color: #000; font-weight: 900; font-size: 15px; letter-spacing: 0.1em;
-            border-radius: 8px; cursor: pointer; transition: 0.3s;
-        }
-        .complete-btn:hover { box-shadow: 0 0 20px rgba(99, 255, 233, 0.4); transform: scale(1.02); }
-
+        .editor-modal textarea { height: 100px; resize: none; }
+        
     </style>
 </head>
 <body>
 
-    <div class="bg">
-        <div class="bg-image" id="main-bg-img"></div>
-        <div class="bg-grid"></div>
-        <div class="bg-noise"></div>
-    </div>
-
-    <header class="header">
-        <div class="header-left">
-            <input type="text" class="pair-name-input" id="pair-name" placeholder="PAIR CODENAME // 페어명">
-            <input type="text" class="pair-keyword-input" id="pair-keyword" placeholder="RELATION KEYWORD // 관계 키워드">
-        </div>
-        <div class="header-right">
-            <label class="header-btn" style="display:flex; align-items:center; cursor:pointer;">
-                배경 이미지 변경
-                <input type="file" hidden accept="image/*" onchange="changeBackground(event)">
-            </label>
-            <button class="header-btn" onclick="toggleEditor()">+ 새 서사 기록</button>
-            <button class="header-btn" onclick="exportArtboard()" style="border-color: var(--accent2); color: var(--accent2);">아트보드 내보내기 (PNG)</button>
-        </div>
-    </header>
-
-    <main class="board" id="capture-area">
+    <div class="app-wrapper" id="capture-area">
         
-        <aside class="profile-column">
-            <div class="profile-panel">
-                <div class="panel-label">CHARACTER 01</div>
-                <label class="profile-image" id="p1-img-box">
-                    <input type="file" hidden accept="image/*" onchange="loadProfileImg(event, 'p1-img-box')">
-                </label>
-                <input type="text" class="profile-name" placeholder="NAME">
-                <textarea class="profile-bio" placeholder="프로필 요약 및 서사 데이터 입력..."></textarea>
-            </div>
-            
-            <div style="height: 1px; background: var(--line); margin: 10px 0;"></div>
-
-            <div class="profile-panel">
-                <div class="panel-label">CHARACTER 02</div>
-                <label class="profile-image" id="p2-img-box">
-                    <input type="file" hidden accept="image/*" onchange="loadProfileImg(event, 'p2-img-box')">
-                </label>
-                <input type="text" class="profile-name" placeholder="NAME">
-                <textarea class="profile-bio" placeholder="프로필 요약 및 서사 데이터 입력..."></textarea>
+        <aside class="char-pillar" id="char1-bg" onclick="document.getElementById('char1-upload').click()">
+            <input type="file" id="char1-upload" hidden accept="image/*" onchange="setCharImage(event, 'char1-bg')">
+            <div class="char-info-overlay" onclick="event.stopPropagation()">
+                <input type="text" class="char-input char-name" placeholder="CHARACTER A">
+                <textarea class="char-input char-bio" placeholder="프로필 및 관계성 요약..."></textarea>
             </div>
         </aside>
 
-        <section class="story-board-wrap" id="board-wrap">
-            <div class="story-board" id="timeline-container">
+        <main class="center-board" id="scroll-board">
+            <div class="top-hud" data-html2canvas-ignore="true">
+                <div class="hud-left">
+                    <div class="system-title">OC CHRONICLE</div>
+                    <div class="theme-picker">
+                        THEME COLOR 
+                        <input type="color" id="theme-color" value="#8ea1ff" onchange="updateTheme(this.value)">
+                    </div>
                 </div>
-        </section>
-    </main>
+                <div class="hud-right">
+                    <button class="btn" onclick="toggleEditor()">+ 서사 추가</button>
+                    <button class="btn btn-primary" onclick="exportImage()">이미지 굽기 (PNG)</button>
+                </div>
+            </div>
 
-    <div class="editor" id="editor-panel">
-        <div class="editor-header">
-            <span class="editor-label">ADD NEW CHRONICLE</span>
-            <button class="close-btn" onclick="toggleEditor()">×</button>
+            <div class="timeline-container" id="timeline-box">
+                </div>
+        </main>
+
+        <aside class="char-pillar right" id="char2-bg" onclick="document.getElementById('char2-upload').click()">
+            <input type="file" id="char2-upload" hidden accept="image/*" onchange="setCharImage(event, 'char2-bg')">
+            <div class="char-info-overlay" onclick="event.stopPropagation()">
+                <input type="text" class="char-input char-name" placeholder="CHARACTER B" style="text-align: right;">
+                <textarea class="char-input char-bio" placeholder="프로필 및 관계성 요약..." style="text-align: right;"></textarea>
+            </div>
+        </aside>
+
+    </div>
+
+    <div class="editor-modal" id="editor" data-html2canvas-ignore="true">
+        <div class="modal-header">
+            <span>RECORD DATA</span>
+            <button class="btn" style="border:none; padding:0;" onclick="toggleEditor()">X</button>
         </div>
         <input type="text" id="evDate" placeholder="DATE (ex: 2026.05.27)">
         <input type="text" id="evTitle" placeholder="EPISODE TITLE">
-        <label class="file-upload-btn">
-            + 썸네일 이미지 첨부 (선택)
-            <input type="file" id="evImg" hidden accept="image/*" onchange="setTempImage(event)">
+        <label class="btn" style="text-align:center; display:block;">
+            + 미니 이미지 첨부
+            <input type="file" hidden accept="image/*" id="evImg" onchange="setEvImage(event)">
         </label>
-        <img id="temp-img-preview" src="" style="display:none; width:100%; border-radius:6px; border:1px solid var(--line);">
-        <textarea id="evContent" placeholder="서사 내용을 작성하십시오..."></textarea>
-        <button class="complete-btn" onclick="addStoryCard()">RECORD >></button>
+        <img id="evPreview" src="" style="display:none; width:100%; max-height:100px; object-fit:cover; border-radius:4px;">
+        <textarea id="evContent" placeholder="서사 내용을 작성하세요..."></textarea>
+        <button class="btn btn-primary" onclick="addStory()">기록 완료</button>
     </div>
 
     <script>
-        let tempImgSrc = '';
+        // 전역 데이터 및 변수
+        let stories = [];
+        let tempImg = '';
 
-        // 에디터 열기/닫기
-        function toggleEditor() {
-            document.getElementById('editor-panel').classList.toggle('open');
+        // 1. 테마 컬러 변경
+        function updateTheme(color) {
+            document.documentElement.style.setProperty('--accent', color);
         }
 
-        // 전체 배경 변경
-        function changeBackground(event) {
+        // 2. 사이드 캐릭터 이미지 업로드
+        function setCharImage(event, bgId) {
             const file = event.target.files[0];
             if(file) {
                 const reader = new FileReader();
                 reader.onload = e => {
-                    document.getElementById('main-bg-img').style.backgroundImage = `url(${e.target.result})`;
+                    const el = document.getElementById(bgId);
+                    el.style.backgroundImage = `url(${e.target.result})`;
+                    el.classList.add('has-img');
                 }
                 reader.readAsDataURL(file);
             }
         }
 
-        // 프로필 이미지 업로드
-        function loadProfileImg(event, boxId) {
+        // 3. 에디터 토글 및 이미지
+        function toggleEditor() { document.getElementById('editor').classList.toggle('active'); }
+        
+        function setEvImage(event) {
             const file = event.target.files[0];
             if(file) {
                 const reader = new FileReader();
                 reader.onload = e => {
-                    const box = document.getElementById(boxId);
-                    box.style.backgroundImage = `url(${e.target.result})`;
-                    box.classList.add('has-img');
+                    tempImg = e.target.result;
+                    document.getElementById('evPreview').src = tempImg;
+                    document.getElementById('evPreview').style.display = 'block';
                 }
                 reader.readAsDataURL(file);
             }
         }
 
-        // 에디터 임시 이미지
-        function setTempImage(event) {
-            const file = event.target.files[0];
-            if(file) {
-                const reader = new FileReader();
-                reader.onload = e => {
-                    tempImgSrc = e.target.result;
-                    const preview = document.getElementById('temp-img-preview');
-                    preview.src = tempImgSrc;
-                    preview.style.display = 'block';
-                }
-                reader.readAsDataURL(file);
-            }
-        }
-
-        // 타임라인 카드 추가
-        function addStoryCard() {
+        // 4. 서사 추가 및 S자 타임라인(뱀파이어 배열) 렌더링
+        function addStory() {
             const date = document.getElementById('evDate').value;
             const title = document.getElementById('evTitle').value;
             const content = document.getElementById('evContent').value;
 
-            if(!title) { alert("서사의 제목은 톱니바퀴의 축입니다. 반드시 입력하십시오."); return; }
+            if(!title) { alert("제목을 입력하세요."); return; }
 
-            const container = document.getElementById('timeline-container');
-            const card = document.createElement('div');
-            card.className = 'story-card';
+            stories.push({ id: Date.now(), date, title, content, img: tempImg });
             
-            let imgHTML = tempImgSrc ? `<img src="${tempImgSrc}" class="story-image" style="display:block;">` : '';
-
-            card.innerHTML = `
-                <button class="delete-btn" onclick="this.parentElement.remove()">[삭제]</button>
-                <div class="story-date">${date}</div>
-                <div class="story-title">${title}</div>
-                ${imgHTML}
-                <div class="story-text">${content}</div>
-            `;
-            
-            container.appendChild(card);
-
-            // 초기화 및 닫기
+            // 입력 폼 초기화
             document.getElementById('evDate').value = '';
             document.getElementById('evTitle').value = '';
             document.getElementById('evContent').value = '';
-            document.getElementById('temp-img-preview').style.display = 'none';
-            tempImgSrc = '';
+            document.getElementById('evPreview').style.display = 'none';
+            tempImg = '';
+            
             toggleEditor();
-
-            // 추가 후 맨 아래로 스크롤
-            const wrap = document.getElementById('board-wrap');
-            wrap.scrollTo({ top: wrap.scrollHeight, behavior: 'smooth' });
+            renderTimeline();
         }
 
-        // 아트보드 이미지로 내보내기 (가장 중요한 기능)
-        function exportArtboard() {
+        function deleteStory(id) {
+            stories = stories.filter(s => s.id !== id);
+            renderTimeline();
+        }
+
+        // 핵심 로직: 3개 단위로 줄(Row)을 묶어 지그재그(S자) 렌더링
+        function renderTimeline() {
+            const box = document.getElementById('timeline-box');
+            box.innerHTML = '';
+
+            const cardsPerRow = 3; // 한 줄당 카드 개수
+
+            for (let i = 0; i < stories.length; i += cardsPerRow) {
+                const rowData = stories.slice(i, i + cardsPerRow);
+                
+                const rowEl = document.createElement('div');
+                rowEl.className = 'timeline-row';
+                
+                rowData.forEach(item => {
+                    const imgHTML = item.img ? `<img src="${item.img}" class="card-img">` : '';
+                    const cardHTML = `
+                        <div class="story-card">
+                            <button class="delete-btn" data-html2canvas-ignore="true" onclick="deleteStory(${item.id})">삭제</button>
+                            <div class="card-date">${item.date}</div>
+                            <div class="card-title">${item.title}</div>
+                            ${imgHTML}
+                            <div class="card-desc">${item.content}</div>
+                        </div>
+                    `;
+                    rowEl.innerHTML += cardHTML;
+                });
+                
+                box.appendChild(rowEl);
+            }
+
+            // 스크롤 맨 아래로
+            const scrollBoard = document.getElementById('scroll-board');
+            scrollBoard.scrollTo({ top: scrollBoard.scrollHeight, behavior: 'smooth' });
+        }
+
+        // 5. 완벽한 아트보드 캡처 (HTML2Canvas)
+        function exportImage() {
             const target = document.getElementById('capture-area');
-            const wrap = document.getElementById('board-wrap');
-            const pairName = document.getElementById('pair-name').value || 'OC_PAIR';
+            const board = document.getElementById('scroll-board');
             
-            // 캡처를 위해 전체 스크롤 길이를 임시로 풀어서 모든 카드가 보이게 함
-            const originalOverflow = wrap.style.overflow;
+            // 캡처를 위해 임시로 높이 제한을 풀고 전체를 펼침
             const originalHeight = target.style.height;
-            wrap.style.overflow = 'visible';
+            const originalOverflow = board.style.overflowY;
             target.style.height = 'auto';
+            board.style.overflowY = 'visible';
 
             html2canvas(target, {
-                backgroundColor: window.getComputedStyle(document.body).backgroundColor,
-                scale: 2, // 고해상도 추출
+                backgroundColor: "#05070a",
+                scale: 2, // 고해상도
                 useCORS: true
             }).then(canvas => {
                 const a = document.createElement('a');
-                a.href = canvas.toDataURL('image/png');
-                a.download = `ARTBOARD_${pairName}.png`;
+                a.href = canvas.toDataURL("image/png");
+                a.download = `OC_CHRONICLE_ARTBOARD.png`;
                 a.click();
 
-                // 원상복구
-                wrap.style.overflow = originalOverflow;
+                // 원상 복구
                 target.style.height = originalHeight;
+                board.style.overflowY = originalOverflow;
             });
         }
     </script>
