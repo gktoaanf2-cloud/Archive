@@ -3,237 +3,195 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OC CHRONICLE - PROJECT: ARCHIVE</title>
+    <title>OC CHRONICLE - APEX ARCHIVE</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
         :root {
-            /* 니어 오토마타 & SF 기반 컬러 시스템 (3색 테마) */
-            --c-main: #d3b58d; /* 니어 샌드/베이지 */
-            --c-sub: #4f5b55;  /* 세련된 뮤트 그린/그레이 */
-            --c-bg: #121212;   /* 딥 다크 캔버스 */
-            
-            --surface: rgba(20, 20, 20, 0.85); /* 글래스모피즘 표면 */
+            --c-main: #d3b58d; 
+            --c-sub: #4f5b55;  
+            --c-bg: #0a0a0a;   
+            --surface: rgba(15, 15, 15, 0.7); 
             --text-primary: #e6e6e6;
-            --text-muted: rgba(255, 255, 255, 0.4);
-            --line: rgba(211, 181, 141, 0.2); /* 얇은 테마 컬러 라인 */
+            --text-muted: rgba(255, 255, 255, 0.5);
+            --line: rgba(211, 181, 141, 0.25); 
             font-family: 'Pretendard', sans-serif;
         }
 
         * { box-sizing: border-box; outline: none; margin: 0; padding: 0; }
-        
-        /* 스크롤바 커스텀 */
         ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: var(--c-bg); }
+        ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--c-main); }
 
         body, html { width: 100%; height: 100%; background: var(--c-bg); color: var(--text-primary); overflow: hidden; }
 
-        /* 1. 배경 인터랙티브 레이어 */
+        /* 1. 배경 (은은하게 깔리도록 수정) */
         #viewport {
-            position: fixed; inset: 0; z-index: -10; overflow: hidden;
-            background-color: var(--c-bg);
-            background-image: 
-                linear-gradient(var(--line) 1px, transparent 1px),
-                linear-gradient(90deg, var(--line) 1px, transparent 1px);
+            position: fixed; inset: 0; z-index: -10; overflow: hidden; background-color: var(--c-bg);
+            background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
             background-size: 40px 40px;
         }
         #bg-canvas {
             position: absolute; left: -50%; top: -50%; width: 200%; height: 200%;
             background-size: cover; background-position: center;
-            transition: filter 0.2s; pointer-events: none;
+            transition: filter 0.2s; pointer-events: none; opacity: 0.4; /* 배경이 너무 튀지 않게 조절 */
         }
 
-        /* 2. 메인 앱 래퍼 */
-        .app-wrapper {
-            display: flex; width: 100%; height: 100vh; position: relative;
-            overflow-y: auto; overflow-x: hidden;
-        }
+        /* 2. 메인 래퍼 */
+        .app-wrapper { display: flex; width: 100%; height: 100vh; position: relative; }
 
-        /* 양 사이드 캐릭터 패널 (에반게리온/니어 식 꽉 찬 기둥) */
+        /* 캐릭터 패널 */
         .char-pillar {
-            width: 320px; min-height: 100%; position: relative; flex-shrink: 0;
-            background: #000; border-right: 1px solid var(--c-main);
-            display: flex; flex-direction: column; cursor: pointer;
+            width: 300px; min-height: 100%; position: relative; flex-shrink: 0;
+            background: #000; border-right: 1px solid var(--c-main); cursor: pointer; z-index: 10;
         }
         .char-pillar.right { border-right: none; border-left: 1px solid var(--c-main); }
-        
-        /* 이미지가 늘어나지 않고 꽉 차게 고정 */
-        .pillar-img {
-            position: absolute; inset: 0; width: 100%; height: 100%;
-            object-fit: cover; filter: grayscale(30%) contrast(1.1); transition: 0.5s;
-        }
+        .pillar-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: grayscale(20%); transition: 0.5s; z-index: 1; }
         .char-pillar:hover .pillar-img { filter: grayscale(0%); }
-
         .char-overlay {
-            position: absolute; bottom: 0; left: 0; width: 100%; padding: 150px 30px 40px;
-            background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.8) 40%, transparent 100%);
-            display: flex; flex-direction: column; gap: 10px; pointer-events: auto; z-index: 2;
+            position: absolute; bottom: 0; left: 0; width: 100%; padding: 150px 25px 40px;
+            background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 50%, transparent 100%);
+            display: flex; flex-direction: column; gap: 10px; z-index: 2; pointer-events: auto;
         }
-        
-        .char-input {
-            background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.1);
-            color: var(--text-primary); font-family: inherit; transition: 0.3s;
-        }
+        .char-input { background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.1); color: var(--text-primary); font-family: inherit; transition: 0.3s; }
         .char-input:focus { border-bottom-color: var(--c-main); }
-        .char-name { font-size: 28px; font-weight: 900; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-main); }
+        .char-name { font-size: 26px; font-weight: 900; letter-spacing: 0.05em; color: var(--c-main); text-transform: uppercase; }
         .char-bio { font-size: 12px; line-height: 1.7; color: var(--text-muted); resize: none; height: 100px; }
 
-        /* 3. 중앙 보드 (데이터 보관소) */
-        .center-board { flex: 1; position: relative; display: flex; flex-direction: column; min-height: 100%; }
+        /* 3. 중앙 보드 (배경이 비치도록 투명도 세팅) */
+        .center-board {
+            flex: 1; position: relative; display: flex; flex-direction: column;
+            background: linear-gradient(to bottom, rgba(10,10,10,0.95) 0%, rgba(10,10,10,0.6) 100%);
+            overflow-y: auto; overflow-x: hidden;
+        }
+        .center-board::-webkit-scrollbar { width: 0; }
 
-        /* HUD 컨트롤 패널 (상단 고정, 세련된 아코디언 스타일) */
         .hud-panel {
-            position: sticky; top: 0; width: 100%; z-index: 100;
-            background: linear-gradient(to bottom, rgba(18,18,18,0.9) 0%, transparent 100%);
-            padding: 20px 40px; backdrop-filter: blur(5px);
+            position: sticky; top: 0; width: 100%; z-index: 100; padding: 20px 40px;
+            background: linear-gradient(to bottom, rgba(10,10,10,1) 0%, transparent 100%); backdrop-filter: blur(5px);
         }
         .hud-top { display: flex; justify-content: space-between; align-items: center; }
-        .sys-title { font-size: 14px; font-weight: 800; letter-spacing: 0.3em; color: var(--c-main); border-bottom: 2px solid var(--c-sub); padding-bottom: 5px; }
+        .sys-title { font-size: 16px; font-weight: 900; letter-spacing: 0.3em; color: var(--c-main); }
         
-        /* 버튼 스타일 (니어 오토마타 스타일 적용) */
         .btn {
-            background: var(--surface); border: 1px solid var(--c-main); color: var(--c-main);
-            padding: 8px 18px; font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
-            cursor: pointer; transition: 0.2s; position: relative; overflow: hidden;
+            background: rgba(0,0,0,0.5); border: 1px solid var(--c-main); color: var(--c-main);
+            padding: 8px 16px; font-size: 11px; font-weight: 800; letter-spacing: 0.1em;
+            cursor: pointer; transition: 0.3s;
         }
-        .btn::before {
-            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-            background: var(--c-main); transition: 0.3s; z-index: -1;
-        }
-        .btn:hover { color: #000; }
-        .btn:hover::before { left: 0; }
-        
-        .btn-sub { border-color: var(--c-sub); color: var(--c-sub); }
-        .btn-sub::before { background: var(--c-sub); }
-        .btn-sub:hover { color: #fff; }
+        .btn:hover { background: var(--c-main); color: #000; box-shadow: 0 0 15px rgba(211,181,141,0.5); }
+        .btn-sub { border-color: var(--c-sub); color: var(--text-primary); }
+        .btn-sub:hover { background: var(--c-sub); color: #fff; }
 
-        /* 설정 툴바 */
-        .settings-bar {
-            display: flex; gap: 15px; flex-wrap: wrap; margin-top: 15px;
-            padding: 15px; border: 1px solid var(--line); background: rgba(0,0,0,0.5);
-        }
+        .settings-bar { display: flex; gap: 15px; flex-wrap: wrap; margin-top: 15px; padding: 15px; border: 1px solid var(--line); background: rgba(0,0,0,0.8); }
         .setting-item { display: flex; align-items: center; gap: 10px; font-size: 11px; color: var(--text-muted); }
         .setting-item input[type="color"] { width: 20px; height: 20px; border: none; cursor: pointer; background: transparent; padding:0; }
         .setting-item input[type="color"]::-webkit-color-swatch { border: 1px solid var(--line); }
-        .setting-item input[type="range"] { width: 80px; accent-color: var(--c-main); }
 
-        /* 4. 라운드형(S자) 타임라인 구조 (더 얇고 세련되게) */
-        .timeline-container { padding: 60px 40px 100px; display: flex; flex-direction: column; flex: 1; }
-        .timeline-row { display: flex; gap: 30px; padding: 50px 0; position: relative; width: 100%; }
-        .timeline-row:nth-child(even) { flex-direction: row-reverse; }
+        /* 4. 타임라인 & 챕터 분기점 */
+        .timeline-container { padding: 40px 60px 100px; display: flex; flex-direction: column; flex: 1; position: relative; }
         
-        /* 가로 라인 */
-        .timeline-row::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: var(--c-sub); z-index: 0; }
-        /* 커브 라인 */
-        .timeline-row:not(:last-child)::after { content: ''; position: absolute; top: 50%; width: 50px; height: 100%; border: 1px solid var(--c-sub); z-index: 0; }
-        .timeline-row:nth-child(odd):not(:last-child)::after { right: -25px; border-left: none; border-radius: 0 30px 30px 0; }
-        .timeline-row:nth-child(even):not(:last-child)::after { left: -25px; border-right: none; border-radius: 30px 0 0 30px; }
+        /* 챕터 디바이더 (마름모 디자인) */
+        .chapter-divider {
+            width: 100%; display: flex; flex-direction: column; align-items: center;
+            margin: 60px 0; position: relative; z-index: 5;
+        }
+        .chapter-divider::before {
+            content: ''; position: absolute; top: -50px; bottom: -50px; width: 1px;
+            background: linear-gradient(to bottom, transparent, var(--c-main), transparent); z-index: 0;
+        }
+        .chapter-rhombus {
+            width: 50px; height: 50px; background: var(--c-bg); border: 2px solid var(--c-main);
+            transform: rotate(45deg); display: flex; align-items: center; justify-content: center;
+            margin-bottom: 20px; z-index: 2; box-shadow: 0 0 20px rgba(211, 181, 141, 0.2);
+        }
+        .chapter-rhombus::after { content: ''; width: 26px; height: 26px; border: 1px solid var(--c-sub); }
+        .chapter-info { text-align: center; background: rgba(10,10,10,0.8); padding: 10px 30px; border: 1px solid var(--line); backdrop-filter: blur(5px); z-index: 2; }
+        .chapter-num { font-size: 12px; font-weight: 900; letter-spacing: 0.3em; color: var(--c-main); margin-bottom: 5px; }
+        .chapter-title { font-size: 22px; font-weight: 900; color: #fff; margin-bottom: 5px; letter-spacing: -0.02em; }
+        .chapter-sub { font-size: 12px; color: var(--text-muted); letter-spacing: 0.1em; }
+        .chapter-delete { font-size: 10px; color: #ff4a4a; cursor: pointer; margin-top: 5px; background: none; border: none; }
 
-        /* 5. 세련된 서사 카드 (UI 레퍼런스 반영) */
+        /* S자 커브 서사 카드 */
+        .timeline-row { display: flex; gap: 30px; padding: 40px 0; position: relative; width: 100%; }
+        .timeline-row:nth-child(even) { flex-direction: row-reverse; }
+        .timeline-row::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: var(--line); z-index: 0; }
+        
         .story-card {
             width: calc(33.333% - 20px); background: var(--surface);
-            border: 1px solid var(--line); border-top: 3px solid var(--c-main);
-            padding: 20px; position: relative; z-index: 2; transition: 0.3s;
-            backdrop-filter: blur(10px);
+            border: 1px solid var(--line); border-top: 2px solid var(--c-main);
+            padding: 25px; position: relative; z-index: 2; backdrop-filter: blur(10px);
         }
-        /* 장식 기믹 (사이드 컷) */
-        .story-card::after {
-            content: ''; position: absolute; bottom: 0; right: 0;
-            width: 15px; height: 15px; background: var(--c-sub);
-            clip-path: polygon(100% 0, 0 100%, 100% 100%);
-        }
-        .story-card:hover { border-color: var(--c-main); transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.8); }
-        
-        /* 타임라인 축 노드 */
         .story-card::before {
-            content: ''; position: absolute; top: -7px; left: 50%; transform: translateX(-50%);
+            content: ''; position: absolute; top: -6px; left: 50%; transform: translateX(-50%) rotate(45deg);
             width: 10px; height: 10px; background: var(--c-bg); border: 2px solid var(--c-main);
-            transform: translateX(-50%) rotate(45deg); /* 마름모 형태 */
         }
-
-        .card-date { font-size: 10px; font-weight: 700; color: var(--c-sub); letter-spacing: 0.2em; margin-bottom: 8px; }
+        .card-date { font-size: 10px; font-weight: 700; color: var(--c-sub); letter-spacing: 0.1em; margin-bottom: 8px; }
         .card-title { font-size: 18px; font-weight: 800; line-height: 1.3; margin-bottom: 12px; color: var(--c-main); }
-        
-        .card-img { width: 100%; max-height: 120px; object-fit: cover; margin-bottom: 12px; border: 1px solid var(--line); }
+        .card-img { width: 100%; max-height: 140px; object-fit: cover; margin-bottom: 12px; border: 1px solid var(--line); }
         .card-desc { font-size: 13px; line-height: 1.8; color: var(--text-primary); white-space: pre-wrap; }
-        
-        .delete-btn { position: absolute; top: 10px; right: 10px; background: none; border: none; color: #ff4a4a; font-size: 10px; cursor: pointer; opacity: 0; font-family: 'Pretendard'; }
+        .delete-btn { position: absolute; top: 10px; right: 10px; background: none; border: none; color: #ff4a4a; font-size: 10px; cursor: pointer; opacity: 0; }
         .story-card:hover .delete-btn { opacity: 1; }
 
-        /* 에디터 팝업 */
-        .editor-modal {
-            position: fixed; right: 40px; bottom: 40px; width: 360px;
-            background: rgba(10, 10, 10, 0.95); border: 1px solid var(--c-main);
-            padding: 25px; border-radius: 4px; backdrop-filter: blur(15px);
-            display: flex; flex-direction: column; gap: 15px; z-index: 1000;
-            transform: translateY(150%); transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        /* 5. 에디터 모달 (통합) */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 999;
+            display: none; justify-content: center; align-items: center; backdrop-filter: blur(5px);
         }
-        .editor-modal.active { transform: translateY(0); }
-        .modal-header { display: flex; justify-content: space-between; font-size: 12px; font-weight: 800; color: var(--c-main); letter-spacing: 0.1em; border-bottom: 1px solid var(--line); padding-bottom: 10px; }
+        .editor-box {
+            width: 400px; background: rgba(15,15,15,0.95); border: 1px solid var(--c-main);
+            padding: 30px; display: flex; flex-direction: column; gap: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+        }
+        .editor-tabs { display: flex; gap: 10px; margin-bottom: 10px; border-bottom: 1px solid var(--line); padding-bottom: 10px; }
+        .tab-btn { background: none; border: none; color: var(--text-muted); font-size: 12px; font-weight: 800; cursor: pointer; }
+        .tab-btn.active { color: var(--c-main); }
         
-        .editor-modal input, .editor-modal textarea {
-            background: rgba(255,255,255,0.05); border: 1px solid var(--line); color: white;
-            padding: 10px; font-family: inherit; font-size: 12px; transition: 0.3s;
-        }
-        .editor-modal input:focus, .editor-modal textarea:focus { border-color: var(--c-main); }
-        .editor-modal textarea { height: 100px; resize: none; }
+        .editor-input { background: rgba(255,255,255,0.05); border: 1px solid var(--line); color: white; padding: 12px; font-family: inherit; font-size: 12px; }
+        .editor-input:focus { border-color: var(--c-main); }
+        
+        /* 폼 분리 */
+        #form-story { display: flex; flex-direction: column; gap: 12px; }
+        #form-chapter { display: none; flex-direction: column; gap: 12px; }
+
     </style>
 </head>
 <body>
 
-    <div id="viewport">
-        <div id="bg-canvas"></div>
-    </div>
+    <div id="viewport"><div id="bg-canvas"></div></div>
 
     <div class="app-wrapper" id="capture-area">
         
         <aside class="char-pillar" onclick="document.getElementById('char1-upload').click()">
             <img id="char1-img" class="pillar-img" src="">
-            <input type="file" id="char1-upload" hidden accept="image/*" onchange="handleImageUpload(event, 'char1-img', 'c1')">
+            <input type="file" id="char1-upload" hidden accept="image/*" onchange="handleImgUpload(event, 'char1-img', 'c1')">
             <div class="char-overlay" onclick="event.stopPropagation()">
-                <input type="text" id="c1-name" class="char-input char-name" placeholder="CHARACTER A" oninput="saveData()">
-                <textarea id="c1-bio" class="char-input char-bio" placeholder="프로필 및 관계성 데이터..." oninput="saveData()"></textarea>
+                <input type="text" id="c1-name" class="char-input char-name" placeholder="CHAR 01" oninput="saveData()">
+                <textarea id="c1-bio" class="char-input char-bio" placeholder="Profile & Data..." oninput="saveData()"></textarea>
             </div>
         </aside>
 
-        <main class="center-board">
-            
+        <main class="center-board" id="scroll-board">
             <div class="hud-panel" data-html2canvas-ignore="true">
                 <div class="hud-top">
-                    <div class="sys-title">DATA ARCHIVE SYSTEM</div>
+                    <div class="sys-title">CHRONICLE ARCHIVE</div>
                     <div style="display:flex; gap: 10px;">
-                        <button class="btn btn-sub" onclick="toggleSettings()">⚙️ SYSTEM SETTINGS</button>
-                        <button class="btn" onclick="toggleEditor()">+ ADD RECORD</button>
-                        <button class="btn" style="border-color:#fff; color:#fff;" onclick="exportImage()">📸 EXPORT PNG</button>
+                        <button class="btn btn-sub" onclick="toggleSettings()">SETTING</button>
+                        <button class="btn" onclick="openModal('chapter')">+ 챕터 분기</button>
+                        <button class="btn" onclick="openModal('story')">+ 서사 기록</button>
+                        <button class="btn" style="background:var(--c-main); color:#000;" onclick="exportImage()">📷 PNG 굽기</button>
                     </div>
                 </div>
                 
                 <div class="settings-bar" id="settings-bar" style="display: none;">
-                    <div class="setting-item">
-                        메인 <input type="color" id="theme-main" value="#d3b58d" onchange="updateColors()">
-                    </div>
-                    <div class="setting-item">
-                        서브 <input type="color" id="theme-sub" value="#4f5b55" onchange="updateColors()">
-                    </div>
-                    <div class="setting-item">
-                        배경 업로드 <input type="file" style="width: 150px;" accept="image/*" onchange="handleBgUpload(event)">
-                    </div>
-                    <div class="setting-item">
-                        배경 블러 <input type="range" id="bg-blur" min="0" max="20" value="0" oninput="updateBgTransform()">
-                    </div>
-                    <div class="setting-item">
-                        <button class="btn btn-sub" onclick="resetBgTransform()">배경 리셋</button>
-                    </div>
-                    <div style="width: 1px; height: 20px; background: var(--line); margin: 0 10px;"></div>
+                    <div class="setting-item">메인 <input type="color" id="theme-main" value="#d3b58d" onchange="updateColors()"></div>
+                    <div class="setting-item">서브 <input type="color" id="theme-sub" value="#4f5b55" onchange="updateColors()"></div>
+                    <div class="setting-item">배경 <input type="file" style="width: 140px;" accept="image/*" onchange="handleBgUpload(event)"></div>
+                    <div class="setting-item">블러 <input type="range" id="bg-blur" min="0" max="20" value="0" oninput="updateBgTransform()"></div>
+                    <div class="setting-item"><button class="btn btn-sub" onclick="resetBg()">리셋</button></div>
+                    <div style="width: 1px; height: 20px; background: var(--line);"></div>
                     <div class="setting-item">
                         <button class="btn btn-sub" onclick="exportData()">TXT 백업</button>
                         <button class="btn btn-sub" onclick="document.getElementById('import-file').click()">TXT 불러오기</button>
                         <input type="file" id="import-file" hidden accept=".txt" onchange="importData(event)">
-                    </div>
-                    <div class="setting-item" style="color:var(--c-main); font-size:10px;">
-                        * 배경 이동: 드래그 / 줌: 휠 / 회전: Shift+휠
                     </div>
                 </div>
             </div>
@@ -244,62 +202,65 @@
 
         <aside class="char-pillar right" onclick="document.getElementById('char2-upload').click()">
             <img id="char2-img" class="pillar-img" src="">
-            <input type="file" id="char2-upload" hidden accept="image/*" onchange="handleImageUpload(event, 'char2-img', 'c2')">
+            <input type="file" id="char2-upload" hidden accept="image/*" onchange="handleImgUpload(event, 'char2-img', 'c2')">
             <div class="char-overlay" onclick="event.stopPropagation()">
-                <input type="text" id="c2-name" class="char-input char-name" placeholder="CHARACTER B" style="text-align: right;" oninput="saveData()">
-                <textarea id="c2-bio" class="char-input char-bio" placeholder="프로필 및 관계성 데이터..." style="text-align: right;" oninput="saveData()"></textarea>
+                <input type="text" id="c2-name" class="char-input char-name" placeholder="CHAR 02" style="text-align: right;" oninput="saveData()">
+                <textarea id="c2-bio" class="char-input char-bio" placeholder="Profile & Data..." style="text-align: right;" oninput="saveData()"></textarea>
             </div>
         </aside>
-
     </div>
 
-    <div class="editor-modal" id="editor" data-html2canvas-ignore="true">
-        <div class="modal-header">
-            <span>INPUT NEW RECORD</span>
-            <button class="btn" style="border:none; padding:0; background:transparent;" onclick="toggleEditor()">X</button>
+    <div class="modal-overlay" id="editor-modal" data-html2canvas-ignore="true">
+        <div class="editor-box">
+            <div class="editor-tabs">
+                <button class="tab-btn active" id="tab-story" onclick="switchTab('story')">서사 기록</button>
+                <button class="tab-btn" id="tab-chapter" onclick="switchTab('chapter')">챕터 분기</button>
+                <button class="btn" style="margin-left:auto; padding:2px 8px; border:none;" onclick="closeModal()">X</button>
+            </div>
+
+            <div id="form-story">
+                <input type="text" id="evDate" class="editor-input" placeholder="DATE (예: 2026.05.27)">
+                <input type="text" id="evTitle" class="editor-input" placeholder="서사 제목">
+                <label class="btn btn-sub" style="text-align:center;">
+                    + 썸네일 이미지 첨부
+                    <input type="file" hidden accept="image/*" onchange="setTempImg(event)">
+                </label>
+                <img id="evPreview" src="" style="display:none; width:100%; max-height:100px; object-fit:cover;">
+                <textarea id="evContent" class="editor-input" style="height:100px; resize:none;" placeholder="서사 내용을 작성하세요..."></textarea>
+                <button class="btn" onclick="addItem('story')">저장</button>
+            </div>
+
+            <div id="form-chapter">
+                <input type="text" id="chNum" class="editor-input" placeholder="챕터 넘버 (예: Chapter.01)">
+                <input type="text" id="chTitle" class="editor-input" placeholder="에피소드 이름">
+                <input type="text" id="chSub" class="editor-input" placeholder="날짜 및 자유 서브 문구">
+                <button class="btn" onclick="addItem('chapter')">챕터 생성</button>
+            </div>
         </div>
-        <input type="text" id="evDate" placeholder="DATE (ex: 2026.05.27)">
-        <input type="text" id="evTitle" placeholder="TITLE">
-        <label class="btn btn-sub" style="text-align:center;">
-            + 첨부 이미지
-            <input type="file" hidden accept="image/*" onchange="setTempImg(event)">
-        </label>
-        <img id="evPreview" src="" style="display:none; width:100%; max-height:80px; object-fit:cover;">
-        <textarea id="evContent" placeholder="서사 텍스트 기록..."></textarea>
-        <button class="btn" onclick="addStory()">SAVE RECORD</button>
     </div>
 
     <script>
-        // --- 데이터 구조 ---
         let appData = {
             c1: { img: '', name: '', bio: '' },
             c2: { img: '', name: '', bio: '' },
             theme: { main: '#d3b58d', sub: '#4f5b55' },
             bg: { img: '', blur: 0, x: 0, y: 0, scale: 1, rotate: 0 },
-            timeline: []
+            timeline: [] // { type: 'story' | 'chapter', ... }
         };
         let tempImg = '';
 
-        // --- 초기화 로직 ---
         window.onload = () => {
-            const saved = localStorage.getItem('oc_archive_v3');
-            if(saved) {
-                appData = JSON.parse(saved);
-                applyDataToUI();
-            }
+            const saved = localStorage.getItem('oc_archive_v4');
+            if(saved) { appData = JSON.parse(saved); applyUI(); }
         };
 
-        function applyDataToUI() {
-            document.getElementById('c1-name').value = appData.c1.name;
-            document.getElementById('c1-bio').value = appData.c1.bio;
+        function applyUI() {
+            document.getElementById('c1-name').value = appData.c1.name; document.getElementById('c1-bio').value = appData.c1.bio;
             if(appData.c1.img) document.getElementById('char1-img').src = appData.c1.img;
-
-            document.getElementById('c2-name').value = appData.c2.name;
-            document.getElementById('c2-bio').value = appData.c2.bio;
+            document.getElementById('c2-name').value = appData.c2.name; document.getElementById('c2-bio').value = appData.c2.bio;
             if(appData.c2.img) document.getElementById('char2-img').src = appData.c2.img;
 
-            document.getElementById('theme-main').value = appData.theme.main;
-            document.getElementById('theme-sub').value = appData.theme.sub;
+            document.getElementById('theme-main').value = appData.theme.main; document.getElementById('theme-sub').value = appData.theme.sub;
             updateColors();
 
             if(appData.bg.img) document.getElementById('bg-canvas').style.backgroundImage = `url(${appData.bg.img})`;
@@ -310,170 +271,94 @@
         }
 
         function saveData() {
-            appData.c1.name = document.getElementById('c1-name').value;
-            appData.c1.bio = document.getElementById('c1-bio').value;
-            appData.c2.name = document.getElementById('c2-name').value;
-            appData.c2.bio = document.getElementById('c2-bio').value;
-            appData.theme.main = document.getElementById('theme-main').value;
-            appData.theme.sub = document.getElementById('theme-sub').value;
+            appData.c1.name = document.getElementById('c1-name').value; appData.c1.bio = document.getElementById('c1-bio').value;
+            appData.c2.name = document.getElementById('c2-name').value; appData.c2.bio = document.getElementById('c2-bio').value;
+            appData.theme.main = document.getElementById('theme-main').value; appData.theme.sub = document.getElementById('theme-sub').value;
             appData.bg.blur = document.getElementById('bg-blur').value;
-            
-            try {
-                localStorage.setItem('oc_archive_v3', JSON.stringify(appData));
-            } catch(e) {
-                console.warn("용량 초과: 고화질 이미지가 너무 많습니다. TXT 백업을 권장합니다.");
-            }
+            try { localStorage.setItem('oc_archive_v4', JSON.stringify(appData)); } catch(e) {}
         }
 
-        // --- 백업 / 불러오기 (부활 완료) ---
-        function exportData() {
-            saveData();
-            const blob = new Blob([JSON.stringify(appData)], {type: 'text/plain'});
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = `ARCHIVE_${appData.c1.name}_${appData.c2.name}.txt`;
-            a.click();
-        }
-        function importData(e) {
-            const file = e.target.files[0];
-            if(!file) return;
-            const reader = new FileReader();
-            reader.onload = ev => {
-                appData = JSON.parse(ev.target.result);
-                applyDataToUI();
-                saveData();
-                alert("데이터 복원 완료!");
-            };
-            reader.readAsText(file);
-        }
-
-        // --- UI 컨트롤 ---
-        function toggleSettings() {
-            const bar = document.getElementById('settings-bar');
-            bar.style.display = bar.style.display === 'none' ? 'flex' : 'none';
-        }
-        function toggleEditor() { document.getElementById('editor').classList.toggle('active'); }
-        
+        /* --- 설정 및 배경 --- */
+        function toggleSettings() { const b = document.getElementById('settings-bar'); b.style.display = b.style.display === 'none' ? 'flex' : 'none'; }
         function updateColors() {
-            const main = document.getElementById('theme-main').value;
-            const sub = document.getElementById('theme-sub').value;
-            document.documentElement.style.setProperty('--c-main', main);
-            document.documentElement.style.setProperty('--c-sub', sub);
-            document.documentElement.style.setProperty('--line', main + '33'); // 투명도 추가
+            const m = document.getElementById('theme-main').value; const s = document.getElementById('theme-sub').value;
+            document.documentElement.style.setProperty('--c-main', m); document.documentElement.style.setProperty('--c-sub', s);
+            document.documentElement.style.setProperty('--line', m + '40'); saveData();
+        }
+        function handleBgUpload(e) {
+            const f = e.target.files[0];
+            if(f) { const r = new FileReader(); r.onload = ev => { appData.bg.img = ev.target.result; document.getElementById('bg-canvas').style.backgroundImage = `url(${appData.bg.img})`; saveData(); }; r.readAsDataURL(f); }
+        }
+        function updateBgTransform() {
+            const b = document.getElementById('bg-blur').value;
+            document.getElementById('bg-canvas').style.filter = `blur(${b}px) brightness(0.6)`;
+            document.getElementById('bg-canvas').style.transform = `translate(${appData.bg.x}px, ${appData.bg.y}px) scale(${appData.bg.scale}) rotate(${appData.bg.rotate}deg)`;
             saveData();
         }
+        function resetBg() { appData.bg.x = 0; appData.bg.y = 0; appData.bg.scale = 1; appData.bg.rotate = 0; updateBgTransform(); }
 
-        // --- 배경 인터랙션 (부활 완료) ---
         let isDragging = false, startX, startY;
         const bgWrap = document.getElementById('viewport');
-        const bgCanvas = document.getElementById('bg-canvas');
-
-        function handleBgUpload(e) {
-            const file = e.target.files[0];
-            if(file) {
-                const reader = new FileReader();
-                reader.onload = ev => {
-                    appData.bg.img = ev.target.result;
-                    bgCanvas.style.backgroundImage = `url(${appData.bg.img})`;
-                    saveData();
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        function updateBgTransform() {
-            const blur = document.getElementById('bg-blur').value;
-            bgCanvas.style.filter = `blur(${blur}px) brightness(0.6)`;
-            bgCanvas.style.transform = `translate(${appData.bg.x}px, ${appData.bg.y}px) scale(${appData.bg.scale}) rotate(${appData.bg.rotate}deg)`;
-            saveData();
-        }
-
-        function resetBgTransform() {
-            appData.bg.x = 0; appData.bg.y = 0; appData.bg.scale = 1; appData.bg.rotate = 0;
-            updateBgTransform();
-        }
-
         bgWrap.addEventListener('mousedown', (e) => { isDragging = true; startX = e.clientX - appData.bg.x; startY = e.clientY - appData.bg.y; });
-        window.addEventListener('mousemove', (e) => { if(!isDragging) return; appData.bg.x = e.clientX - startX; appData.bg.y = e.clientY - startY; updateBgTransform(); });
+        window.addEventListener('mousemove', (e) => { if(isDragging) { appData.bg.x = e.clientX - startX; appData.bg.y = e.clientY - startY; updateBgTransform(); } });
         window.addEventListener('mouseup', () => isDragging = false);
-        bgWrap.addEventListener('wheel', (e) => {
-            e.preventDefault();
-            if(e.shiftKey) appData.bg.rotate += e.deltaY * 0.1;
-            else { appData.bg.scale -= e.deltaY * 0.001; if(appData.bg.scale < 0.1) appData.bg.scale = 0.1; }
-            updateBgTransform();
-        }, {passive: false});
+        bgWrap.addEventListener('wheel', (e) => { e.preventDefault(); if(e.shiftKey) appData.bg.rotate += e.deltaY * 0.1; else { appData.bg.scale -= e.deltaY * 0.001; if(appData.bg.scale < 0.1) appData.bg.scale = 0.1; } updateBgTransform(); }, {passive: false});
 
-        // --- 캐릭터 및 에디터 이미지 ---
-        function handleImageUpload(e, imgId, charKey) {
-            const file = e.target.files[0];
-            if(file) {
-                const reader = new FileReader();
-                reader.onload = ev => {
-                    appData[charKey].img = ev.target.result;
-                    document.getElementById(imgId).src = appData[charKey].img;
-                    saveData();
-                };
-                reader.readAsDataURL(file);
-            }
+        function handleImgUpload(e, imgId, key) {
+            const f = e.target.files[0];
+            if(f) { const r = new FileReader(); r.onload = ev => { appData[key].img = ev.target.result; document.getElementById(imgId).src = appData[key].img; saveData(); }; r.readAsDataURL(f); }
+        }
+
+        /* --- 모달 및 데이터 입력 --- */
+        function openModal(type) { document.getElementById('editor-modal').style.display = 'flex'; switchTab(type); }
+        function closeModal() { document.getElementById('editor-modal').style.display = 'none'; }
+        function switchTab(type) {
+            document.getElementById('tab-story').classList.toggle('active', type === 'story');
+            document.getElementById('tab-chapter').classList.toggle('active', type === 'chapter');
+            document.getElementById('form-story').style.display = type === 'story' ? 'flex' : 'none';
+            document.getElementById('form-chapter').style.display = type === 'chapter' ? 'flex' : 'none';
         }
         function setTempImg(e) {
-            const file = e.target.files[0];
-            if(file) {
-                const reader = new FileReader();
-                reader.onload = ev => {
-                    tempImg = ev.target.result;
-                    document.getElementById('evPreview').src = tempImg;
-                    document.getElementById('evPreview').style.display = 'block';
-                };
-                reader.readAsDataURL(file);
+            const f = e.target.files[0];
+            if(f) { const r = new FileReader(); r.onload = ev => { tempImg = ev.target.result; document.getElementById('evPreview').src = tempImg; document.getElementById('evPreview').style.display = 'block'; }; r.readAsDataURL(f); }
+        }
+
+        function addItem(type) {
+            if(type === 'story') {
+                const title = document.getElementById('evTitle').value;
+                if(!title) return alert("제목을 입력하세요.");
+                appData.timeline.push({ type: 'story', id: Date.now(), date: document.getElementById('evDate').value, title: title, content: document.getElementById('evContent').value, img: tempImg });
+                document.getElementById('evDate').value = ''; document.getElementById('evTitle').value = ''; document.getElementById('evContent').value = ''; document.getElementById('evPreview').style.display = 'none'; tempImg = '';
+            } else {
+                const chTitle = document.getElementById('chTitle').value;
+                if(!chTitle) return alert("챕터 이름을 입력하세요.");
+                appData.timeline.push({ type: 'chapter', id: Date.now(), num: document.getElementById('chNum').value, title: chTitle, sub: document.getElementById('chSub').value });
+                document.getElementById('chNum').value = ''; document.getElementById('chTitle').value = ''; document.getElementById('chSub').value = '';
             }
+            closeModal(); saveData(); renderTimeline();
         }
 
-        // --- 서사 로직 ---
-        function addStory() {
-            const title = document.getElementById('evTitle').value;
-            if(!title) return alert("제목을 입력하세요.");
-            
-            appData.timeline.push({
-                id: Date.now(),
-                date: document.getElementById('evDate').value,
-                title: title,
-                content: document.getElementById('evContent').value,
-                img: tempImg
-            });
-            
-            document.getElementById('evDate').value = '';
-            document.getElementById('evTitle').value = '';
-            document.getElementById('evContent').value = '';
-            document.getElementById('evPreview').style.display = 'none';
-            tempImg = '';
-            
-            toggleEditor();
-            saveData();
-            renderTimeline();
-        }
+        function deleteItem(id) { appData.timeline = appData.timeline.filter(i => i.id !== id); saveData(); renderTimeline(); }
 
-        function deleteStory(id) {
-            appData.timeline = appData.timeline.filter(s => s.id !== id);
-            saveData();
-            renderTimeline();
-        }
-
+        /* --- 렌더링 로직 (챕터 + 서사 조합) --- */
         function renderTimeline() {
             const box = document.getElementById('timeline-box');
             box.innerHTML = '';
-            const cardsPerRow = 3;
+            
+            let currentRowItems = [];
+            let rowCount = 0; // S자 커브 방향 결정을 위한 로우 카운트
 
-            for (let i = 0; i < appData.timeline.length; i += cardsPerRow) {
-                const rowData = appData.timeline.slice(i, i + cardsPerRow);
+            function flushRow() {
+                if (currentRowItems.length === 0) return;
                 const rowEl = document.createElement('div');
                 rowEl.className = 'timeline-row';
+                if (rowCount % 2 !== 0) rowEl.style.flexDirection = 'row-reverse';
                 
-                rowData.forEach(item => {
+                currentRowItems.forEach(item => {
                     const imgHTML = item.img ? `<img src="${item.img}" class="card-img">` : '';
                     rowEl.innerHTML += `
                         <div class="story-card">
-                            <button class="delete-btn" data-html2canvas-ignore="true" onclick="deleteStory(${item.id})">삭제</button>
+                            <button class="delete-btn" data-html2canvas-ignore="true" onclick="deleteItem(${item.id})">삭제</button>
                             <div class="card-date">${item.date}</div>
                             <div class="card-title">${item.title}</div>
                             ${imgHTML}
@@ -482,59 +367,87 @@
                     `;
                 });
                 box.appendChild(rowEl);
+                currentRowItems = [];
+                rowCount++;
             }
+
+            appData.timeline.forEach(item => {
+                if (item.type === 'chapter') {
+                    flushRow(); // 챕터 전에 있던 카드들 한 줄 완성
+                    box.innerHTML += `
+                        <div class="chapter-divider">
+                            <div class="chapter-rhombus"></div>
+                            <div class="chapter-info">
+                                <div class="chapter-num">${item.num}</div>
+                                <div class="chapter-title">${item.title}</div>
+                                <div class="chapter-sub">${item.sub}</div>
+                                <button class="chapter-delete" data-html2canvas-ignore="true" onclick="deleteItem(${item.id})">[챕터 삭제]</button>
+                            </div>
+                        </div>
+                    `;
+                    rowCount = 0; // 챕터 이후 S자 방향 리셋
+                } else {
+                    currentRowItems.push(item);
+                    if (currentRowItems.length === 3) flushRow(); // 3개 차면 한 줄 완성
+                }
+            });
+            flushRow(); // 남은 거 마저 완성
+
+            const sb = document.getElementById('scroll-board');
+            sb.scrollTo({ top: sb.scrollHeight, behavior: 'smooth' });
         }
 
-        // --- 캡처 찌그러짐 버그 완벽 픽스 ---
+        /* --- 캡처 찌그러짐/크래시 완전 박멸 로직 --- */
         function exportImage() {
             const wrapper = document.getElementById('capture-area');
+            const board = document.getElementById('scroll-board');
             
-            // 핵심: 캡처할 요소의 길이를 '실제 스크롤된 높이' 만큼 px단위로 완전히 펼쳐서 고정함
-            const fullHeight = wrapper.scrollHeight;
-            const originalHeight = wrapper.style.height;
-            const originalOverflow = wrapper.style.overflowY;
+            // 1. 현재 화면 크기와 실제 스크롤 길이 추출
+            const origWidth = wrapper.offsetWidth;
+            const fullHeight = board.scrollHeight;
 
-            // 브라우저 렌더링 강제 업데이트
+            // 2. 기존 스타일 백업
+            const backupWrapperWidth = wrapper.style.width;
+            const backupWrapperHeight = wrapper.style.height;
+            const backupBoardOverflow = board.style.overflowY;
+
+            // 3. 캡처를 위해 "절대적인 픽셀 값"으로 콘크리트 타설 (Flexbox 유동성 원천 차단)
+            wrapper.style.width = origWidth + 'px';
             wrapper.style.height = fullHeight + 'px';
-            wrapper.style.overflowY = 'visible';
-            
-            // 딜레이를 주어 이미지 로드 및 레이아웃 재계산 시간 확보
+            board.style.overflowY = 'visible';
+
+            // DOM 렌더링 대기
             setTimeout(() => {
                 html2canvas(wrapper, {
-                    backgroundColor: null, // 투명으로 캡처해 뷰포트 배경이 보이게
-                    scale: 2,
+                    backgroundColor: null,
+                    scale: 2, 
                     useCORS: true,
-                    height: fullHeight, // 캡처 엔진에 명시적 높이 전달 (찌그러짐 방지)
+                    width: origWidth,
+                    height: fullHeight,
+                    windowWidth: origWidth,
                     windowHeight: fullHeight
                 }).then(canvas => {
-                    // 배경 레이어도 합치기 위해 새 캔버스 생성
                     const finalCanvas = document.createElement('canvas');
-                    finalCanvas.width = canvas.width;
-                    finalCanvas.height = canvas.height;
+                    finalCanvas.width = canvas.width; finalCanvas.height = canvas.height;
                     const ctx = finalCanvas.getContext('2d');
-                    
-                    // 1. 설정된 단색 배경 먼저 칠하기
-                    ctx.fillStyle = getComputedStyle(document.body).backgroundColor;
-                    ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
-                    
-                    // 2. 캡처된 UI 덮어쓰기
+                    ctx.fillStyle = "#0a0a0a"; ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
                     ctx.drawImage(canvas, 0, 0);
 
-                    const a = document.createElement('a');
-                    a.href = finalCanvas.toDataURL("image/png");
-                    a.download = `ARCHIVE_ARTBOARD.png`;
-                    a.click();
+                    const a = document.createElement('a'); a.href = finalCanvas.toDataURL("image/png");
+                    a.download = `CHRONICLE_ARCHIVE.png`; a.click();
 
-                    // 원상 복구
-                    wrapper.style.height = originalHeight;
-                    wrapper.style.overflowY = originalOverflow;
+                    // 4. 원상 복구
+                    wrapper.style.width = backupWrapperWidth; wrapper.style.height = backupWrapperHeight; board.style.overflowY = backupBoardOverflow;
                 }).catch(err => {
-                    alert("캡처 중 오류가 발생했습니다.");
-                    wrapper.style.height = originalHeight;
-                    wrapper.style.overflowY = originalOverflow;
+                    alert("렌더링 실패. 데이터가 너무 방대하거나 이미지 용량이 너무 큽니다.");
+                    wrapper.style.width = backupWrapperWidth; wrapper.style.height = backupWrapperHeight; board.style.overflowY = backupBoardOverflow;
                 });
             }, 300);
         }
+
+        /* --- 백업 --- */
+        function exportData() { saveData(); const b = new Blob([JSON.stringify(appData)], {type: 'text/plain'}); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `ARCHIVE_DATA.txt`; a.click(); }
+        function importData(e) { const f = e.target.files[0]; if(!f) return; const r = new FileReader(); r.onload = ev => { appData = JSON.parse(ev.target.result); applyUI(); saveData(); alert("복원 완료!"); }; r.readAsText(f); }
     </script>
 </body>
 </html>
