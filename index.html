@@ -258,9 +258,9 @@
             </div>
             <div style="font-size:12px; line-height:1.8; color:var(--text-pri);">
                 <span style="color:var(--c-sub);">1.</span> 우측 상단의 <b>[HTML 전시관 내보내기]</b> 버튼을 클릭합니다.<br>
-                <span style="color:var(--c-sub);">2.</span> 다운로드된 HTML 파일은 애니메이션이 포함된 감상 전용 파일입니다.<br>
+                <span style="color:var(--c-sub);">2.</span> 다운로드된 HTML 파일은 감상 전용 파일입니다.<br>
                 <span style="color:var(--c-sub);">3.</span> <b>[app.netlify.com/drop]</b> 에 접속하여 파일을 드래그합니다.<br>
-                <span style="color:var(--c-sub);">4.</span> 생성된 링크를 앤오님께 전달하세요!
+                <span style="color:var(--c-sub);">4.</span> 생성된 링크를 통해 서사를 완성하세요!
             </div>
         </div>
     </div>
@@ -552,7 +552,7 @@
             const blob = new Blob([finalHTML], {type: "text/html;charset=utf-8"});
             const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
             a.download = `VIEWER_${appData.pair.title || 'ARCHIVE'}.html`; a.click();
-            captureRestore(); alert("테마 컬러와 애니메이션이 완벽하게 박제된 전시관 HTML이 생성되었습니다!");
+            captureRestore(); alert("전시관 HTML이 생성되었습니다!");
         }
 
         function importData(e) { 
