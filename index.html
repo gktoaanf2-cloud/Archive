@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OC CHRONICLE - LIMIT BREAKER</title>
+    <title>OC CHRONICLE - MEMORY FRAGMENT</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
@@ -21,10 +21,12 @@
 
         body, html { width: 100%; height: 100%; background: var(--c-bg); color: var(--text-pri); overflow: hidden; }
 
+        /* 배경 및 래퍼 */
         .app-wrapper { display: flex; width: 100%; height: 100vh; position: relative; background-color: var(--c-bg); overflow: hidden; }
         .bg-layer { position: absolute; inset: 0; width: 100%; height: 100%; background-size: cover; background-position: center; opacity: 0.3; z-index: 0; pointer-events: none; transition: filter 0.3s ease; }
         .bg-grid { position: absolute; inset: 0; width: 100%; height: 100%; background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 30px 30px; opacity: 0.5; z-index: 1; pointer-events: none; transition: 0.3s; }
         
+        /* 캐릭터 기둥 */
         .char-pillar { width: 320px; height: 100%; flex-shrink: 0; position: relative; z-index: 10; border-right: 1px solid var(--line); cursor: pointer; background: #000; }
         .char-pillar.right { border-right: none; border-left: 1px solid var(--line); }
         .pillar-img { position: absolute; inset: 0; width: 100%; height: 100%; background-size: cover; background-position: center; filter: grayscale(40%); transition: 0.5s; z-index: 1; }
@@ -32,11 +34,13 @@
         .char-overlay { position: absolute; bottom: 0; left: 0; width: 100%; padding: 150px 30px 40px; background: linear-gradient(to top, rgba(10,11,13,1) 0%, rgba(10,11,13,0.7) 40%, transparent 100%); display: flex; flex-direction: column; gap: 8px; z-index: 2; pointer-events: auto; }
         .char-input { background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-pri); font-family: inherit; transition: 0.3s; padding-bottom: 5px; }
         .char-input:focus { border-bottom-color: var(--c-main); }
-        .char-name { font-size: 24px; font-weight: 900; letter-spacing: 0.15em; color: var(--c-main); text-transform: uppercase;}
+        .char-name { font-size: 24px; font-weight: 900; letter-spacing: 0.15em; color: var(--c-main); }
         .char-bio { font-size: 11px; line-height: 1.8; color: var(--text-mut); resize: none; height: 90px; }
 
+        /* 중앙 보드 */
         .center-board { flex: 1; height: 100%; position: relative; z-index: 5; display: flex; flex-direction: column; background: radial-gradient(circle at center, transparent 0%, rgba(10,11,13,0.8) 100%); overflow-y: auto; overflow-x: hidden; }
         
+        /* HUD 제어창 */
         .hud-panel { position: sticky; top: 0; width: 100%; z-index: 100; padding: 20px 40px; background: linear-gradient(to bottom, rgba(10,11,13,0.95) 0%, transparent 100%); }
         .hud-top { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); padding-bottom: 15px; }
         .sys-title { font-size: 12px; font-weight: 900; letter-spacing: 0.4em; color: var(--text-mut); }
@@ -52,11 +56,11 @@
         input[type="color"] { width: 16px; height: 16px; border: none; cursor: pointer; background: transparent; padding:0; }
         input[type="color"]::-webkit-color-swatch { border: 1px solid var(--line); border-radius: 2px; }
 
+        /* 페어 헤더 */
         .pair-header { width: 100%; padding: 80px 40px 40px; display: flex; flex-direction: column; align-items: center; text-align: center; border-bottom: 1px solid var(--line); position: relative; z-index: 10; }
         .pair-input { background: transparent; border: none; text-align: center; font-family: inherit; color: var(--c-main); transition: 0.3s; width: 100%; }
         .pair-input:focus { border-bottom: 1px solid var(--c-main); background: rgba(255,255,255,0.02); }
         .pair-input::placeholder { color: var(--text-mut); opacity: 0.5; }
-        
         .ph-title { font-size: 52px; font-weight: 900; letter-spacing: 0.15em; margin-bottom: 10px; text-transform: uppercase; }
         .ph-sub { font-size: 14px; font-weight: 300; letter-spacing: 0.4em; color: var(--text-pri); margin-bottom: 30px; }
         
@@ -65,57 +69,71 @@
         .ph-date-input::-webkit-calendar-picker-indicator { filter: invert(1); opacity: 0.5; cursor: pointer; }
         .ph-dday-text { font-size: 16px; font-weight: 800; color: var(--c-sub); letter-spacing: 0.1em; }
 
+        /* 타임라인 레이아웃 (왼쪽에서 오른쪽 흐름 고정) */
         .timeline-container { padding: 40px 60px 100px; display: flex; flex-direction: column; flex: 1; }
-        .timeline-row { display: flex; align-items: flex-start; gap: 40px; padding: 40px 0; position: relative; width: 100%; }
-        .timeline-row:nth-child(even) { flex-direction: row-reverse; }
+        .timeline-row { display: flex; align-items: flex-start; justify-content: flex-start; gap: 40px; padding: 40px 0; position: relative; width: 100%; }
+        .timeline-row:nth-child(even) { flex-direction: row-reverse; } /* S자 곡선 유지, 홀수줄은 왼쪽부터 */
         .timeline-row::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: var(--line); z-index: 0; }
 
+        /* 서사 카드 */
         .story-card {
             width: calc(33.333% - 26px); background: var(--panel);
             border: 1px solid var(--line); border-top: 1px solid var(--c-main);
             padding: 30px 25px; position: relative; z-index: 2; transition: 0.3s ease; height: auto; 
-            backdrop-filter: blur(10px); /* 캡처 시 제거할 클래스 */
+            backdrop-filter: blur(10px);
         }
         .story-card::before { content: ''; position: absolute; top: -5px; left: 50%; transform: translateX(-50%) rotate(45deg); width: 8px; height: 8px; background: var(--c-bg); border: 1px solid var(--c-main); }
-        .story-card:hover { border-color: var(--c-main); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .story-card:hover { border-color: var(--c-main); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 10; }
         
         .card-no { position: absolute; top: -12px; left: 15px; background: var(--c-bg); border: 1px solid var(--c-main); color: var(--c-main); font-size: 9px; padding: 2px 6px; font-weight: 800; letter-spacing: 0.1em; }
         .card-date { font-size: 9px; font-weight: 700; color: var(--c-sub); letter-spacing: 0.2em; margin-top: 5px; margin-bottom: 12px; }
         .card-title { font-size: 16px; font-weight: 800; line-height: 1.4; margin-bottom: 15px; color: var(--text-pri); }
         
-        .card-img-box { width: 100%; max-height: 90px; margin-bottom: 15px; border: 1px solid var(--line); background-size: cover; background-position: center; border-radius: 4px; filter: grayscale(15%); transition: 0.3s; }
-        .story-card:hover .card-img-box { filter: grayscale(0%); max-height: 120px; }
+        /* [신규 기믹] 메모지 스타일 플로팅 이미지 */
+        .card-img-memo { 
+            position: absolute; top: -15px; right: -15px; 
+            width: 70px; height: 70px; 
+            border: 1px solid var(--line); border-top: 8px solid rgba(255,255,255,0.05); /* 마스킹 테이프 효과 */
+            background-color: var(--c-bg); background-size: cover; background-position: center; 
+            box-shadow: 2px 5px 15px rgba(0,0,0,0.8); 
+            transform: rotate(5deg); z-index: 5; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            filter: grayscale(20%);
+        }
+        .story-card:hover .card-img-memo { transform: rotate(0deg) scale(2) translate(-10px, 10px); z-index: 20; filter: grayscale(0%); border-top-color: var(--c-main); }
         
         .card-desc { font-size: 12px; line-height: 1.9; color: var(--text-mut); white-space: pre-wrap; word-break: keep-all; }
-        .del-btn { position: absolute; top: 15px; right: 15px; background: none; border: none; color: #ff5555; font-size: 9px; cursor: pointer; opacity: 0; letter-spacing: 0.1em; }
-        .story-card:hover .del-btn { opacity: 1; }
+        
+        /* 삭제 버튼은 왼쪽 아래로 이동 */
+        .del-btn { position: absolute; bottom: 15px; right: 15px; background: none; border: none; color: #ff5555; font-size: 9px; cursor: pointer; opacity: 0; letter-spacing: 0.1em; transition: 0.2s;}
+        .story-card:hover .del-btn { opacity: 0.5; }
+        .del-btn:hover { opacity: 1 !important; text-decoration: underline; }
 
-        /* [수정] 챕터 디자인 개편 (마름모 1/3 사이즈로 축소 및 위치 조정) */
+        /* [수정] 챕터 디자인 컴팩트화 (3분의 1 사이즈) */
         .chapter-divider {
             width: 100%; display: flex; align-items: center; justify-content: center;
-            margin: 80px 0; position: relative; z-index: 5; height: 120px;
+            margin: 50px 0; position: relative; z-index: 5; height: 80px;
         }
-        .chapter-divider::before { content: ''; position: absolute; top: -60px; bottom: -60px; width: 1px; background: linear-gradient(to bottom, transparent, var(--c-sub), transparent); z-index: 0; }
+        .chapter-divider::before { content: ''; position: absolute; top: -30px; bottom: -30px; width: 1px; background: linear-gradient(to bottom, transparent, var(--c-sub), transparent); z-index: 0; }
         
-        /* 마름모를 60px(기존의 1/3 크기)로 대폭 축소 */
+        /* 마름모 초압축 (40px) */
         .chapter-rhombus-bg {
-            position: absolute; width: 60px; height: 60px;
+            position: absolute; width: 40px; height: 40px;
             border: 1px solid var(--line); transform: rotate(45deg);
-            background: var(--c-bg); 
-            display: flex; align-items: center; justify-content: center; z-index: 1;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+            background: var(--c-bg); display: flex; align-items: center; justify-content: center; z-index: 1;
         }
-        .chapter-rhombus-bg::after { content: ''; position: absolute; width: 45px; height: 45px; border: 1px solid rgba(209,189,160,0.1); }
+        .chapter-rhombus-bg::after { content: ''; position: absolute; width: 28px; height: 28px; border: 1px solid rgba(209,189,160,0.2); }
 
+        /* 챕터 폰트 축소 및 핏 조정 */
         .chapter-text-content {
             position: relative; z-index: 2; text-align: center; display: flex; flex-direction: column; align-items: center;
         }
-        .chapter-num-display { font-size: 11px; font-weight: 800; letter-spacing: 0.5em; color: var(--c-main); margin-bottom: 4px; text-transform: uppercase; }
-        .chapter-title-display { font-size: 22px; font-weight: 900; color: #fff; margin-bottom: 3px; letter-spacing: 0.1em; text-shadow: 0 0 10px rgba(0,0,0,0.8); }
-        .chapter-sub-display { font-size: 10px; color: var(--c-sub); letter-spacing: 0.2em; margin-bottom: 5px; }
+        .chapter-num-display { font-size: 9px; font-weight: 800; letter-spacing: 0.3em; color: var(--c-main); margin-bottom: 2px; text-transform: uppercase; }
+        .chapter-title-display { font-size: 16px; font-weight: 900; color: #fff; margin-bottom: 2px; letter-spacing: 0.05em; text-shadow: 0 0 10px rgba(0,0,0,0.8); }
+        .chapter-sub-display { font-size: 9px; color: var(--c-sub); letter-spacing: 0.2em; margin-bottom: 2px; }
         .chapter-del { font-size: 9px; color: #ff5555; cursor: pointer; background: none; border: none; letter-spacing: 0.1em; opacity: 0.3; transition: 0.2s; }
         .chapter-text-content:hover .chapter-del { opacity: 1; }
 
+        /* 모달창 */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 999; display: none; justify-content: center; align-items: center; }
         .editor-box { width: 380px; background: #0a0b0d; border: 1px solid var(--line); border-top: 2px solid var(--c-main); padding: 30px; display: flex; flex-direction: column; gap: 15px; }
         .editor-tabs { display: flex; gap: 15px; border-bottom: 1px solid var(--line); padding-bottom: 10px; margin-bottom: 10px; }
@@ -126,10 +144,10 @@
         #form-story, #form-chapter { display: flex; flex-direction: column; gap: 12px; }
         #form-chapter { display: none; }
 
-        /* 캡처 시 과부하를 막기 위해 일시적으로 적용될 클래스 */
+        /* 캡처 안전 모드 */
         .capture-mode .story-card { backdrop-filter: none !important; }
         .capture-mode .pillar-img { filter: grayscale(0%) !important; }
-        .capture-mode .card-img-box { filter: grayscale(0%) !important; }
+        .capture-mode .card-img-memo { transform: rotate(0deg) scale(1) translate(0,0) !important; filter: grayscale(0%) !important; border-top-color: var(--c-main) !important;}
 
     </style>
 </head>
@@ -151,7 +169,7 @@
         <main class="center-board" id="scroll-board">
             <div class="hud-panel" data-html2canvas-ignore="true">
                 <div class="hud-top">
-                    <div class="sys-title">SYSTEM_READY</div>
+                    <div class="sys-title">CHRONICLE_READY</div>
                     <div style="display:flex; gap: 10px;">
                         <button class="btn btn-sub" onclick="document.getElementById('settings-bar').classList.toggle('active')">⚙️ SETTING</button>
                         <button class="btn" onclick="openModal('chapter')">+ 챕터 분기</button>
@@ -213,10 +231,10 @@
                 <input type="text" id="evDate" class="editor-input" placeholder="DATE (예: 2026.05.27)">
                 <input type="text" id="evTitle" class="editor-input" placeholder="서사 제목">
                 <label class="btn" style="text-align:center; background:rgba(255,255,255,0.02); border-color:var(--line);">
-                    + 썸네일 첨부 (자동 압축)
+                    + 이미지 첨부 (메모지로 부착됨)
                     <input type="file" hidden accept="image/*" onchange="setTempImg(event)">
                 </label>
-                <div id="evPreview" class="card-img-box" style="display:none; height:80px; margin:0;"></div>
+                <div id="evPreview" style="display:none; height:80px; background-size:cover; background-position:center; border:1px solid var(--line);"></div>
                 <textarea id="evContent" class="editor-input" style="height:120px; resize:none;" placeholder="서사 내용 작성..."></textarea>
                 <button class="btn" style="background:var(--c-main); color:#000;" onclick="addItem('story')">저장</button>
             </div>
@@ -261,7 +279,7 @@
         }
 
         window.onload = () => {
-            const saved = localStorage.getItem('oc_archive_v8');
+            const saved = localStorage.getItem('oc_archive_v9');
             if(saved) { 
                 const parsed = JSON.parse(saved);
                 appData = { ...appData, ...parsed }; 
@@ -271,64 +289,37 @@
         };
 
         function applyUI() {
-            document.getElementById('pair-title').value = appData.pair.title;
-            document.getElementById('pair-sub').value = appData.pair.sub;
-            document.getElementById('pair-date').value = appData.pair.date;
-            calcDday();
-
+            document.getElementById('pair-title').value = appData.pair.title; document.getElementById('pair-sub').value = appData.pair.sub; document.getElementById('pair-date').value = appData.pair.date; calcDday();
             document.getElementById('c1-name').value = appData.c1.name; document.getElementById('c1-bio').value = appData.c1.bio;
             if(appData.c1.img) document.getElementById('char1-img').style.backgroundImage = `url(${appData.c1.img})`;
-            
             document.getElementById('c2-name').value = appData.c2.name; document.getElementById('c2-bio').value = appData.c2.bio;
             if(appData.c2.img) document.getElementById('char2-img').style.backgroundImage = `url(${appData.c2.img})`;
-
             document.getElementById('theme-main').value = appData.theme.main; document.getElementById('theme-sub').value = appData.theme.sub;
             updateColors();
-
             if(appData.bg.img) document.getElementById('bg-canvas').style.backgroundImage = `url(${appData.bg.img})`;
             document.getElementById('bg-opacity').value = appData.bg.opacity; document.getElementById('bg-blur').value = appData.bg.blur;
             updateBgStyle();
-            
-            applySettingsUI();
-            renderTimeline();
+            applySettingsUI(); renderTimeline();
         }
 
         function saveData() {
-            appData.pair.title = document.getElementById('pair-title').value;
-            appData.pair.sub = document.getElementById('pair-sub').value;
-            appData.pair.date = document.getElementById('pair-date').value;
-
+            appData.pair.title = document.getElementById('pair-title').value; appData.pair.sub = document.getElementById('pair-sub').value; appData.pair.date = document.getElementById('pair-date').value;
             appData.c1.name = document.getElementById('c1-name').value; appData.c1.bio = document.getElementById('c1-bio').value;
             appData.c2.name = document.getElementById('c2-name').value; appData.c2.bio = document.getElementById('c2-bio').value;
             appData.theme.main = document.getElementById('theme-main').value; appData.theme.sub = document.getElementById('theme-sub').value;
             appData.bg.opacity = document.getElementById('bg-opacity').value; appData.bg.blur = document.getElementById('bg-blur').value;
-            try { localStorage.setItem('oc_archive_v8', JSON.stringify(appData)); } catch(e) {}
+            try { localStorage.setItem('oc_archive_v9', JSON.stringify(appData)); } catch(e) {}
         }
 
         function calcDday() {
-            const dateStr = document.getElementById('pair-date').value;
-            const res = document.getElementById('dday-result');
+            const dateStr = document.getElementById('pair-date').value; const res = document.getElementById('dday-result');
             if(!dateStr) { res.innerText = "D-DAY"; return; }
-            
-            const start = new Date(dateStr);
-            const today = new Date();
-            const diffTime = today - start;
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            
-            if(diffDays > 0) res.innerText = `D+${diffDays}`;
-            else if(diffDays < 0) res.innerText = `D${diffDays}`;
-            else res.innerText = `D-DAY`;
+            const start = new Date(dateStr); const today = new Date(); const diffTime = today - start; const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            if(diffDays > 0) res.innerText = `D+${diffDays}`; else if(diffDays < 0) res.innerText = `D${diffDays}`; else res.innerText = `D-DAY`;
         }
 
-        function updateColors() {
-            const m = document.getElementById('theme-main').value; const s = document.getElementById('theme-sub').value;
-            document.documentElement.style.setProperty('--c-main', m); document.documentElement.style.setProperty('--c-sub', s);
-            document.documentElement.style.setProperty('--line', m + '25'); saveData();
-        }
-        function updateBgStyle() {
-            document.getElementById('bg-canvas').style.opacity = document.getElementById('bg-opacity').value / 10;
-            document.getElementById('bg-canvas').style.filter = `blur(${document.getElementById('bg-blur').value}px)`; saveData();
-        }
+        function updateColors() { const m = document.getElementById('theme-main').value; const s = document.getElementById('theme-sub').value; document.documentElement.style.setProperty('--c-main', m); document.documentElement.style.setProperty('--c-sub', s); document.documentElement.style.setProperty('--line', m + '25'); saveData(); }
+        function updateBgStyle() { document.getElementById('bg-canvas').style.opacity = document.getElementById('bg-opacity').value / 10; document.getElementById('bg-canvas').style.filter = `blur(${document.getElementById('bg-blur').value}px)`; saveData(); }
         function handleBgUpload(e) { if(e.target.files[0]) { compressImage(e.target.files[0], (compressedData) => { appData.bg.img = compressedData; document.getElementById('bg-canvas').style.backgroundImage = `url(${appData.bg.img})`; saveData(); }); } }
         function handleImgUpload(e, imgId, key) { if(e.target.files[0]) { compressImage(e.target.files[0], (compressedData) => { appData[key].img = compressedData; document.getElementById(imgId).style.backgroundImage = `url(${appData[key].img})`; saveData(); }); } }
 
@@ -336,26 +327,16 @@
         function toggleNumStyle() { appData.settings.numStyle = appData.settings.numStyle === 'arabic' ? 'roman' : 'arabic'; applySettingsUI(); saveData(); renderTimeline(); }
         function applySettingsUI() {
             const gridEl = document.getElementById('bg-grid'); const gridBtn = document.getElementById('grid-toggle-btn');
-            if(appData.settings.grid) { gridEl.style.display = 'block'; gridBtn.innerText = '격자 [ON]'; gridBtn.classList.add('btn-active'); } 
-            else { gridEl.style.display = 'none'; gridBtn.innerText = '격자 [OFF]'; gridBtn.classList.remove('btn-active'); }
-            
-            const numBtn = document.getElementById('num-style-btn');
-            numBtn.innerText = appData.settings.numStyle === 'arabic' ? '챕터 [01]' : '챕터 [ I ]';
+            if(appData.settings.grid) { gridEl.style.display = 'block'; gridBtn.innerText = '격자 [ON]'; gridBtn.classList.add('btn-active'); } else { gridEl.style.display = 'none'; gridBtn.innerText = '격자 [OFF]'; gridBtn.classList.remove('btn-active'); }
+            const numBtn = document.getElementById('num-style-btn'); numBtn.innerText = appData.settings.numStyle === 'arabic' ? '챕터 [01]' : '챕터 [ I ]';
             if(appData.settings.numStyle === 'roman') numBtn.classList.add('btn-active'); else numBtn.classList.remove('btn-active');
         }
 
-        function toRoman(num) {
-            const roman = {M:1000, CM:900, D:500, CD:400, C:100, XC:90, L:50, XL:40, X:10, IX:9, V:5, IV:4, I:1};
-            let str = ''; for (let i of Object.keys(roman)) { let q = Math.floor(num / roman[i]); num -= q * roman[i]; str += i.repeat(q); }
-            return str;
-        }
+        function toRoman(num) { const roman = {M:1000, CM:900, D:500, CD:400, C:100, XC:90, L:50, XL:40, X:10, IX:9, V:5, IV:4, I:1}; let str = ''; for (let i of Object.keys(roman)) { let q = Math.floor(num / roman[i]); num -= q * roman[i]; str += i.repeat(q); } return str; }
 
         function openModal(type) { document.getElementById('editor-modal').style.display = 'flex'; switchTab(type); }
         function closeModal() { document.getElementById('editor-modal').style.display = 'none'; }
-        function switchTab(type) {
-            document.getElementById('tab-story').classList.toggle('active', type === 'story'); document.getElementById('tab-chapter').classList.toggle('active', type === 'chapter');
-            document.getElementById('form-story').style.display = type === 'story' ? 'flex' : 'none'; document.getElementById('form-chapter').style.display = type === 'chapter' ? 'flex' : 'none';
-        }
+        function switchTab(type) { document.getElementById('tab-story').classList.toggle('active', type === 'story'); document.getElementById('tab-chapter').classList.toggle('active', type === 'chapter'); document.getElementById('form-story').style.display = type === 'story' ? 'flex' : 'none'; document.getElementById('form-chapter').style.display = type === 'chapter' ? 'flex' : 'none'; }
         function setTempImg(e) { if(e.target.files[0]) { compressImage(e.target.files[0], (compressedData) => { tempImg = compressedData; const preview = document.getElementById('evPreview'); preview.style.backgroundImage = `url(${tempImg})`; preview.style.display = 'block'; }); } }
 
         function addItem(type) {
@@ -370,9 +351,9 @@
             }
             closeModal(); saveData(); renderTimeline();
         }
-
         function deleteItem(id) { appData.timeline = appData.timeline.filter(i => i.id !== id); saveData(); renderTimeline(); }
 
+        /* [수정] 메모지 기믹 및 정렬 흐름 강제 반영 */
         function renderTimeline() {
             const box = document.getElementById('timeline-box'); box.innerHTML = '';
             let currentRowItems = []; let rowCount = 0; let storyCounter = 1; let chapterCounter = 1;
@@ -383,17 +364,18 @@
                 if (rowCount % 2 !== 0) rowEl.style.flexDirection = 'row-reverse';
                 
                 currentRowItems.forEach(item => {
-                    const imgHTML = item.img ? `<div class="card-img-box" style="background-image: url(${item.img})"></div>` : '';
+                    /* [수정] 이미지를 카드 모서리에 붙은 메모지처럼 빼냄 */
+                    const imgHTML = item.img ? `<div class="card-img-memo" style="background-image: url(${item.img})"></div>` : '';
                     const formattedNum = storyCounter.toString().padStart(2, '0');
                     
                     rowEl.innerHTML += `
                         <div class="story-card">
                             <div class="card-no">No.${formattedNum}</div>
-                            <button class="del-btn" data-html2canvas-ignore="true" onclick="deleteItem(${item.id})">삭제</button>
+                            ${imgHTML}
                             <div class="card-date">${item.date}</div>
                             <div class="card-title">${item.title}</div>
-                            ${imgHTML}
                             <div class="card-desc">${item.content}</div>
+                            <button class="del-btn" data-html2canvas-ignore="true" onclick="deleteItem(${item.id})">삭제</button>
                         </div>
                     `;
                     storyCounter++;
@@ -405,7 +387,6 @@
                 if (item.type === 'chapter') {
                     flushRow();
                     const chNumFormat = appData.settings.numStyle === 'arabic' ? `CHAPTER ${chapterCounter.toString().padStart(2, '0')}` : `CHAPTER ${toRoman(chapterCounter)}`;
-                    
                     box.innerHTML += `
                         <div class="chapter-divider">
                             <div class="chapter-rhombus-bg"></div>
@@ -424,37 +405,26 @@
                 }
             });
             flushRow();
-            
             const sb = document.getElementById('scroll-board'); sb.scrollTo({ top: sb.scrollHeight, behavior: 'smooth' });
         }
 
-        /* [최종 수정] 메모리 폭파 100% 억제 엔진 */
+        /* 렌더링 엔진 안정화 모드 */
         function exportImage() {
-            const wrapper = document.getElementById('capture-area');
-            const board = document.getElementById('scroll-board');
-            
+            const wrapper = document.getElementById('capture-area'); const board = document.getElementById('scroll-board');
             const w = wrapper.offsetWidth; const h = board.scrollHeight;
             const backupW = wrapper.style.width; const backupH = wrapper.style.height; const backupOverflow = board.style.overflowY;
-
             wrapper.style.width = w + 'px'; wrapper.style.height = h + 'px'; board.style.overflowY = 'visible';
-
-            // 캡처 전, 메모리를 갉아먹는 블러(backdrop-filter)와 그레이스케일(filter)을 전부 꺼버림
             wrapper.classList.add('capture-mode');
 
             setTimeout(() => {
-                // scale: 1 강제 고정으로 거대한 캔버스 렌더링 한계점 방어
                 html2canvas(wrapper, { backgroundColor: "#0a0b0d", scale: 1, useCORS: true, width: w, height: h, windowWidth: w, windowHeight: h, logging: false })
                 .then(canvas => {
                     const a = document.createElement('a'); a.href = canvas.toDataURL("image/jpeg", 0.9);
                     a.download = `CHRONICLE_${document.getElementById('pair-title').value || 'ARCHIVE'}.jpg`; a.click();
-                    
-                    // 캡처 완료 후 복구
-                    wrapper.style.width = backupW; wrapper.style.height = backupH; board.style.overflowY = backupOverflow;
-                    wrapper.classList.remove('capture-mode');
+                    wrapper.style.width = backupW; wrapper.style.height = backupH; board.style.overflowY = backupOverflow; wrapper.classList.remove('capture-mode');
                 }).catch(err => {
-                    alert("정말 엄청난 분량의 서사군요! 브라우저의 이미지 저장 한계를 초과했습니다.\n[크롬 확장프로그램인 'GoFullPage'를 설치하여 캡처하시는 것을 강력히 권장합니다!]");
-                    wrapper.style.width = backupW; wrapper.style.height = backupH; board.style.overflowY = backupOverflow;
-                    wrapper.classList.remove('capture-mode');
+                    alert("렌더링 실패. 데이터 한계 초과입니다. 크롬 확장프로그램 [GoFullPage] 캡처를 권장합니다.");
+                    wrapper.style.width = backupW; wrapper.style.height = backupH; board.style.overflowY = backupOverflow; wrapper.classList.remove('capture-mode');
                 });
             }, 300);
         }
