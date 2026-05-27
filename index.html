@@ -18,7 +18,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dom-to-image-more@3.3.0/dist/dom-to-image-more.min.js"></script>
 
 </head>
 
@@ -33,9 +33,9 @@
     id="bgImage"
   ></div>
 
-  <div class="grid"></div>
+  <div class="bg-noise"></div>
 
-  <div class="noise"></div>
+  <div class="bg-line"></div>
 
 </div>
 
@@ -43,259 +43,119 @@
 
 <div class="app">
 
-  <!-- SIDE -->
+  <!-- TOP BAR -->
 
-  <aside class="sidebar">
+  <div class="topbar">
 
-    <div class="sidebar-inner">
+    <div class="top-left">
 
-      <div class="logo-box">
+      <input
+        id="pairName"
+        class="pair-input"
+        placeholder="PAIR NAME"
+      />
 
-        <div class="logo-circle"></div>
+      <input
+        id="pairTag"
+        class="tag-input"
+        placeholder="relationship keyword"
+      />
 
-        <div>
+    </div>
 
-          <div class="tiny-label">
-            PAIR ARCHIVE
-          </div>
+    <div class="top-right">
 
-          <div class="logo-title">
-            Narrative
-          </div>
+      <button
+        class="minimal-btn"
+        onclick="addChapter()"
+      >
+        CHAPTER
+      </button>
 
-        </div>
+      <button
+        class="minimal-btn"
+        onclick="addTimeline()"
+      >
+        EPISODE
+      </button>
 
-      </div>
+      <button
+        class="minimal-btn"
+        onclick="exportPNG()"
+      >
+        PNG
+      </button>
 
-      <!-- PROJECT -->
+      <button
+        class="minimal-btn"
+        onclick="saveProject()"
+      >
+        SAVE
+      </button>
 
-      <div class="block">
+    </div>
 
-        <div class="block-title">
-          PROJECT
-        </div>
+  </div>
 
-        <input
-          id="projectName"
-          placeholder="프로젝트"
-        />
+  <!-- BOARD -->
 
-        <button
-          class="line-btn"
-          onclick="saveProject()"
-        >
-          SAVE
-        </button>
+  <div
+    class="board"
+    id="exportBoard"
+  >
 
-        <select
-          id="projectSelect"
-          onchange="loadProject(this.value)"
-        ></select>
+    <!-- CHARACTER A -->
 
-      </div>
+    <aside class="character-side">
 
-      <!-- PAIR -->
+      <div class="character-panel">
 
-      <div class="block">
-
-        <div class="block-title">
-          PAIR
-        </div>
-
-        <input
-          id="pairName"
-          placeholder="페어명"
-        />
-
-        <input
-          id="pairTag"
-          placeholder="관계 키워드"
-        />
-
-      </div>
-
-      <!-- CHAR -->
-
-      <div class="block profile-block">
-
-        <div class="profile-top">
-
-          <div
-            class="profile"
-            id="profileA"
-          ></div>
-
-          <div class="profile-info">
-
-            <div class="profile-name">
-              Character A
-            </div>
-
-            <input
-              type="file"
-              accept="image/*"
-              onchange="uploadCharacter(event, 'A')"
-            />
-
-          </div>
-
-        </div>
-
-        <input
-          id="charAName"
-          placeholder="이름"
-        />
-
-        <textarea
-          id="charABio"
-          placeholder="소개"
-        ></textarea>
-
-      </div>
-
-      <div class="block profile-block">
-
-        <div class="profile-top">
-
-          <div
-            class="profile"
-            id="profileB"
-          ></div>
-
-          <div class="profile-info">
-
-            <div class="profile-name">
-              Character B
-            </div>
-
-            <input
-              type="file"
-              accept="image/*"
-              onchange="uploadCharacter(event, 'B')"
-            />
-
-          </div>
-
-        </div>
-
-        <input
-          id="charBName"
-          placeholder="이름"
-        />
-
-        <textarea
-          id="charBBio"
-          placeholder="소개"
-        ></textarea>
-
-      </div>
-
-      <!-- EXPORT -->
-
-      <div class="block">
-
-        <div class="block-title">
-          EXPORT
-        </div>
-
-        <button
-          class="line-btn"
-          onclick="exportPNG()"
-        >
-          PNG EXPORT
-        </button>
-
-        <button
-          class="line-btn"
-          onclick="exportTXT()"
-        >
-          TXT EXPORT
-        </button>
-
-        <input
-          type="file"
-          accept=".txt"
-          onchange="importTXT(event)"
-        />
-
-      </div>
-
-      <!-- THEME -->
-
-      <div class="block">
-
-        <div class="block-title">
-          THEME
-        </div>
-
-        <div class="color-grid">
-
-          <input
-            type="color"
-            value="#91a2ff"
-            onchange="setAccent(this.value)"
-          />
-
-          <input
-            type="color"
-            value="#63ffe9"
-            onchange="setAccent2(this.value)"
-          />
-
-          <input
-            type="color"
-            value="#101726"
-            onchange="setPanel(this.value)"
-          />
-
-        </div>
+        <div
+          class="profile-image"
+          id="profileA"
+        ></div>
 
         <input
           type="file"
           accept="image/*"
-          onchange="changeBG(event)"
+          onchange="uploadCharacter(event, 'A')"
         />
+
+        <input
+          id="charAName"
+          class="character-name"
+          placeholder="Character A"
+        />
+
+        <textarea
+          id="charABio"
+          class="character-bio"
+          placeholder="Character introduction"
+        ></textarea>
 
       </div>
 
-    </div>
+    </aside>
 
-  </aside>
+    <!-- TIMELINE -->
 
-  <!-- MAIN -->
+    <main class="timeline-section">
 
-  <main class="main">
-
-    <!-- EXPORT BOARD -->
-
-    <div
-      class="board"
-      id="exportBoard"
-    >
-
-      <!-- TOP -->
-
-      <div class="board-top">
+      <div class="timeline-header">
 
         <div>
 
-          <div class="tiny-label">
-            STORY TIMELINE
+          <div
+            class="render-pair"
+            id="pairRender"
+          >
+            Pair Name
           </div>
 
-          <h1 class="board-title">
-            Narrative Flow
-          </h1>
-
-        </div>
-
-        <div class="board-meta">
-
-          <div id="pairTitleRender">
-            Pair
-          </div>
-
-          <div id="pairTagRender">
+          <div
+            class="render-tag"
+            id="tagRender"
+          >
             Relationship
           </div>
 
@@ -305,12 +165,12 @@
 
       <!-- RELATION -->
 
-      <div class="relation-panel">
+      <div class="relation-box">
 
         <canvas
           id="relationCanvas"
-          width="1200"
-          height="180"
+          width="900"
+          height="140"
         ></canvas>
 
       </div>
@@ -322,29 +182,76 @@
         id="timeline"
       ></div>
 
+    </main>
+
+    <!-- CHARACTER B -->
+
+    <aside class="character-side">
+
+      <div class="character-panel">
+
+        <div
+          class="profile-image"
+          id="profileB"
+        ></div>
+
+        <input
+          type="file"
+          accept="image/*"
+          onchange="uploadCharacter(event, 'B')"
+        />
+
+        <input
+          id="charBName"
+          class="character-name"
+          placeholder="Character B"
+        />
+
+        <textarea
+          id="charBBio"
+          class="character-bio"
+          placeholder="Character introduction"
+        ></textarea>
+
+      </div>
+
+    </aside>
+
+  </div>
+
+  <!-- SETTINGS -->
+
+  <div class="floating-settings">
+
+    <div class="setting-group">
+
+      <input
+        type="color"
+        value="#91a2ff"
+        onchange="setAccent(this.value)"
+      />
+
+      <input
+        type="color"
+        value="#63ffe9"
+        onchange="setAccent2(this.value)"
+      />
+
+      <input
+        type="color"
+        value="#141824"
+        onchange="setPanel(this.value)"
+      />
+
     </div>
 
-    <!-- FLOAT BUTTON -->
+    <input
+      type="file"
+      accept="image/*"
+      onchange="changeBG(event)"
+    />
 
-    <div class="floating-buttons">
-
-      <button
-        class="circle-btn"
-        onclick="addChapter()"
-      >
-        +
-      </button>
-
-      <button
-        class="circle-btn"
-        onclick="addTimeline()"
-      >
-        ●
-      </button>
-
-    </div>
-
-  </main>
+  </div>
 
 </div>
 
@@ -353,8 +260,6 @@
 let state = JSON.parse(
   localStorage.getItem('pairArchiveData')
 ) || {
-
-  projectName: '',
 
   pairName: '',
 
@@ -371,16 +276,6 @@ let state = JSON.parse(
   timelines: [],
 
   bg: '',
-
-  blur: 0,
-
-  scale: 1,
-
-  rotate: 0,
-
-  posX: 0,
-
-  posY: 0,
 }
 
 const timelineEl =
@@ -395,98 +290,9 @@ function save() {
     'pairArchiveData',
     JSON.stringify(state)
   )
-
-  renderProjectList()
-}
-
-function renderProjectList() {
-
-  const select =
-    document.getElementById('projectSelect')
-
-  select.innerHTML = ''
-
-  const projects =
-    JSON.parse(
-      localStorage.getItem('pairProjects')
-    ) || []
-
-  projects.forEach(project => {
-
-    const option =
-      document.createElement('option')
-
-    option.value =
-      project.projectName
-
-    option.innerText =
-      project.projectName
-
-    select.appendChild(option)
-  })
-}
-
-function saveProject() {
-
-  const projects =
-    JSON.parse(
-      localStorage.getItem('pairProjects')
-    ) || []
-
-  const filtered =
-    projects.filter(
-      p =>
-      p.projectName !==
-      state.projectName
-    )
-
-  filtered.push(state)
-
-  localStorage.setItem(
-    'pairProjects',
-    JSON.stringify(filtered)
-  )
-
-  renderProjectList()
-}
-
-function loadProject(name) {
-
-  const projects =
-    JSON.parse(
-      localStorage.getItem('pairProjects')
-    ) || []
-
-  const found =
-    projects.find(
-      p => p.projectName === name
-    )
-
-  if (!found) return
-
-  state = found
-
-  render()
-}
-
-function applyBG() {
-
-  bgImage.style.backgroundImage =
-    state.bg
-      ? `url(${state.bg})`
-      : 'none'
-
-  bgImage.style.transform = `
-    translate(${state.posX}px, ${state.posY}px)
-    scale(${state.scale})
-    rotate(${state.rotate}deg)
-  `
 }
 
 function render() {
-
-  projectName.value =
-    state.projectName
 
   pairName.value =
     state.pairName
@@ -494,10 +300,10 @@ function render() {
   pairTag.value =
     state.pairTag
 
-  pairTitleRender.innerText =
-    state.pairName || 'Pair'
+  pairRender.innerText =
+    state.pairName || 'Pair Name'
 
-  pairTagRender.innerText =
+  tagRender.innerText =
     state.pairTag || 'Relationship'
 
   charAName.value =
@@ -522,21 +328,24 @@ function render() {
       ? `url(${state.charBImage})`
       : 'none'
 
+  bgImage.style.backgroundImage =
+    state.bg
+      ? `url(${state.bg})`
+      : 'none'
+
   timelineEl.innerHTML = ''
 
   state.timelines.forEach((item, index) => {
 
-    const node =
+    const row =
       document.createElement('div')
 
     if (item.type === 'chapter') {
 
-      node.className =
-        'chapter-row'
+      row.className =
+        'chapter'
 
-      node.innerHTML = `
-
-        <div class="chapter-line"></div>
+      row.innerHTML = `
 
         <input
           class="chapter-input"
@@ -548,10 +357,10 @@ function render() {
 
     } else {
 
-      node.className =
+      row.className =
         'timeline-row'
 
-      node.innerHTML = `
+      row.innerHTML = `
 
         <div class="timeline-left">
 
@@ -565,32 +374,39 @@ function render() {
 
         <div class="timeline-card">
 
-          <div class="timeline-head">
-
-            <input
-              class="timeline-title"
-              placeholder="에피소드 제목"
-              value="${item.title || ''}"
-              onchange="updateTimeline(${index}, 'title', this.value)"
-            >
-
-            <input
-              class="timeline-date-input"
-              placeholder="날짜"
-              value="${item.date || ''}"
-              onchange="updateTimeline(${index}, 'date', this.value)"
-            >
-
-          </div>
+          <input
+            class="timeline-title"
+            placeholder="Episode title"
+            value="${item.title || ''}"
+            onchange="updateTimeline(${index}, 'title', this.value)"
+          >
 
           <textarea
-            class="compact-area"
-            placeholder="서사 입력"
+            class="story-area"
+            placeholder="Narrative"
             oninput="autoResize(this)"
             onchange="updateTimeline(${index}, 'content', this.value)"
           >${item.content || ''}</textarea>
 
+          ${
+            item.image
+            ? `
+              <img
+                src="${item.image}"
+                class="episode-image"
+              >
+            `
+            : ''
+          }
+
           <div class="timeline-bottom">
+
+            <input
+              class="date-input"
+              placeholder="DATE"
+              value="${item.date || ''}"
+              onchange="updateTimeline(${index}, 'date', this.value)"
+            >
 
             <input
               type="range"
@@ -608,25 +424,12 @@ function render() {
 
           </div>
 
-          ${
-            item.image
-            ? `
-              <img
-                src="${item.image}"
-                class="episode-image"
-              >
-            `
-            : ''
-          }
-
         </div>
       `
     }
 
-    timelineEl.appendChild(node)
+    timelineEl.appendChild(row)
   })
-
-  applyBG()
 
   renderGraph()
 
@@ -647,11 +450,11 @@ function addTimeline() {
 
     type: 'episode',
 
-    date: '',
-
     title: '',
 
     content: '',
+
+    date: '',
 
     relation: 50,
 
@@ -751,7 +554,7 @@ function setPanel(color) {
 
   document.documentElement
     .style
-    .setProperty('--panelSolid', color)
+    .setProperty('--panel', color)
 }
 
 function changeBG(event) {
@@ -775,52 +578,6 @@ function changeBG(event) {
   reader.readAsDataURL(file)
 }
 
-function exportTXT() {
-
-  const text =
-    JSON.stringify(state, null, 2)
-
-  const blob =
-    new Blob(
-      [text],
-      {
-        type: 'text/plain'
-      }
-    )
-
-  const a =
-    document.createElement('a')
-
-  a.href =
-    URL.createObjectURL(blob)
-
-  a.download =
-    `${state.projectName || 'pair'}.txt`
-
-  a.click()
-}
-
-function importTXT(event) {
-
-  const file =
-    event.target.files[0]
-
-  if (!file) return
-
-  const reader =
-    new FileReader()
-
-  reader.onload = () => {
-
-    state =
-      JSON.parse(reader.result)
-
-    render()
-  }
-
-  reader.readAsText(file)
-}
-
 async function exportPNG() {
 
   const board =
@@ -828,43 +585,36 @@ async function exportPNG() {
       'exportBoard'
     )
 
-  const clone =
-    board.cloneNode(true)
+  try {
 
-  clone.style.width = '1400px'
+    const dataUrl =
+      await domtoimage.toPng(
+        board,
+        {
+          quality: 1,
+          bgcolor: 'transparent'
+        }
+      )
 
-  clone.style.position = 'absolute'
+    const link =
+      document.createElement('a')
 
-  clone.style.left = '-99999px'
+    link.download =
+      `${state.pairName || 'pair'}.png`
 
-  clone.style.top = '0'
+    link.href =
+      dataUrl
 
-  clone.style.padding = '60px'
+    link.click()
 
-  document.body.appendChild(clone)
+  } catch (err) {
 
-  const canvas =
-    await html2canvas(
-      clone,
-      {
-        backgroundColor: null,
-        scale: 2,
-        useCORS: true,
-      }
+    alert(
+      'PNG export failed.'
     )
 
-  document.body.removeChild(clone)
-
-  const link =
-    document.createElement('a')
-
-  link.download =
-    `${state.projectName || 'pair'}.png`
-
-  link.href =
-    canvas.toDataURL('image/png')
-
-  link.click()
+    console.error(err)
+  }
 }
 
 function renderGraph() {
@@ -899,10 +649,10 @@ function renderGraph() {
   episodes.forEach((item, index) => {
 
     const x =
-      80 + index * 120
+      60 + index * 110
 
     const y =
-      150 - item.relation
+      120 - item.relation
 
     if (index === 0) {
 
@@ -919,10 +669,10 @@ function renderGraph() {
   episodes.forEach((item, index) => {
 
     const x =
-      80 + index * 120
+      60 + index * 110
 
     const y =
-      150 - item.relation
+      120 - item.relation
 
     ctx.beginPath()
 
@@ -941,39 +691,59 @@ function renderGraph() {
   })
 }
 
-projectName.oninput = e => {
-  state.projectName = e.target.value
-  save()
-}
-
 pairName.oninput = e => {
-  state.pairName = e.target.value
-  save()
+
+  state.pairName =
+    e.target.value
+
+  render()
 }
 
 pairTag.oninput = e => {
-  state.pairTag = e.target.value
-  save()
+
+  state.pairTag =
+    e.target.value
+
+  render()
 }
 
 charAName.oninput = e => {
-  state.charAName = e.target.value
+
+  state.charAName =
+    e.target.value
+
   save()
 }
 
 charABio.oninput = e => {
-  state.charABio = e.target.value
+
+  state.charABio =
+    e.target.value
+
   save()
 }
 
 charBName.oninput = e => {
-  state.charBName = e.target.value
+
+  state.charBName =
+    e.target.value
+
   save()
 }
 
 charBBio.oninput = e => {
-  state.charBBio = e.target.value
+
+  state.charBBio =
+    e.target.value
+
   save()
+}
+
+function saveProject() {
+
+  save()
+
+  alert('saved')
 }
 
 new Sortable(
@@ -1001,8 +771,6 @@ new Sortable(
     }
   }
 )
-
-renderProjectList()
 
 render()
 
