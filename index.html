@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OC CHRONICLE - MEMORY FRAGMENT</title>
+    <title>OC CHRONICLE - PERFECT FLOW</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
@@ -21,12 +21,10 @@
 
         body, html { width: 100%; height: 100%; background: var(--c-bg); color: var(--text-pri); overflow: hidden; }
 
-        /* 배경 및 래퍼 */
         .app-wrapper { display: flex; width: 100%; height: 100vh; position: relative; background-color: var(--c-bg); overflow: hidden; }
         .bg-layer { position: absolute; inset: 0; width: 100%; height: 100%; background-size: cover; background-position: center; opacity: 0.3; z-index: 0; pointer-events: none; transition: filter 0.3s ease; }
         .bg-grid { position: absolute; inset: 0; width: 100%; height: 100%; background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 30px 30px; opacity: 0.5; z-index: 1; pointer-events: none; transition: 0.3s; }
         
-        /* 캐릭터 기둥 */
         .char-pillar { width: 320px; height: 100%; flex-shrink: 0; position: relative; z-index: 10; border-right: 1px solid var(--line); cursor: pointer; background: #000; }
         .char-pillar.right { border-right: none; border-left: 1px solid var(--line); }
         .pillar-img { position: absolute; inset: 0; width: 100%; height: 100%; background-size: cover; background-position: center; filter: grayscale(40%); transition: 0.5s; z-index: 1; }
@@ -37,10 +35,8 @@
         .char-name { font-size: 24px; font-weight: 900; letter-spacing: 0.15em; color: var(--c-main); }
         .char-bio { font-size: 11px; line-height: 1.8; color: var(--text-mut); resize: none; height: 90px; }
 
-        /* 중앙 보드 */
         .center-board { flex: 1; height: 100%; position: relative; z-index: 5; display: flex; flex-direction: column; background: radial-gradient(circle at center, transparent 0%, rgba(10,11,13,0.8) 100%); overflow-y: auto; overflow-x: hidden; }
         
-        /* HUD 제어창 */
         .hud-panel { position: sticky; top: 0; width: 100%; z-index: 100; padding: 20px 40px; background: linear-gradient(to bottom, rgba(10,11,13,0.95) 0%, transparent 100%); }
         .hud-top { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); padding-bottom: 15px; }
         .sys-title { font-size: 12px; font-weight: 900; letter-spacing: 0.4em; color: var(--text-mut); }
@@ -56,26 +52,32 @@
         input[type="color"] { width: 16px; height: 16px; border: none; cursor: pointer; background: transparent; padding:0; }
         input[type="color"]::-webkit-color-swatch { border: 1px solid var(--line); border-radius: 2px; }
 
-        /* 페어 헤더 */
         .pair-header { width: 100%; padding: 80px 40px 40px; display: flex; flex-direction: column; align-items: center; text-align: center; border-bottom: 1px solid var(--line); position: relative; z-index: 10; }
         .pair-input { background: transparent; border: none; text-align: center; font-family: inherit; color: var(--c-main); transition: 0.3s; width: 100%; }
         .pair-input:focus { border-bottom: 1px solid var(--c-main); background: rgba(255,255,255,0.02); }
         .pair-input::placeholder { color: var(--text-mut); opacity: 0.5; }
         .ph-title { font-size: 52px; font-weight: 900; letter-spacing: 0.15em; margin-bottom: 10px; text-transform: uppercase; }
         .ph-sub { font-size: 14px; font-weight: 300; letter-spacing: 0.4em; color: var(--text-pri); margin-bottom: 30px; }
-        
         .ph-dday-wrap { display: flex; align-items: center; justify-content: center; gap: 15px; padding: 10px 30px; border: 1px solid var(--line); border-radius: 50px; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); }
         .ph-date-input { background: transparent; border: none; color: var(--text-mut); font-family: inherit; font-size: 11px; cursor: pointer; letter-spacing: 0.1em; }
         .ph-date-input::-webkit-calendar-picker-indicator { filter: invert(1); opacity: 0.5; cursor: pointer; }
         .ph-dday-text { font-size: 16px; font-weight: 800; color: var(--c-sub); letter-spacing: 0.1em; }
 
-        /* 타임라인 레이아웃 (왼쪽에서 오른쪽 흐름 고정) */
+        /* [핵심 수정] 타임라인 S자 로직 (CSS 자동계산 멸망, JS 클래스로 100% 강제 통제) */
         .timeline-container { padding: 40px 60px 100px; display: flex; flex-direction: column; flex: 1; }
-        .timeline-row { display: flex; align-items: flex-start; justify-content: flex-start; gap: 40px; padding: 40px 0; position: relative; width: 100%; }
-        .timeline-row:nth-child(even) { flex-direction: row-reverse; } /* S자 곡선 유지, 홀수줄은 왼쪽부터 */
+        .timeline-row { display: flex; align-items: flex-start; gap: 40px; padding: 40px 0; position: relative; width: 100%; }
         .timeline-row::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: var(--line); z-index: 0; }
+        
+        /* 1열 (왼쪽 시작 강제) */
+        .row-normal { flex-direction: row; justify-content: flex-start; }
+        /* 2열 (오른쪽 시작 강제) */
+        .row-reverse { flex-direction: row-reverse; justify-content: flex-start; }
+        
+        /* 연결 커브선 */
+        .has-curve::after { content: ''; position: absolute; top: 50%; width: 50px; height: 100%; border: 1px solid var(--c-sub); z-index: 0; }
+        .row-normal.has-curve::after { right: -25px; border-left: none; border-radius: 0 40px 40px 0; }
+        .row-reverse.has-curve::after { left: -25px; border-right: none; border-radius: 40px 0 0 40px; }
 
-        /* 서사 카드 */
         .story-card {
             width: calc(33.333% - 26px); background: var(--panel);
             border: 1px solid var(--line); border-top: 1px solid var(--c-main);
@@ -89,11 +91,11 @@
         .card-date { font-size: 9px; font-weight: 700; color: var(--c-sub); letter-spacing: 0.2em; margin-top: 5px; margin-bottom: 12px; }
         .card-title { font-size: 16px; font-weight: 800; line-height: 1.4; margin-bottom: 15px; color: var(--text-pri); }
         
-        /* [신규 기믹] 메모지 스타일 플로팅 이미지 */
+        /* 플로팅 메모지 이미지 */
         .card-img-memo { 
             position: absolute; top: -15px; right: -15px; 
             width: 70px; height: 70px; 
-            border: 1px solid var(--line); border-top: 8px solid rgba(255,255,255,0.05); /* 마스킹 테이프 효과 */
+            border: 1px solid var(--line); border-top: 8px solid rgba(255,255,255,0.05);
             background-color: var(--c-bg); background-size: cover; background-position: center; 
             box-shadow: 2px 5px 15px rgba(0,0,0,0.8); 
             transform: rotate(5deg); z-index: 5; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
@@ -102,38 +104,22 @@
         .story-card:hover .card-img-memo { transform: rotate(0deg) scale(2) translate(-10px, 10px); z-index: 20; filter: grayscale(0%); border-top-color: var(--c-main); }
         
         .card-desc { font-size: 12px; line-height: 1.9; color: var(--text-mut); white-space: pre-wrap; word-break: keep-all; }
-        
-        /* 삭제 버튼은 왼쪽 아래로 이동 */
         .del-btn { position: absolute; bottom: 15px; right: 15px; background: none; border: none; color: #ff5555; font-size: 9px; cursor: pointer; opacity: 0; letter-spacing: 0.1em; transition: 0.2s;}
         .story-card:hover .del-btn { opacity: 0.5; }
         .del-btn:hover { opacity: 1 !important; text-decoration: underline; }
 
-        /* [수정] 챕터 디자인 컴팩트화 (3분의 1 사이즈) */
-        .chapter-divider {
-            width: 100%; display: flex; align-items: center; justify-content: center;
-            margin: 50px 0; position: relative; z-index: 5; height: 80px;
-        }
+        /* 컴팩트 마름모 챕터 (1/3 크기) */
+        .chapter-divider { width: 100%; display: flex; align-items: center; justify-content: center; margin: 50px 0; position: relative; z-index: 5; height: 80px; }
         .chapter-divider::before { content: ''; position: absolute; top: -30px; bottom: -30px; width: 1px; background: linear-gradient(to bottom, transparent, var(--c-sub), transparent); z-index: 0; }
-        
-        /* 마름모 초압축 (40px) */
-        .chapter-rhombus-bg {
-            position: absolute; width: 40px; height: 40px;
-            border: 1px solid var(--line); transform: rotate(45deg);
-            background: var(--c-bg); display: flex; align-items: center; justify-content: center; z-index: 1;
-        }
+        .chapter-rhombus-bg { position: absolute; width: 40px; height: 40px; border: 1px solid var(--line); transform: rotate(45deg); background: var(--c-bg); display: flex; align-items: center; justify-content: center; z-index: 1; }
         .chapter-rhombus-bg::after { content: ''; position: absolute; width: 28px; height: 28px; border: 1px solid rgba(209,189,160,0.2); }
-
-        /* 챕터 폰트 축소 및 핏 조정 */
-        .chapter-text-content {
-            position: relative; z-index: 2; text-align: center; display: flex; flex-direction: column; align-items: center;
-        }
+        .chapter-text-content { position: relative; z-index: 2; text-align: center; display: flex; flex-direction: column; align-items: center; }
         .chapter-num-display { font-size: 9px; font-weight: 800; letter-spacing: 0.3em; color: var(--c-main); margin-bottom: 2px; text-transform: uppercase; }
         .chapter-title-display { font-size: 16px; font-weight: 900; color: #fff; margin-bottom: 2px; letter-spacing: 0.05em; text-shadow: 0 0 10px rgba(0,0,0,0.8); }
         .chapter-sub-display { font-size: 9px; color: var(--c-sub); letter-spacing: 0.2em; margin-bottom: 2px; }
         .chapter-del { font-size: 9px; color: #ff5555; cursor: pointer; background: none; border: none; letter-spacing: 0.1em; opacity: 0.3; transition: 0.2s; }
         .chapter-text-content:hover .chapter-del { opacity: 1; }
 
-        /* 모달창 */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 999; display: none; justify-content: center; align-items: center; }
         .editor-box { width: 380px; background: #0a0b0d; border: 1px solid var(--line); border-top: 2px solid var(--c-main); padding: 30px; display: flex; flex-direction: column; gap: 15px; }
         .editor-tabs { display: flex; gap: 15px; border-bottom: 1px solid var(--line); padding-bottom: 10px; margin-bottom: 10px; }
@@ -144,11 +130,9 @@
         #form-story, #form-chapter { display: flex; flex-direction: column; gap: 12px; }
         #form-chapter { display: none; }
 
-        /* 캡처 안전 모드 */
         .capture-mode .story-card { backdrop-filter: none !important; }
         .capture-mode .pillar-img { filter: grayscale(0%) !important; }
         .capture-mode .card-img-memo { transform: rotate(0deg) scale(1) translate(0,0) !important; filter: grayscale(0%) !important; border-top-color: var(--c-main) !important;}
-
     </style>
 </head>
 <body>
@@ -279,7 +263,7 @@
         }
 
         window.onload = () => {
-            const saved = localStorage.getItem('oc_archive_v9');
+            const saved = localStorage.getItem('oc_archive_v10');
             if(saved) { 
                 const parsed = JSON.parse(saved);
                 appData = { ...appData, ...parsed }; 
@@ -308,7 +292,7 @@
             appData.c2.name = document.getElementById('c2-name').value; appData.c2.bio = document.getElementById('c2-bio').value;
             appData.theme.main = document.getElementById('theme-main').value; appData.theme.sub = document.getElementById('theme-sub').value;
             appData.bg.opacity = document.getElementById('bg-opacity').value; appData.bg.blur = document.getElementById('bg-blur').value;
-            try { localStorage.setItem('oc_archive_v9', JSON.stringify(appData)); } catch(e) {}
+            try { localStorage.setItem('oc_archive_v10', JSON.stringify(appData)); } catch(e) {}
         }
 
         function calcDday() {
@@ -353,39 +337,55 @@
         }
         function deleteItem(id) { appData.timeline = appData.timeline.filter(i => i.id !== id); saveData(); renderTimeline(); }
 
-        /* [수정] 메모지 기믹 및 정렬 흐름 강제 반영 */
+        /* [최강의 논리 구조] 챕터가 있든 없든 1열은 무조건 왼쪽에서부터 시작되도록 완벽 고정! */
         function renderTimeline() {
             const box = document.getElementById('timeline-box'); box.innerHTML = '';
-            let currentRowItems = []; let rowCount = 0; let storyCounter = 1; let chapterCounter = 1;
+            
+            // 데이터를 챕터 단위 그룹으로 묶기
+            let currentRows = []; 
+            let storyCounter = 1; 
+            let chapterCounter = 1;
 
-            function flushRow() {
-                if (currentRowItems.length === 0) return;
-                const rowEl = document.createElement('div'); rowEl.className = 'timeline-row';
-                if (rowCount % 2 !== 0) rowEl.style.flexDirection = 'row-reverse';
-                
-                currentRowItems.forEach(item => {
-                    /* [수정] 이미지를 카드 모서리에 붙은 메모지처럼 빼냄 */
-                    const imgHTML = item.img ? `<div class="card-img-memo" style="background-image: url(${item.img})"></div>` : '';
-                    const formattedNum = storyCounter.toString().padStart(2, '0');
+            // 그려주는 함수
+            function flushRows() {
+                for(let i=0; i<currentRows.length; i++) {
+                    const rowItems = currentRows[i];
+                    // i가 0(첫줄), 2(셋째줄)이면 짝수=왼쪽시작. i가 1, 3이면 홀수=오른쪽시작
+                    const isReverse = (i % 2 !== 0); 
+                    const isLastRow = (i === currentRows.length - 1);
                     
-                    rowEl.innerHTML += `
-                        <div class="story-card">
-                            <div class="card-no">No.${formattedNum}</div>
-                            ${imgHTML}
-                            <div class="card-date">${item.date}</div>
-                            <div class="card-title">${item.title}</div>
-                            <div class="card-desc">${item.content}</div>
-                            <button class="del-btn" data-html2canvas-ignore="true" onclick="deleteItem(${item.id})">삭제</button>
-                        </div>
-                    `;
-                    storyCounter++;
-                });
-                box.appendChild(rowEl); currentRowItems = []; rowCount++;
+                    const rowClass = isReverse ? 'timeline-row row-reverse' : 'timeline-row row-normal';
+                    const curveClass = !isLastRow ? ' has-curve' : '';
+
+                    let rowHtml = `<div class="${rowClass}${curveClass}">`;
+
+                    rowItems.forEach(item => {
+                        const imgHTML = item.img ? `<div class="card-img-memo" style="background-image: url(${item.img})"></div>` : '';
+                        const formattedNum = storyCounter.toString().padStart(2, '0');
+                        rowHtml += `
+                            <div class="story-card">
+                                <div class="card-no">No.${formattedNum}</div>
+                                ${imgHTML}
+                                <div class="card-date">${item.date}</div>
+                                <div class="card-title">${item.title}</div>
+                                <div class="card-desc">${item.content}</div>
+                                <button class="del-btn" data-html2canvas-ignore="true" onclick="deleteItem(${item.id})">삭제</button>
+                            </div>
+                        `;
+                        storyCounter++;
+                    });
+                    rowHtml += `</div>`;
+                    box.innerHTML += rowHtml;
+                }
+                currentRows = []; // 그리기 끝났으면 배열 초기화
             }
 
+            let tempRow = [];
             appData.timeline.forEach(item => {
                 if (item.type === 'chapter') {
-                    flushRow();
+                    if (tempRow.length > 0) { currentRows.push(tempRow); tempRow = []; }
+                    flushRows(); // 챕터 나오기 전에 쌓인 줄 다 그리기
+
                     const chNumFormat = appData.settings.numStyle === 'arabic' ? `CHAPTER ${chapterCounter.toString().padStart(2, '0')}` : `CHAPTER ${toRoman(chapterCounter)}`;
                     box.innerHTML += `
                         <div class="chapter-divider">
@@ -398,17 +398,19 @@
                             </div>
                         </div>
                     `;
-                    chapterCounter++; rowCount = 0;
+                    chapterCounter++;
                 } else {
-                    currentRowItems.push(item);
-                    if (currentRowItems.length === 3) flushRow();
+                    tempRow.push(item);
+                    if (tempRow.length === 3) { currentRows.push(tempRow); tempRow = []; }
                 }
             });
-            flushRow();
+            if (tempRow.length > 0) currentRows.push(tempRow);
+            flushRows(); // 마지막 남은 줄 그리기
+            
             const sb = document.getElementById('scroll-board'); sb.scrollTo({ top: sb.scrollHeight, behavior: 'smooth' });
         }
 
-        /* 렌더링 엔진 안정화 모드 */
+        /* 캡처 메모리 붕괴 억제 */
         function exportImage() {
             const wrapper = document.getElementById('capture-area'); const board = document.getElementById('scroll-board');
             const w = wrapper.offsetWidth; const h = board.scrollHeight;
